@@ -1012,6 +1012,29 @@ body.tv-mode .row:hover .card-w{opacity:1;}
 .rec-item:hover{background:rgba(255,255,255,.15);}
 .rec-del{margin-left:4px;opacity:.5;font-size:10px;}
 .rec-del:hover{opacity:1;}
+
+/* ══ TORRENT PLAYER ══ */
+#torrent-player{
+  position:absolute;inset:0;background:#000;
+  display:none;flex-direction:column;align-items:center;justify-content:center;z-index:2;
+}
+#torrent-player.active{display:flex;}
+#torrent-video{width:100%;height:100%;background:#000;display:none;}
+#torrent-loading{display:flex;flex-direction:column;align-items:center;gap:16px;color:var(--text2);font-size:14px;}
+.torrent-spinner{width:44px;height:44px;border:3px solid rgba(255,255,255,.1);border-top-color:var(--lime);border-radius:50%;animation:tspin .8s linear infinite;}
+@keyframes tspin{to{transform:rotate(360deg);}}
+#torrent-streams{display:none;flex-direction:column;gap:8px;width:100%;max-width:520px;padding:20px;max-height:100%;overflow-y:auto;}
+#torrent-streams h3{font-size:15px;font-weight:700;margin-bottom:6px;color:var(--text);}
+.torrent-stream-btn{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-radius:10px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);cursor:pointer;transition:all .2s;text-align:left;color:var(--text);width:100%;}
+.torrent-stream-btn:hover{background:rgba(255,255,255,.16);border-color:var(--lime);}
+.ts-name{font-size:13px;font-weight:600;line-height:1.4;}
+.ts-meta{font-size:11px;color:var(--lime);margin-top:3px;}
+.ts-size{font-size:11px;color:var(--text3);flex-shrink:0;margin-left:10px;}
+#torrent-progress{position:absolute;bottom:0;left:0;right:0;padding:10px 16px;background:rgba(0,0,0,.85);display:none;align-items:center;gap:10px;z-index:3;}
+#torrent-progress.show{display:flex;}
+#torrent-prog-bar{flex:1;height:4px;background:rgba(255,255,255,.1);border-radius:2px;overflow:hidden;}
+#torrent-prog-fill{height:100%;background:var(--lime);border-radius:2px;width:0%;transition:width .5s;}
+#torrent-prog-txt{font-size:11px;color:var(--text2);flex-shrink:0;white-space:nowrap;}
 </style>
 </head>
 <body>
@@ -1255,6 +1278,22 @@ body.tv-mode .row:hover .card-w{opacity:1;}
   </div>
   <div class="p-wrap" id="p-wrap" style="position:relative;">
     <iframe id="player-iframe" allowfullscreen allow="autoplay;fullscreen;picture-in-picture" referrerpolicy="no-referrer"></iframe>
+    <!-- TORRENT PLAYER -->
+    <div id="torrent-player">
+      <div id="torrent-loading">
+        <div class="torrent-spinner"></div>
+        <span id="torrent-status">Fetching streams...</span>
+      </div>
+      <div id="torrent-streams">
+        <h3>🧲 Select Stream Quality</h3>
+        <div id="torrent-stream-list"></div>
+      </div>
+      <video id="torrent-video" controls autoplay playsinline></video>
+      <div id="torrent-progress">
+        <div id="torrent-prog-bar"><div id="torrent-prog-fill"></div></div>
+        <span id="torrent-prog-txt">Buffering...</span>
+      </div>
+    </div>
     <!-- AUTO-NEXT OVERLAY — sits ON the video -->
     <div id="autonext-overlay">
       <div id="autonext-box">
@@ -1352,11 +1391,23 @@ function _initSupabase(){
 }
 
 const SERVERS=[
-  {n:'2Embed',    f:(id,t,s,e)=>t==='tv'?`https://www.2embed.cc/embedtv/${id}&s=${s||1}&e=${e||1}`:`https://www.2embed.cc/embed/${id}`},
-  {n:'VidSrc',    f:(id,t,s,e)=>t==='tv'?`https://vidsrc.to/embed/tv/${id}/${s||1}/${e||1}`:`https://vidsrc.to/embed/movie/${id}`},
-  {n:'VidSrc.cc', f:(id,t,s,e)=>t==='tv'?`https://vidsrc.cc/v2/embed/tv/${id}/${s||1}/${e||1}`:`https://vidsrc.cc/v2/embed/movie/${id}`},
-  {n:'SuperEmbed',f:(id,t,s,e)=>t==='tv'?`https://multiembed.mov/?video_id=${id}&tmdb=1&s=${s||1}&e=${e||1}`:`https://multiembed.mov/?video_id=${id}&tmdb=1`},
-  {n:'VidLink',   f:(id,t,s,e)=>t==='tv'?`https://vidlink.pro/tv/${id}/${s||1}/${e||1}?autoplay=true`:`https://vidlink.pro/movie/${id}?autoplay=true`},
+  // ── Tier 1: Cleanest (Low/No Ads) ──
+  {n:'VidLink',     f:(id,t,s,e)=>t==='tv'?`https://vidlink.pro/tv/${id}/${s||1}/${e||1}?autoplay=true`:`https://vidlink.pro/movie/${id}?autoplay=true`},
+  {n:'Videasy',     f:(id,t,s,e)=>t==='tv'?`https://player.videasy.net/tv/${id}/${s||1}/${e||1}`:`https://player.videasy.net/movie/${id}`},
+  {n:'VidFast',     f:(id,t,s,e)=>t==='tv'?`https://vidfast.pro/tv/${id}/${s||1}/${e||1}?autoPlay=true`:`https://vidfast.pro/movie/${id}?autoPlay=true`},
+  {n:'VidSrc Pro',  f:(id,t,s,e)=>t==='tv'?`https://vidsrc.pro/embed/tv/${id}/${s||1}/${e||1}`:`https://vidsrc.pro/embed/movie/${id}`},
+  {n:'EmbedSu',     f:(id,t,s,e)=>t==='tv'?`https://embed.su/embed/tv/${id}/${s||1}/${e||1}`:`https://embed.su/embed/movie/${id}`},
+  {n:'PStream',     f:(id,t,s,e)=>t==='tv'?`https://iframe.pstream.org/media/tmdb-tv-${id}/${s||1}/${e||1}`:`https://iframe.pstream.org/media/tmdb-movie-${id}`},
+  {n:'Vidora',      f:(id,t,s,e)=>t==='tv'?`https://vidora.su/tv/${id}/${s||1}/${e||1}`:`https://vidora.su/movie/${id}`},
+  // ── Tier 2: Fallback (some ads) ──
+  {n:'AutoEmbed',   f:(id,t,s,e)=>t==='tv'?`https://autoembed.co/tv/tmdb/${id}-${s||1}-${e||1}`:`https://autoembed.co/movie/tmdb/${id}`},
+  {n:'SmashyStream',f:(id,t,s,e)=>t==='tv'?`https://player.smashy.stream/tv/${id}?s=${s||1}&e=${e||1}`:`https://player.smashy.stream/movie/${id}`},
+  {n:'VidSrc',      f:(id,t,s,e)=>t==='tv'?`https://vidsrc.to/embed/tv/${id}/${s||1}/${e||1}`:`https://vidsrc.to/embed/movie/${id}`},
+  {n:'VidSrc.cc',   f:(id,t,s,e)=>t==='tv'?`https://vidsrc.cc/v2/embed/tv/${id}/${s||1}/${e||1}`:`https://vidsrc.cc/v2/embed/movie/${id}`},
+  {n:'2Embed',      f:(id,t,s,e)=>t==='tv'?`https://www.2embed.cc/embedtv/${id}&s=${s||1}&e=${e||1}`:`https://www.2embed.cc/embed/${id}`},
+  {n:'SuperEmbed',  f:(id,t,s,e)=>t==='tv'?`https://multiembed.mov/?video_id=${id}&tmdb=1&s=${s||1}&e=${e||1}`:`https://multiembed.mov/?video_id=${id}&tmdb=1`},
+  // ── Torrentio + WebTorrent (fallback) ──
+  {n:'🧲 Torrent',  torrent:true},
 ];
 const GM={28:'Action',12:'Adventure',16:'Animation',35:'Comedy',80:'Crime',99:'Documentary',18:'Drama',10751:'Family',14:'Fantasy',36:'History',27:'Horror',10749:'Romance',878:'Sci-Fi',53:'Thriller',10752:'War',10759:'Action & Adventure',10765:'Sci-Fi & Fantasy'};
 const gn=ids=>ids&&ids[0]?GM[ids[0]]||'':'';
@@ -2373,6 +2424,16 @@ async function rateIt(r){await rateTp(r);}
 // ── PLAYER ──
 async function openPlayer(id,type,title,m,season,ep){
   closeDetail();
+  // ── Fullscreen IMMEDIATELY — must be in same user gesture tick, before any await ──
+  const _modal=document.getElementById('player-modal');
+  _modal.classList.add('open');
+  document.body.style.overflow='hidden';
+  try{
+    if(_modal.requestFullscreen)_modal.requestFullscreen({navigationUI:'hide'}).catch(()=>{});
+    else if(_modal.webkitRequestFullscreen)_modal.webkitRequestFullscreen();
+    else if(_modal.mozRequestFullScreen)_modal.mozRequestFullScreen();
+    else if(_modal.msRequestFullscreen)_modal.msRequestFullscreen();
+  }catch(_){}
   curPlayerSeason=season||1;
   curPlayerEp=ep||1;
   curPlayerMedia=m;
@@ -2398,15 +2459,6 @@ async function openPlayer(id,type,title,m,season,ep){
     epRow.style.display='none';
     document.getElementById('ep-panel').classList.remove('open');
   }
-  document.getElementById('player-modal').classList.add('open');
-  document.body.style.overflow='hidden';
-  // Request fullscreen — works correctly now that we removed requestFullscreen on p-wrap
-  // Use document.documentElement so our overlays remain visible inside fullscreen
-  const _fsEl = document.getElementById('player-modal');
-  try{
-    if(_fsEl.requestFullscreen) _fsEl.requestFullscreen({navigationUI:'hide'}).catch(()=>{});
-    else if(_fsEl.webkitRequestFullscreen) _fsEl.webkitRequestFullscreen();
-  }catch(_){}
   if(m&&user){
     clearInterval(progTimer);
     let prog=0;
@@ -2467,8 +2519,149 @@ function buildSrvBar(id,type){
   });
 }
 function loadSrv(id,type,i){
-  const url=SERVERS[i].f(id,type,curPlayerSeason,curPlayerEp);
-  document.getElementById('player-iframe').src=USE_PROXY?PROXY+encodeURIComponent(url):url;
+  const iframe=document.getElementById('player-iframe');
+  const tp=document.getElementById('torrent-player');
+  if(SERVERS[i]&&SERVERS[i].torrent){
+    // Stop any existing WebTorrent
+    if(wtClient){try{wtClient.destroy();}catch(_){}wtClient=null;}
+    iframe.src='';
+    iframe.style.display='none';
+    tp.classList.add('active');
+    loadTorrentSrv(id,type);
+  }else{
+    // Hide torrent player, show iframe
+    tp.classList.remove('active');
+    iframe.style.display='';
+    if(wtClient){try{wtClient.destroy();}catch(_){}wtClient=null;}
+    const url=SERVERS[i].f(id,type,curPlayerSeason,curPlayerEp);
+    iframe.src=USE_PROXY?PROXY+encodeURIComponent(url):url;
+  }
+}
+
+// ── WEBTORRENT STATE ──
+let wtClient=null,wtLoaded=false;
+
+function _loadWTScript(cb){
+  if(wtLoaded){cb();return;}
+  const s=document.createElement('script');
+  s.src='https://cdn.jsdelivr.net/npm/webtorrent@latest/webtorrent.min.js';
+  s.onload=()=>{wtLoaded=true;cb();};
+  s.onerror=()=>{
+    document.getElementById('torrent-status').textContent='⚠️ WebTorrent failed to load. Check your connection.';
+  };
+  document.head.appendChild(s);
+}
+
+async function loadTorrentSrv(id,type){
+  const loadingEl=document.getElementById('torrent-loading');
+  const streamsEl=document.getElementById('torrent-streams');
+  const videoEl=document.getElementById('torrent-video');
+  const progressEl=document.getElementById('torrent-progress');
+  const statusEl=document.getElementById('torrent-status');
+
+  // Reset UI
+  loadingEl.style.display='flex';
+  streamsEl.style.display='none';
+  videoEl.style.display='none';
+  progressEl.classList.remove('show');
+  statusEl.textContent='Getting IMDB ID...';
+
+  // Step 1: Get IMDB ID
+  let imdbId=null;
+  try{
+    const r=await fetch(`${TMDB}/${type}/${id}/external_ids?api_key=${TMDB_KEY}`);
+    const d=await r.json();
+    imdbId=d.imdb_id;
+  }catch(e){}
+
+  if(!imdbId){
+    statusEl.textContent='⚠️ Could not find IMDB ID for this title.';
+    return;
+  }
+
+  // Step 2: Fetch Torrentio streams
+  statusEl.textContent='Searching Torrentio for streams...';
+  let streams=[];
+  try{
+    const endpoint=type==='tv'
+      ?`https://torrentio.strem.fun/stream/series/${imdbId}:${curPlayerSeason}:${curPlayerEp}.json`
+      :`https://torrentio.strem.fun/stream/movie/${imdbId}.json`;
+    const r=await fetch(endpoint);
+    const d=await r.json();
+    streams=(d.streams||[]).filter(s=>s.infoHash||s.url).slice(0,12);
+  }catch(e){}
+
+  if(!streams.length){
+    statusEl.textContent='⚠️ No streams found on Torrentio. Try another server.';
+    return;
+  }
+
+  // Step 3: Show stream picker
+  loadingEl.style.display='none';
+  streamsEl.style.display='flex';
+  const list=document.getElementById('torrent-stream-list');
+  list.innerHTML='';
+
+  streams.forEach(stream=>{
+    const name=(stream.name||'Unknown Source').split('\n')[0].slice(0,70);
+    const title=stream.title||'';
+    const quality=['4K','2160p','1080p','720p','480p'].find(q=>(name+title).includes(q))||'';
+    const size=title.match(/💾\s*([\d.]+\s*\w+)/)?.[1]||'';
+    const seeders=title.match(/👤\s*(\d+)/)?.[1]||'';
+
+    const btn=document.createElement('button');
+    btn.className='torrent-stream-btn';
+    btn.innerHTML=`
+      <div style="flex:1;min-width:0;">
+        <div class="ts-name">${name}</div>
+        <div class="ts-meta">${quality?`🎬 ${quality.replace('2160p','4K')}`:''}${seeders?` · 👤 ${seeders} seeders`:''}</div>
+      </div>
+      ${size?`<div class="ts-size">${size}</div>`:''}`;
+    btn.onclick=()=>_playTorrent(stream,videoEl,progressEl,streamsEl);
+    list.appendChild(btn);
+  });
+}
+
+function _playTorrent(stream,videoEl,progressEl,streamsEl){
+  streamsEl.style.display='none';
+  document.getElementById('torrent-loading').style.display='flex';
+  document.getElementById('torrent-status').textContent='Loading WebTorrent engine...';
+
+  _loadWTScript(()=>{
+    if(wtClient){try{wtClient.destroy();}catch(_){}}
+    wtClient=new WebTorrent();
+
+    const trackers=(stream.sources||[]);
+    const magnet=stream.url||
+      `magnet:?xt=urn:btih:${stream.infoHash}&dn=${encodeURIComponent(stream.name||'')}${trackers.map(t=>'&tr='+encodeURIComponent(t)).join('')}`;
+
+    document.getElementById('torrent-status').textContent='Connecting to peers...';
+
+    wtClient.add(magnet,torrent=>{
+      document.getElementById('torrent-loading').style.display='none';
+      videoEl.style.display='block';
+      progressEl.classList.add('show');
+
+      // Pick the largest file (the video)
+      const file=torrent.files.reduce((a,b)=>a.length>b.length?a:b);
+      file.renderTo(videoEl,{autoplay:true});
+
+      torrent.on('download',()=>{
+        const pct=Math.round(torrent.progress*100);
+        const speed=(torrent.downloadSpeed/1024/1024).toFixed(1);
+        const peers=torrent.numPeers;
+        document.getElementById('torrent-prog-fill').style.width=pct+'%';
+        document.getElementById('torrent-prog-txt').textContent=
+          `${pct}% · ↓${speed}MB/s · ${peers} peers`;
+      });
+    });
+
+    wtClient.on('error',err=>{
+      document.getElementById('torrent-loading').style.display='flex';
+      document.getElementById('torrent-status').textContent='⚠️ '+err.message;
+      videoEl.style.display='none';
+    });
+  });
 }
 function buildEpPanel(tvId,type,showTitle){
   const list=document.getElementById('ep-panel-list');
@@ -2565,6 +2758,12 @@ function cancelAutoNext(){
 function closePlayer(){
   clearInterval(progTimer);clearTimeout(nextEpTimer);cancelAutoNext();
   document.getElementById('player-iframe').src='';
+  // Destroy WebTorrent if active
+  if(wtClient){try{wtClient.destroy();}catch(_){}wtClient=null;}
+  const tp=document.getElementById('torrent-player');
+  if(tp)tp.classList.remove('active');
+  const tv=document.getElementById('torrent-video');
+  if(tv){tv.pause();tv.src='';tv.style.display='none';}
   document.getElementById('ep-panel').classList.remove('open');
   document.getElementById('player-modal').classList.remove('open');
   document.body.style.overflow='';
