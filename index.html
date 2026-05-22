@@ -1307,7 +1307,7 @@ body.tv-mode .row:hover .card-w{opacity:1;}
 const TMDB_KEY='847ec7d26110a21ab7c93e980ef69c87',TMDB='https://api.themoviedb.org/3',IMG='https://image.tmdb.org/t/p/';
 const SB_URL='https://gucblbvfzuraaozswfwd.supabase.co',SB_ANON='sb_publishable_T5n5dt0F_Hbqbyf0mReLPQ_PMaZMjWY';
 const PROXY='https://zeeyus-proxy.multippurps.workers.dev/?url=';
-const USE_PROXY=true; // Worker strips ads
+const USE_PROXY=false; // Disabled — proxy breaks most embed servers
 
 // ── SUPABASE — dynamic load so CDN failure never crashes the app ──
 const _sbStub={
@@ -1352,11 +1352,20 @@ function _initSupabase(){
 }
 
 const SERVERS=[
-  {n:'2Embed',    f:(id,t,s,e)=>t==='tv'?`https://www.2embed.cc/embedtv/${id}&s=${s||1}&e=${e||1}`:`https://www.2embed.cc/embed/${id}`},
+  // 1. VidLink — best UI, no autoplay so browser doesn't force-mute
+  {n:'VidLink',   f:(id,t,s,e)=>t==='tv'?`https://vidlink.pro/tv/${id}/${s||1}/${e||1}`:`https://vidlink.pro/movie/${id}`},
+  // 2. VidSrc — most stable, huge library
   {n:'VidSrc',    f:(id,t,s,e)=>t==='tv'?`https://vidsrc.to/embed/tv/${id}/${s||1}/${e||1}`:`https://vidsrc.to/embed/movie/${id}`},
+  // 3. EmbedSu — clean, fast, reliable
+  {n:'EmbedSu',   f:(id,t,s,e)=>t==='tv'?`https://embed.su/embed/tv/${id}/${s||1}/${e||1}`:`https://embed.su/embed/movie/${id}`},
+  // 4. VidSrc.cc — good backup when vidsrc.to is slow
   {n:'VidSrc.cc', f:(id,t,s,e)=>t==='tv'?`https://vidsrc.cc/v2/embed/tv/${id}/${s||1}/${e||1}`:`https://vidsrc.cc/v2/embed/movie/${id}`},
+  // 5. SuperEmbed — auto-tries multiple sources internally
   {n:'SuperEmbed',f:(id,t,s,e)=>t==='tv'?`https://multiembed.mov/?video_id=${id}&tmdb=1&s=${s||1}&e=${e||1}`:`https://multiembed.mov/?video_id=${id}&tmdb=1`},
-  {n:'VidLink',   f:(id,t,s,e)=>t==='tv'?`https://vidlink.pro/tv/${id}/${s||1}/${e||1}?autoplay=true`:`https://vidlink.pro/movie/${id}?autoplay=true`},
+  // 6. AutoEmbed — solid last resort, wide coverage
+  {n:'AutoEmbed', f:(id,t,s,e)=>t==='tv'?`https://autoembed.co/tv/tmdb/${id}-${s||1}-${e||1}`:`https://autoembed.co/movie/tmdb/${id}`},
+  // 7. 2Embed — works but more ads
+  {n:'2Embed',    f:(id,t,s,e)=>t==='tv'?`https://www.2embed.cc/embedtv/${id}?s=${s||1}&e=${e||1}`:`https://www.2embed.cc/embed/${id}`},
 ];
 const GM={28:'Action',12:'Adventure',16:'Animation',35:'Comedy',80:'Crime',99:'Documentary',18:'Drama',10751:'Family',14:'Fantasy',36:'History',27:'Horror',10749:'Romance',878:'Sci-Fi',53:'Thriller',10752:'War',10759:'Action & Adventure',10765:'Sci-Fi & Fantasy'};
 const gn=ids=>ids&&ids[0]?GM[ids[0]]||'':'';
@@ -1369,6 +1378,7 @@ let curDetail=null,curType='movie',heroMuted=true,heroTrailerKey=null;
 let curPlayerSeason=1,curPlayerEp=1,curPlayerMedia=null;
 let epPanelEps=[],nextEpTimer=null,heroStopObserver=null;
 let searchTimer=null,progTimer=null,pendingPlay=null;
+let _cwSaveFn=null; // module-level so closePlayer can trigger a final save
 let hoverTimer=null,trailerCache={};
 let seeAllState={type:'',genres:'',mediaType:'movie',page:1,title:''};
 let seeAllItems=[];
@@ -2264,19 +2274,45 @@ async function loadTpSeasons(tvId,totalSeasons){
 async function loadTpEpisodes(tvId,season){
   const list=document.getElementById('tp-ep-list');
   list.innerHTML='<div style="color:var(--text3);padding:10px 0;font-size:13px;">Loading...</div>';
+
+  // Fetch CW progress for this show so we can highlight watched episodes
+  let cwData=null;
+  try{cwData=await getCwProgress(tvId,'tv');}catch(_){}
+
   try{
     const d=await api(`/tv/${tvId}/season/${season}`,'');
     const eps=d.episodes||[];
     const title=curDetail?curDetail.title||curDetail.name||'':'';
     list.innerHTML='';
     eps.forEach(ep=>{
+      // Determine per-episode watch state
+      let epWatchPct=0,epWatched=false;
+      if(cwData){
+        const cs=cwData.season||1,ce=cwData.episode||1,cp=cwData.progress||0;
+        if(cs>season) epWatched=true;                          // past this whole season
+        else if(cs===season&&ce>ep.episode_number) epWatched=true; // past this episode
+        else if(cs===season&&ce===ep.episode_number) epWatchPct=cp; // currently watching
+      }
+
       const thumb=ep.still_path?IMG+'w300'+ep.still_path:'';
       const el=document.createElement('div');el.className='tp-ep-item';
       el.innerHTML=`
         <div class="tp-ep-num-badge">${ep.episode_number}</div>
-        <div class="tp-ep-thumb">
-          ${thumb?`<img src="${thumb}" alt="" loading="lazy" style="width:100%;height:100%;object-fit:cover;display:block;border-radius:6px" onerror="this.style.display='none'">`:`<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:var(--card);border-radius:6px"><svg viewBox="0 0 24 24" style="width:22px;height:22px;fill:none;stroke:var(--text3);stroke-width:1.5"><polygon points="5 3 19 12 5 21 5 3"/></svg></div>`}
+        <div class="tp-ep-thumb" style="position:relative;">
+          ${thumb
+            ?`<img src="${thumb}" alt="" loading="lazy" style="width:100%;height:100%;object-fit:cover;display:block;border-radius:6px" onerror="this.style.display='none'">`
+            :`<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:var(--card);border-radius:6px"><svg viewBox="0 0 24 24" style="width:22px;height:22px;fill:none;stroke:var(--text3);stroke-width:1.5"><polygon points="5 3 19 12 5 21 5 3"/></svg></div>`}
           <div class="tp-ep-thumb-play"><svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg></div>
+          ${epWatched
+            ?`<div style="position:absolute;inset:0;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;border-radius:6px;pointer-events:none;">
+                <svg viewBox="0 0 24 24" style="width:22px;height:22px;fill:none;stroke:var(--lime);stroke-width:2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              </div>`
+            :''}
+          ${epWatchPct>0&&!epWatched
+            ?`<div style="position:absolute;bottom:0;left:0;right:0;height:3px;background:rgba(255,255,255,.15);border-radius:0 0 6px 6px;pointer-events:none;">
+                <div style="width:${epWatchPct}%;height:100%;background:var(--lime);border-radius:0 0 6px 6px;"></div>
+              </div>`
+            :''}
         </div>
         <div class="tp-ep-info">
           <div class="tp-ep-name-row">
@@ -2380,12 +2416,24 @@ async function openPlayer(id,type,title,m,season,ep){
   document.getElementById('p-title').textContent=(title||'')+epTitle;
   buildSrvBar(id,type);
   loadSrv(id,type,0);
-  // Episode controls row
+
+  // ── Show player & request fullscreen IMMEDIATELY before any async ops ──
+  // This keeps the user-gesture chain unbroken so fullscreen is allowed.
+  document.getElementById('player-modal').classList.add('open');
+  document.body.style.overflow='hidden';
+  const _fsEl=document.getElementById('player-modal');
+  try{
+    if(_fsEl.requestFullscreen) _fsEl.requestFullscreen({navigationUI:'hide'}).catch(()=>{});
+    else if(_fsEl.webkitRequestFullscreen) _fsEl.webkitRequestFullscreen();
+    else if(_fsEl.mozRequestFullScreen) _fsEl.mozRequestFullScreen();
+    else if(_fsEl.msRequestFullscreen) _fsEl.msRequestFullscreen();
+  }catch(_){}
+
+  // ── Episode controls row (async after fullscreen is triggered) ──
   const epRow=document.getElementById('p-ep-row');
   if(type==='tv'){
     epRow.style.display='flex';
     document.getElementById('p-ep-label').textContent=`S${curPlayerSeason} · E${curPlayerEp}`;
-    // Preload episodes for panel
     try{
       const d=await api(`/tv/${id}/season/${curPlayerSeason}`,'');
       epPanelEps=d.episodes||[];
@@ -2398,27 +2446,24 @@ async function openPlayer(id,type,title,m,season,ep){
     epRow.style.display='none';
     document.getElementById('ep-panel').classList.remove('open');
   }
-  document.getElementById('player-modal').classList.add('open');
-  document.body.style.overflow='hidden';
-  // Request fullscreen — works correctly now that we removed requestFullscreen on p-wrap
-  // Use document.documentElement so our overlays remain visible inside fullscreen
-  const _fsEl = document.getElementById('player-modal');
-  try{
-    if(_fsEl.requestFullscreen) _fsEl.requestFullscreen({navigationUI:'hide'}).catch(()=>{});
-    else if(_fsEl.webkitRequestFullscreen) _fsEl.webkitRequestFullscreen();
-  }catch(_){}
+
+  // ── Continue Watching progress tracking ──
   if(m&&user){
     clearInterval(progTimer);
+    _cwSaveFn=null;
     let prog=0;
     const lsKey='zeeyus_cw_'+user.id;
     const _epKey=`zeeyus_eprog_${id}_${type}`;
-    // Always write current ep to dedicated key immediately
+
+    // Save current episode to dedicated localStorage key for fast restore
     const _saveEpKey=()=>{
       try{localStorage.setItem(_epKey,JSON.stringify({season:curPlayerSeason,episode:curPlayerEp,ts:Date.now()}));}catch(_){}
     };
     _saveEpKey();
+
     const cwRecord={user_id:user.id,media_id:String(id),media_type:type,media_data:m,progress:1,season:curPlayerSeason,episode:curPlayerEp,updated_at:new Date().toISOString()};
-    // Save to localStorage — always use CURRENT season/ep globals (not closure)
+
+    // Save to localStorage backup
     const _saveLs=(p)=>{
       try{
         let ls=JSON.parse(localStorage.getItem(lsKey)||'[]');
@@ -2427,30 +2472,58 @@ async function openPlayer(id,type,title,m,season,ep){
         localStorage.setItem(lsKey,JSON.stringify(ls.slice(0,20)));
       }catch(e){}
     };
-    // Load existing progress from Supabase
+
+    // Helper: delete from CW (film finished)
+    const _deleteCw=()=>{
+      sb.from('zeeyus_continue').delete().eq('user_id',user.id).eq('media_id',String(id)).eq('media_type',type).then(()=>{});
+      try{
+        let ls=JSON.parse(localStorage.getItem(lsKey)||'[]');
+        ls=ls.filter(i=>!(i.media_id===String(id)&&i.media_type===type));
+        localStorage.setItem(lsKey,JSON.stringify(ls));
+        localStorage.removeItem(_epKey);
+      }catch(_){}
+      loadContinueWatching();
+    };
+
+    // Load existing progress from Supabase so we don't reset it
     sb.from('zeeyus_continue').select('progress').eq('user_id',user.id).eq('media_id',String(id)).eq('media_type',type).single()
-      .then(({data:existing})=>{if(existing&&existing.progress)prog=existing.progress;});
+      .then(({data:existing})=>{if(existing&&existing.progress)prog=existing.progress;}).catch(()=>{});
+
     const startTime=Date.now();
-    const _saveProgress=(forceRefresh)=>{
+
+    // Module-level save function so closePlayer can call it for a final save
+    _cwSaveFn=(forceRefresh)=>{
+      _saveEpKey();
       const elapsedMins=Math.floor((Date.now()-startTime)/60000);
-      const runtime=m.runtime||m.episode_run_time?.[0]||100;
-      const newProg=Math.min(Math.round(prog+(elapsedMins/runtime)*100),98);
+      const runtime=m.runtime||m.episode_run_time?.[0]||90;
+      const newProg=Math.min(Math.round(prog+(elapsedMins/runtime)*100),99);
       if(newProg>prog)prog=newProg;
+
+      // ── If >=95% — film/episode is finished, remove from CW ──
+      if(prog>=95){
+        _deleteCw();
+        clearInterval(progTimer);
+        return;
+      }
+
       _saveLs(prog);
       sb.from('zeeyus_continue').upsert({
         user_id:user.id,media_id:String(id),media_type:type,
         media_data:m,progress:prog,season:curPlayerSeason,episode:curPlayerEp,
         updated_at:new Date().toISOString()
-      },{onConflict:'user_id,media_id,media_type'}).then(()=>{if(forceRefresh)loadContinueWatching();});
+      },{onConflict:'user_id,media_id,media_type'}).then(()=>{if(forceRefresh)loadContinueWatching();}).catch(()=>{});
     };
-    progTimer=setInterval(()=>_saveProgress(false),180000); // every 3 min
-    // Save immediately on open
+
+    // Save every 30 seconds (was 3 min — too infrequent)
+    progTimer=setInterval(()=>_cwSaveFn(false),30000);
+
+    // Save immediately on open (progress=1 so it appears in CW right away)
     _saveLs(1);
     sb.from('zeeyus_continue').upsert({
       user_id:user.id,media_id:String(id),media_type:type,
       media_data:m,progress:Math.max(prog,1),season:curPlayerSeason,episode:curPlayerEp,
       updated_at:new Date().toISOString()
-    },{onConflict:'user_id,media_id,media_type'}).then(()=>{loadContinueWatching();});
+    },{onConflict:'user_id,media_id,media_type'}).then(()=>{loadContinueWatching();}).catch(()=>{});
   }
 }
 function buildSrvBar(id,type){
@@ -2564,6 +2637,8 @@ function cancelAutoNext(){
 }
 function closePlayer(){
   clearInterval(progTimer);clearTimeout(nextEpTimer);cancelAutoNext();
+  // Final progress save so nothing is lost when user closes player
+  if(_cwSaveFn){try{_cwSaveFn(true);}catch(_){} _cwSaveFn=null;}
   document.getElementById('player-iframe').src='';
   document.getElementById('ep-panel').classList.remove('open');
   document.getElementById('player-modal').classList.remove('open');
