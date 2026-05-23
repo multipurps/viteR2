@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">
 <title>Zeeyus</title>
 <meta name="theme-color" content="#080810">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -37,12 +37,76 @@ body{
 :root{--sab:0px;}
 body{padding-bottom:0!important;margin-bottom:0!important;}
 /* safe area forced off */
-html,body{width:100%;height:100%;margin:0;padding:0;background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;overflow-x:hidden;}
+html,body{width:100%;height:100%;margin:0;padding:0;background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;overflow-x:hidden;touch-action:pan-y;-webkit-user-select:none;user-select:none;}
 a{text-decoration:none;color:inherit;}
 button{border:none;background:none;cursor:pointer;font-family:inherit;color:inherit;}
-input{font-family:inherit;}
+input{font-family:inherit;-webkit-user-select:auto;user-select:auto;}
 ::-webkit-scrollbar{width:3px;height:3px;}
 ::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.12);border-radius:3px;}
+
+/* ── PROFILE PAGE ── */
+#profile-page{
+  display:none;padding:0 clamp(16px,4vw,52px);
+  padding-top:calc(var(--safe-top) + 90px);
+  padding-bottom:120px;
+}
+#profile-page.active{display:block;}
+.prof-hero{
+  display:flex;align-items:center;gap:18px;
+  margin-bottom:28px;
+  padding:22px 20px;
+  background:var(--bg3);border:1px solid var(--border);
+  border-radius:16px;
+}
+.prof-avatar-big{
+  width:68px;height:68px;border-radius:50%;flex-shrink:0;
+  background:var(--purple);
+  display:flex;align-items:center;justify-content:center;
+  font-size:28px;font-weight:700;color:#fff;
+  border:3px solid rgba(255,255,255,.12);
+}
+.prof-info{flex:1;min-width:0;}
+.prof-name{font-size:18px;font-weight:700;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.prof-email{font-size:12px;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.prof-section{margin-bottom:24px;}
+.prof-section-title{font-size:12px;font-weight:700;color:var(--text3);letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px;}
+.prof-card{
+  background:var(--bg3);border:1px solid var(--border);
+  border-radius:12px;overflow:hidden;
+}
+.prof-item{
+  display:flex;align-items:center;gap:14px;
+  padding:14px 18px;cursor:pointer;
+  transition:background .15s;border-bottom:1px solid var(--border);
+}
+.prof-item:last-child{border-bottom:none;}
+.prof-item:active{background:rgba(255,255,255,.05);}
+.prof-item svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;flex-shrink:0;color:var(--text2);}
+.prof-item-label{flex:1;font-size:14px;font-weight:500;}
+.prof-item-chevron{width:16px;height:16px;fill:none;stroke:var(--text3);stroke-width:2;flex-shrink:0;}
+.prof-item-badge{
+  font-size:11px;font-weight:700;padding:2px 8px;
+  border-radius:20px;background:var(--lime);color:#0a0a0a;flex-shrink:0;
+}
+.prof-stat-row{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:10px;
+  margin-bottom:24px;
+}
+.prof-stat{
+  background:var(--bg3);border:1px solid var(--border);border-radius:12px;
+  padding:16px 12px;text-align:center;
+}
+.prof-stat-num{font-size:22px;font-weight:800;color:var(--lime);}
+.prof-stat-lbl{font-size:10px;color:var(--text2);margin-top:3px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;}
+.prof-signout{
+  width:100%;padding:14px;border-radius:12px;
+  background:rgba(255,60,60,.1);border:1px solid rgba(255,60,60,.25);
+  color:#ff4444;font-size:14px;font-weight:600;
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  cursor:pointer;transition:background .2s;margin-top:8px;
+}
+.prof-signout:active{background:rgba(255,60,60,.2);}
+.prof-signout svg{width:18px;height:18px;stroke:#ff4444;fill:none;stroke-width:2;}
 
 /* ══ SPLASH ══ */
 #splash{
@@ -462,7 +526,7 @@ body.tv-mode .row{overflow-x:hidden;cursor:default;scroll-snap-type:none;}
 .p-close svg{width:18px;height:18px;stroke:white;stroke-width:2;fill:none;}
 .p-wrap{flex:1;position:relative;overflow:hidden;}
 #player-iframe{width:100%;height:100%;border:none;}
-/* ══ SERVER BAR ══ */
+/* Server bar — hidden in fullscreen, shown when not fullscreen */
 .srv-bar{
   padding:10px 14px;display:flex;gap:7px;
   overflow-x:auto;flex-shrink:0;
@@ -470,8 +534,49 @@ body.tv-mode .row{overflow-x:hidden;cursor:default;scroll-snap-type:none;}
   background:rgba(0,0,0,.85);
   scrollbar-width:none;
   padding-bottom:calc(10px + var(--safe-bot));
+  transition:opacity .2s;
 }
 .srv-bar::-webkit-scrollbar{display:none;}
+/* Hide header + server bar when in fullscreen */
+:fullscreen .p-top,
+:-webkit-full-screen .p-top,
+:-moz-full-screen .p-top,
+:fullscreen .srv-bar,
+:-webkit-full-screen .srv-bar,
+:-moz-full-screen .srv-bar,
+:fullscreen #p-ep-row,
+:-webkit-full-screen #p-ep-row,
+:-moz-full-screen #p-ep-row{
+  display:none!important;
+}
+/* Floating server toggle button — visible only in fullscreen */
+#srv-toggle-btn{
+  position:absolute;top:12px;right:12px;z-index:50;
+  width:38px;height:38px;border-radius:50%;
+  background:rgba(0,0,0,.6);border:1px solid rgba(255,255,255,.2);
+  display:none;align-items:center;justify-content:center;cursor:pointer;
+  backdrop-filter:blur(8px);
+}
+#srv-toggle-btn svg{width:18px;height:18px;stroke:white;fill:none;stroke-width:2;}
+:fullscreen #srv-toggle-btn,
+:-webkit-full-screen #srv-toggle-btn,
+:-moz-full-screen #srv-toggle-btn{display:flex!important;}
+/* Floating server picker panel in fullscreen */
+#srv-fs-panel{
+  position:absolute;top:58px;right:12px;z-index:51;
+  background:rgba(10,10,20,.92);border:1px solid rgba(255,255,255,.15);
+  border-radius:12px;padding:8px;
+  display:none;flex-direction:column;gap:4px;
+  backdrop-filter:blur(12px);min-width:130px;
+}
+#srv-fs-panel.open{display:flex;}
+.srv-fs-btn{
+  padding:8px 14px;border-radius:8px;
+  font-size:12px;font-weight:600;cursor:pointer;
+  color:var(--text2);background:transparent;
+  text-align:left;transition:background .15s;
+}
+.srv-fs-btn:hover,.srv-fs-btn.on{background:var(--lime);color:#0a0a0a;}
 .srv-btn{
   flex-shrink:0;padding:7px 16px;border-radius:20px;
   font-size:12px;font-weight:600;
@@ -1255,6 +1360,12 @@ body.tv-mode .row:hover .card-w{opacity:1;}
   </div>
   <div class="p-wrap" id="p-wrap" style="position:relative;">
     <iframe id="player-iframe" allowfullscreen allow="autoplay;fullscreen;picture-in-picture" referrerpolicy="no-referrer"></iframe>
+    <!-- Floating server toggle — visible only in fullscreen -->
+    <button id="srv-toggle-btn" onclick="toggleSrvFsPanel()">
+      <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+    </button>
+    <!-- Floating server picker panel -->
+    <div id="srv-fs-panel"></div>
     <!-- AUTO-NEXT OVERLAY — sits ON the video -->
     <div id="autonext-overlay">
       <div id="autonext-box">
@@ -1360,12 +1471,8 @@ const SERVERS=[
   {n:'EmbedSu',   f:(id,t,s,e)=>t==='tv'?`https://embed.su/embed/tv/${id}/${s||1}/${e||1}`:`https://embed.su/embed/movie/${id}`},
   // 4. VidSrc.cc — good backup when vidsrc.to is slow
   {n:'VidSrc.cc', f:(id,t,s,e)=>t==='tv'?`https://vidsrc.cc/v2/embed/tv/${id}/${s||1}/${e||1}`:`https://vidsrc.cc/v2/embed/movie/${id}`},
-  // 5. SuperEmbed — auto-tries multiple sources internally
-  {n:'SuperEmbed',f:(id,t,s,e)=>t==='tv'?`https://multiembed.mov/?video_id=${id}&tmdb=1&s=${s||1}&e=${e||1}`:`https://multiembed.mov/?video_id=${id}&tmdb=1`},
-  // 6. AutoEmbed — solid last resort, wide coverage
+  // 5. AutoEmbed — solid last resort, wide coverage
   {n:'AutoEmbed', f:(id,t,s,e)=>t==='tv'?`https://autoembed.co/tv/tmdb/${id}-${s||1}-${e||1}`:`https://autoembed.co/movie/tmdb/${id}`},
-  // 7. 2Embed — works but more ads
-  {n:'2Embed',    f:(id,t,s,e)=>t==='tv'?`https://www.2embed.cc/embedtv/${id}?s=${s||1}&e=${e||1}`:`https://www.2embed.cc/embed/${id}`},
 ];
 const GM={28:'Action',12:'Adventure',16:'Animation',35:'Comedy',80:'Crime',99:'Documentary',18:'Drama',10751:'Family',14:'Fantasy',36:'History',27:'Horror',10749:'Romance',878:'Sci-Fi',53:'Thriller',10752:'War',10759:'Action & Adventure',10765:'Sci-Fi & Fantasy'};
 const gn=ids=>ids&&ids[0]?GM[ids[0]]||'':'';
@@ -1470,9 +1577,28 @@ function onUserLoggedOut(){
 }
 async function loadUserData(){
   if(!user)return;
+  // Ratings from Supabase
   const {data:rs}=await sb.from('zeeyus_ratings').select('*').eq('user_id',user.id);
   if(rs)rs.forEach(r=>ratings[r.media_id+'_'+r.media_type]=r.rating);
-  myList=JSON.parse(localStorage.getItem('zeeyus_list_'+user.id)||'[]');
+  // My List from Supabase (with localStorage fallback for migration)
+  try{
+    const {data:wlData}=await sb.from('zeeyus_watchlist').select('*').eq('user_id',user.id).order('created_at',{ascending:false});
+    if(wlData&&wlData.length){
+      myList=wlData.map(w=>({...w.media_data,_type:w.media_type}));
+    } else {
+      // Migrate from localStorage if present
+      const lsItems=JSON.parse(localStorage.getItem('zeeyus_list_'+user.id)||'[]');
+      myList=lsItems;
+      if(lsItems.length){
+        // Push to Supabase
+        const rows=lsItems.map(m=>({user_id:user.id,media_id:String(m.id),media_type:m._type||'movie',media_data:m}));
+        await sb.from('zeeyus_watchlist').upsert(rows,{onConflict:'user_id,media_id,media_type'}).catch(()=>{});
+        localStorage.removeItem('zeeyus_list_'+user.id);
+      }
+    }
+  }catch(e){
+    myList=JSON.parse(localStorage.getItem('zeeyus_list_'+user.id)||'[]');
+  }
   loadContinueWatching();
 }
 
@@ -1730,12 +1856,8 @@ function mkWide(item){
     </div>`;
   d.querySelector('.cw-ov-resume').addEventListener('click',e=>{
     e.stopPropagation();
-    // Read season/ep from item, then fall back to dedicated localStorage backup
-    const _epKey=`zeeyus_eprog_${m.id}_${type}`;
-    let _epBak=null;
-    try{_epBak=JSON.parse(localStorage.getItem(_epKey)||'null');}catch(_){}
-    const _s=item.season||_epBak?.season||1;
-    const _e=item.episode||_epBak?.episode||1;
+    const _s=item.season||1;
+    const _e=item.episode||1;
     requireAuth(()=>openPlayer(m.id,type,m.title||m.name,m,_s,_e));
   });
   d.querySelector('.cw-ov-start').addEventListener('click',e=>{e.stopPropagation();requireAuth(()=>openPlayer(m.id,type,m.title||m.name,m,1,1));});
@@ -1745,17 +1867,7 @@ function mkWide(item){
 }
 async function removeCw(mediaId,mediaType,el){
   if(!user)return;
-  // Remove from Supabase
   try{await sb.from('zeeyus_continue').delete().eq('user_id',user.id).eq('media_id',String(mediaId)).eq('media_type',mediaType);}catch(_){}
-  // ALSO remove from localStorage so it doesn't reappear on reload
-  try{
-    const lsKey='zeeyus_cw_'+user.id;
-    let ls=JSON.parse(localStorage.getItem(lsKey)||'[]');
-    ls=ls.filter(i=>!(String(i.media_id)===String(mediaId)&&i.media_type===mediaType));
-    localStorage.setItem(lsKey,JSON.stringify(ls));
-  }catch(_){}
-  // Remove ep progress key too
-  try{localStorage.removeItem(`zeeyus_eprog_${mediaId}_${mediaType}`);}catch(_){}
   el.style.transition='opacity .3s';el.style.opacity='0';
   setTimeout(()=>{
     el.remove();
@@ -1784,22 +1896,11 @@ function fillRow(rowId,items,type,style){
 
 async function loadContinueWatching(){
   if(!user){document.getElementById('continue-sec').style.display='none';return;}
-  // Try Supabase first, fall back to localStorage
   let data=null;
   try{
     const res=await sb.from('zeeyus_continue').select('*').eq('user_id',user.id).order('updated_at',{ascending:false}).limit(20);
     data=res.data;
   }catch(e){}
-  // Merge with localStorage backup
-  const lsKey='zeeyus_cw_'+user.id;
-  let lsItems=[];
-  try{lsItems=JSON.parse(localStorage.getItem(lsKey)||'[]');}catch(e){}
-  if(!data||!data.length) data=lsItems;
-  else{
-    // Merge: add any localStorage items not already in Supabase data
-    const sbIds=new Set(data.map(i=>i.media_id+'_'+i.media_type));
-    lsItems.forEach(i=>{if(!sbIds.has(i.media_id+'_'+i.media_type))data.push(i);});
-  }
   const row=document.getElementById('continue-row');
   row.innerHTML='';
   if(!data||!data.length){document.getElementById('continue-sec').style.display='none';return;}
@@ -2353,11 +2454,17 @@ function updateTpRatingBtns(){
 }
 function toggleTpList(){
   if(!curDetail)return;
-  requireAuth(()=>{
+  requireAuth(async()=>{
     const idx=myList.findIndex(x=>x.id===curDetail.id);
-    if(idx>-1){myList.splice(idx,1);toast('Removed from My List');}
-    else{myList.push({...curDetail,_type:curType});toast('Added to My List');}
-    if(user)localStorage.setItem('zeeyus_list_'+user.id,JSON.stringify(myList));
+    if(idx>-1){
+      myList.splice(idx,1);
+      toast('Removed from My List');
+      await sb.from('zeeyus_watchlist').delete().eq('user_id',user.id).eq('media_id',String(curDetail.id)).eq('media_type',curType).catch(()=>{});
+    }else{
+      myList.push({...curDetail,_type:curType});
+      toast('Added to My List');
+      await sb.from('zeeyus_watchlist').upsert({user_id:user.id,media_id:String(curDetail.id),media_type:curType,media_data:{...curDetail,_type:curType},created_at:new Date().toISOString()},{onConflict:'user_id,media_id,media_type'}).catch(()=>{});
+    }
     updateTpListBtn();
   });
 }
@@ -2393,11 +2500,15 @@ function updateListBtn(){updateTpListBtn();}
 function toggleList(){toggleTpList();}
 function _toggleListOld(){
   if(!curDetail)return;
-  requireAuth(()=>{
+  requireAuth(async()=>{
     const idx=myList.findIndex(x=>x.id===curDetail.id);
-    if(idx>-1){myList.splice(idx,1);toast('Removed from My List');}
-    else{myList.push({...curDetail,_type:curType});toast('Added to My List');}
-    if(user)localStorage.setItem('zeeyus_list_'+user.id,JSON.stringify(myList));
+    if(idx>-1){
+      myList.splice(idx,1);toast('Removed from My List');
+      await sb.from('zeeyus_watchlist').delete().eq('user_id',user.id).eq('media_id',String(curDetail.id)).eq('media_type',curType).catch(()=>{});
+    }else{
+      myList.push({...curDetail,_type:curType});toast('Added to My List');
+      await sb.from('zeeyus_watchlist').upsert({user_id:user.id,media_id:String(curDetail.id),media_type:curType,media_data:{...curDetail,_type:curType},created_at:new Date().toISOString()},{onConflict:'user_id,media_id,media_type'}).catch(()=>{});
+    }
     updateListBtn();
   });
 }
@@ -2452,61 +2563,29 @@ async function openPlayer(id,type,title,m,season,ep){
     clearInterval(progTimer);
     _cwSaveFn=null;
     let prog=0;
-    const lsKey='zeeyus_cw_'+user.id;
-    const _epKey=`zeeyus_eprog_${id}_${type}`;
 
-    // Save current episode to dedicated localStorage key for fast restore
-    const _saveEpKey=()=>{
-      try{localStorage.setItem(_epKey,JSON.stringify({season:curPlayerSeason,episode:curPlayerEp,ts:Date.now()}));}catch(_){}
-    };
-    _saveEpKey();
-
-    const cwRecord={user_id:user.id,media_id:String(id),media_type:type,media_data:m,progress:1,season:curPlayerSeason,episode:curPlayerEp,updated_at:new Date().toISOString()};
-
-    // Save to localStorage backup
-    const _saveLs=(p)=>{
-      try{
-        let ls=JSON.parse(localStorage.getItem(lsKey)||'[]');
-        ls=ls.filter(i=>!(i.media_id===String(id)&&i.media_type===type));
-        ls.unshift({...cwRecord,progress:p,season:curPlayerSeason,episode:curPlayerEp,updated_at:new Date().toISOString()});
-        localStorage.setItem(lsKey,JSON.stringify(ls.slice(0,20)));
-      }catch(e){}
-    };
-
-    // Helper: delete from CW (film finished)
+    // Helper: delete from CW when film finished
     const _deleteCw=()=>{
-      sb.from('zeeyus_continue').delete().eq('user_id',user.id).eq('media_id',String(id)).eq('media_type',type).then(()=>{});
-      try{
-        let ls=JSON.parse(localStorage.getItem(lsKey)||'[]');
-        ls=ls.filter(i=>!(i.media_id===String(id)&&i.media_type===type));
-        localStorage.setItem(lsKey,JSON.stringify(ls));
-        localStorage.removeItem(_epKey);
-      }catch(_){}
+      sb.from('zeeyus_continue').delete().eq('user_id',user.id).eq('media_id',String(id)).eq('media_type',type).then(()=>{}).catch(()=>{});
       loadContinueWatching();
     };
 
-    // Load existing progress from Supabase so we don't reset it
+    // Load existing progress from Supabase
     sb.from('zeeyus_continue').select('progress').eq('user_id',user.id).eq('media_id',String(id)).eq('media_type',type).single()
       .then(({data:existing})=>{if(existing&&existing.progress)prog=existing.progress;}).catch(()=>{});
 
     const startTime=Date.now();
 
-    // Module-level save function so closePlayer can call it for a final save
+    // Module-level save so closePlayer can call final save
     _cwSaveFn=(forceRefresh)=>{
-      _saveEpKey();
       const elapsedMins=Math.floor((Date.now()-startTime)/60000);
       const runtime=m.runtime||m.episode_run_time?.[0]||90;
       const newProg=Math.min(Math.round(prog+(elapsedMins/runtime)*100),99);
       if(newProg>prog)prog=newProg;
 
-      // ── If >=95% — film/episode is finished, remove from CW ──
-      if(prog>=95){
-        _deleteCw();
-        clearInterval(progTimer);
-        return;
-      }
+      // ≥95% → finished, remove from CW
+      if(prog>=95){_deleteCw();clearInterval(progTimer);return;}
 
-      _saveLs(prog);
       sb.from('zeeyus_continue').upsert({
         user_id:user.id,media_id:String(id),media_type:type,
         media_data:m,progress:prog,season:curPlayerSeason,episode:curPlayerEp,
@@ -2514,11 +2593,10 @@ async function openPlayer(id,type,title,m,season,ep){
       },{onConflict:'user_id,media_id,media_type'}).then(()=>{if(forceRefresh)loadContinueWatching();}).catch(()=>{});
     };
 
-    // Save every 30 seconds (was 3 min — too infrequent)
+    // Save every 30 seconds
     progTimer=setInterval(()=>_cwSaveFn(false),30000);
 
     // Save immediately on open (progress=1 so it appears in CW right away)
-    _saveLs(1);
     sb.from('zeeyus_continue').upsert({
       user_id:user.id,media_id:String(id),media_type:type,
       media_data:m,progress:Math.max(prog,1),season:curPlayerSeason,episode:curPlayerEp,
@@ -2528,20 +2606,56 @@ async function openPlayer(id,type,title,m,season,ep){
 }
 function buildSrvBar(id,type){
   const bar=document.getElementById('srv-bar');bar.innerHTML='';
+  const fsPanel=document.getElementById('srv-fs-panel');fsPanel.innerHTML='';
   SERVERS.forEach((s,i)=>{
+    // Bottom bar button
     const btn=document.createElement('button');
     btn.className='srv-btn'+(i===0?' on':'');
     btn.textContent=s.n;btn.tabIndex=0;
     btn.onclick=()=>{
       document.querySelectorAll('.srv-btn').forEach(b=>b.classList.remove('on'));
-      btn.classList.add('on');loadSrv(id,type,i);
+      document.querySelectorAll('.srv-fs-btn').forEach(b=>b.classList.remove('on'));
+      btn.classList.add('on');
+      fsPanel.querySelectorAll('.srv-fs-btn')[i]?.classList.add('on');
+      loadSrv(id,type,i);
+      fsPanel.classList.remove('open');
     };
     bar.appendChild(btn);
+    // Floating panel button (fullscreen)
+    const fbtn=document.createElement('button');
+    fbtn.className='srv-fs-btn'+(i===0?' on':'');
+    fbtn.textContent=s.n;
+    fbtn.onclick=()=>{
+      document.querySelectorAll('.srv-btn').forEach(b=>b.classList.remove('on'));
+      document.querySelectorAll('.srv-fs-btn').forEach(b=>b.classList.remove('on'));
+      btn.classList.add('on');fbtn.classList.add('on');
+      loadSrv(id,type,i);
+      fsPanel.classList.remove('open');
+    };
+    fsPanel.appendChild(fbtn);
   });
 }
+function toggleSrvFsPanel(){
+  document.getElementById('srv-fs-panel').classList.toggle('open');
+}
+// Close panel when clicking outside
+document.addEventListener('click',e=>{
+  const panel=document.getElementById('srv-fs-panel');
+  const toggleBtn=document.getElementById('srv-toggle-btn');
+  if(panel&&!panel.contains(e.target)&&!toggleBtn?.contains(e.target)){
+    panel.classList.remove('open');
+  }
+});
 function loadSrv(id,type,i){
   const url=SERVERS[i].f(id,type,curPlayerSeason,curPlayerEp);
-  document.getElementById('player-iframe').src=USE_PROXY?PROXY+encodeURIComponent(url):url;
+  // EmbedSu requires allow-same-origin which some browsers block; set sandbox to allow it
+  const iframe=document.getElementById('player-iframe');
+  if(SERVERS[i].n==='EmbedSu'){
+    iframe.setAttribute('sandbox','allow-scripts allow-same-origin allow-forms allow-popups allow-presentation');
+  } else {
+    iframe.removeAttribute('sandbox');
+  }
+  iframe.src=USE_PROXY?PROXY+encodeURIComponent(url):url;
 }
 function buildEpPanel(tvId,type,showTitle){
   const list=document.getElementById('ep-panel-list');
@@ -2803,12 +2917,19 @@ function switchPage(page) {
   _curPage = page;
   // Hide all pages
   document.querySelectorAll('.page-sec').forEach(el => el.classList.remove('active'));
+  document.getElementById('profile-page').classList.remove('active');
   // Show hero only on home
   const hero = document.getElementById('hero');
   if(hero) hero.style.display = page === 'home' ? 'block' : 'none';
   // Show target page
-  const pg = document.getElementById('page-' + page);
-  if(pg) pg.classList.add('active');
+  if(page === 'profile'){
+    document.getElementById('profile-page').classList.add('active');
+    document.getElementById('main').style.display = 'block';
+    loadProfilePage();
+  } else {
+    const pg = document.getElementById('page-' + page);
+    if(pg) pg.classList.add('active');
+  }
   // Scroll to top
   document.getElementById('main').scrollTo({top:0,behavior:'instant'});
   // Sync nav tabs (desktop)
@@ -2822,7 +2943,6 @@ function switchPage(page) {
   // Lazy-load pages when first visited
   if(page === 'movies' && !window._moviesLoaded) {
     window._moviesLoaded = true;
-    // rows already loaded in loadRows — just trigger track setup
     setTimeout(setupRowDrag, 200);
     setTimeout(addRowTracks, 400);
   }
@@ -2835,6 +2955,31 @@ function switchPage(page) {
   TV.reset();
   // Stop hero trailer when leaving home
   if(page !== 'home') stopHeroTrailer();
+}
+async function loadProfilePage(){
+  if(!user) return;
+  // Fill name/email/avatar
+  const uname=(user.user_metadata&&(user.user_metadata.full_name||user.user_metadata.name))||user.email.split('@')[0]||'User';
+  document.getElementById('prof-avatar-big').textContent=uname[0].toUpperCase();
+  document.getElementById('prof-name').textContent=uname;
+  document.getElementById('prof-email-disp').textContent=user.email||'';
+  // Member since
+  const since=user.created_at?new Date(user.created_at).toLocaleDateString('en-US',{year:'numeric',month:'short'}):'';
+  document.getElementById('prof-since').textContent=since;
+  // Stats from Supabase
+  try{
+    const [{data:cwData},{data:ratingsData}]=await Promise.all([
+      sb.from('zeeyus_continue').select('id',{count:'exact'}).eq('user_id',user.id),
+      sb.from('zeeyus_ratings').select('id',{count:'exact'}).eq('user_id',user.id)
+    ]);
+    document.getElementById('pstat-cw').textContent=cwData?.length||0;
+    document.getElementById('pstat-rated').textContent=ratingsData?.length||0;
+  }catch(e){}
+  // My List count from Supabase
+  try{
+    const {data:listData}=await sb.from('zeeyus_watchlist').select('id',{count:'exact'}).eq('user_id',user.id);
+    document.getElementById('pstat-list').textContent=listData?.length||myList.length||0;
+  }catch(e){document.getElementById('pstat-list').textContent=myList.length||0;}
 }
 
 // ── NETFLIX D-PAD TV NAVIGATION ──
@@ -3240,6 +3385,70 @@ if('serviceWorker' in navigator){
   <div class="dl-grid" id="dl-grid"></div>
 </div>
 
+<!-- PROFILE PAGE -->
+<div id="profile-page" class="page-sec">
+  <div class="prof-hero">
+    <div class="prof-avatar-big" id="prof-avatar-big">Z</div>
+    <div class="prof-info">
+      <div class="prof-name" id="prof-name">User</div>
+      <div class="prof-email" id="prof-email-disp"></div>
+    </div>
+  </div>
+  <div class="prof-stat-row">
+    <div class="prof-stat">
+      <div class="prof-stat-num" id="pstat-cw">0</div>
+      <div class="prof-stat-lbl">Watching</div>
+    </div>
+    <div class="prof-stat">
+      <div class="prof-stat-num" id="pstat-list">0</div>
+      <div class="prof-stat-lbl">My List</div>
+    </div>
+    <div class="prof-stat">
+      <div class="prof-stat-num" id="pstat-rated">0</div>
+      <div class="prof-stat-lbl">Rated</div>
+    </div>
+  </div>
+  <div class="prof-section">
+    <div class="prof-section-title">My Content</div>
+    <div class="prof-card">
+      <div class="prof-item" onclick="openMyList()">
+        <svg viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+        <span class="prof-item-label">My Watchlist</span>
+        <svg class="prof-item-chevron" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+      </div>
+      <div class="prof-item" onclick="openContinueList()">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        <span class="prof-item-label">Watch History</span>
+        <svg class="prof-item-chevron" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+      </div>
+      <div class="prof-item" onclick="openDownloads()">
+        <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        <span class="prof-item-label">Downloads</span>
+        <svg class="prof-item-chevron" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+      </div>
+    </div>
+  </div>
+  <div class="prof-section">
+    <div class="prof-section-title">Account</div>
+    <div class="prof-card">
+      <div class="prof-item" id="prof-member-item">
+        <svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+        <span class="prof-item-label">Member Since</span>
+        <span class="prof-item-badge" id="prof-since">—</span>
+      </div>
+      <div class="prof-item">
+        <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        <span class="prof-item-label">Plan</span>
+        <span class="prof-item-badge">Premium</span>
+      </div>
+    </div>
+  </div>
+  <button class="prof-signout" onclick="doSignout();switchPage('home')">
+    <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+    Sign Out
+  </button>
+</div>
+
 <!-- BOTTOM NAV (mobile) -->
 <nav id="bottom-nav">
   <div class="bnav-item active" id="bnav-home" onclick="switchPage('home')">
@@ -3258,7 +3467,7 @@ if('serviceWorker' in navigator){
     <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
     Search<div class="bnav-dot"></div>
   </div>
-  <div class="bnav-item" id="bnav-profile" onclick="requireAuth(()=>toggleProfileDd())">
+  <div class="bnav-item" id="bnav-profile" onclick="requireAuth(()=>switchPage('profile'))">
     <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
     Profile<div class="bnav-dot"></div>
   </div>
