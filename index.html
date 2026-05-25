@@ -526,57 +526,17 @@ body.tv-mode .row{overflow-x:hidden;cursor:default;scroll-snap-type:none;}
 .p-close svg{width:18px;height:18px;stroke:white;stroke-width:2;fill:none;}
 .p-wrap{flex:1;position:relative;overflow:hidden;}
 #player-iframe{width:100%;height:100%;border:none;}
-/* Server bar — hidden in fullscreen, shown when not fullscreen */
+
+/* ── SERVER BAR — shown by default, hidden when fullscreen ── */
 .srv-bar{
   padding:10px 14px;display:flex;gap:7px;
   overflow-x:auto;flex-shrink:0;
   border-top:1px solid var(--border);
-  background:rgba(0,0,0,.85);
+  background:rgba(0,0,0,.9);
   scrollbar-width:none;
   padding-bottom:calc(10px + var(--safe-bot));
-  transition:opacity .2s;
 }
 .srv-bar::-webkit-scrollbar{display:none;}
-/* Hide header + server bar when in fullscreen */
-:fullscreen .p-top,
-:-webkit-full-screen .p-top,
-:-moz-full-screen .p-top,
-:fullscreen .srv-bar,
-:-webkit-full-screen .srv-bar,
-:-moz-full-screen .srv-bar,
-:fullscreen #p-ep-row,
-:-webkit-full-screen #p-ep-row,
-:-moz-full-screen #p-ep-row{
-  display:none!important;
-}
-/* Floating server toggle button — visible only in fullscreen */
-#srv-toggle-btn{
-  position:absolute;top:12px;right:12px;z-index:50;
-  width:38px;height:38px;border-radius:50%;
-  background:rgba(0,0,0,.6);border:1px solid rgba(255,255,255,.2);
-  display:none;align-items:center;justify-content:center;cursor:pointer;
-  backdrop-filter:blur(8px);
-}
-#srv-toggle-btn svg{width:18px;height:18px;stroke:white;fill:none;stroke-width:2;}
-:fullscreen #srv-toggle-btn,
-:-webkit-full-screen #srv-toggle-btn,
-:-moz-full-screen #srv-toggle-btn{display:flex!important;}
-/* Floating server picker panel in fullscreen */
-#srv-fs-panel{
-  position:absolute;top:58px;right:12px;z-index:51;
-  background:rgba(10,10,20,.92);border:1px solid rgba(255,255,255,.15);
-  border-radius:12px;padding:8px;
-  display:none;flex-direction:column;gap:4px;
-  backdrop-filter:blur(12px);min-width:130px;
-}
-#srv-fs-panel.open{display:flex;}
-.srv-fs-btn{
-  padding:8px 14px;border-radius:8px;
-  font-size:12px;font-weight:600;cursor:pointer;
-  color:var(--text2);background:transparent;
-  text-align:left;transition:background .15s;
-}
-.srv-fs-btn:hover,.srv-fs-btn.on{background:var(--lime);color:#0a0a0a;}
 .srv-btn{
   flex-shrink:0;padding:7px 16px;border-radius:20px;
   font-size:12px;font-weight:600;
@@ -585,6 +545,46 @@ body.tv-mode .row{overflow-x:hidden;cursor:default;scroll-snap-type:none;}
 }
 .srv-btn:hover{background:rgba(255,255,255,.16);color:var(--text);}
 .srv-btn.on{background:var(--lime);color:#0a0a0a;border-color:var(--lime);}
+
+/* ── Hide top bar + ep row + server bar when in FULLSCREEN ── */
+#player-modal:-webkit-full-screen .p-top,
+#player-modal:-webkit-full-screen #p-ep-row,
+#player-modal:-webkit-full-screen .srv-bar,
+#player-modal:fullscreen .p-top,
+#player-modal:fullscreen #p-ep-row,
+#player-modal:fullscreen .srv-bar { display:none !important; }
+
+/* ── Floating server button — only visible in fullscreen ── */
+#srv-toggle-btn{
+  position:absolute;bottom:20px;right:20px;z-index:20;
+  width:42px;height:42px;border-radius:50%;
+  background:rgba(0,0,0,.65);border:1px solid rgba(255,255,255,.2);
+  display:none;align-items:center;justify-content:center;
+  cursor:pointer;backdrop-filter:blur(10px);
+  transition:background .2s;
+}
+#srv-toggle-btn:hover{background:rgba(255,255,255,.15);}
+#srv-toggle-btn svg{width:20px;height:20px;stroke:white;fill:none;stroke-width:2;}
+#player-modal:-webkit-full-screen #srv-toggle-btn,
+#player-modal:fullscreen #srv-toggle-btn { display:flex !important; }
+
+/* ── Floating server picker panel ── */
+#srv-fs-panel{
+  position:absolute;bottom:74px;right:20px;z-index:21;
+  background:rgba(8,8,20,.95);border:1px solid rgba(255,255,255,.15);
+  border-radius:14px;padding:8px;
+  display:none;flex-direction:column;gap:4px;
+  backdrop-filter:blur(16px);min-width:150px;
+}
+#srv-fs-panel.open{display:flex;}
+.srv-fs-btn{
+  padding:10px 18px;border-radius:10px;
+  font-size:13px;font-weight:600;cursor:pointer;
+  color:var(--text2);background:transparent;
+  text-align:left;transition:background .15s;white-space:nowrap;
+}
+.srv-fs-btn:hover{background:rgba(255,255,255,.1);}
+.srv-fs-btn.on{background:var(--lime);color:#0a0a0a;}
 /* Quality/subtitle strip inside player */
 #p-quality-strip{
   display:none;align-items:center;gap:8px;
@@ -1360,13 +1360,12 @@ body.tv-mode .row:hover .card-w{opacity:1;}
   </div>
   <div class="p-wrap" id="p-wrap" style="position:relative;">
     <iframe id="player-iframe" allowfullscreen allow="autoplay;fullscreen;picture-in-picture" referrerpolicy="no-referrer"></iframe>
-    <!-- Floating server toggle — visible only in fullscreen -->
+    <!-- Floating server button — only shows when in fullscreen via CSS -->
     <button id="srv-toggle-btn" onclick="toggleSrvFsPanel()">
       <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
     </button>
-    <!-- Floating server picker panel -->
     <div id="srv-fs-panel"></div>
-    <!-- AUTO-NEXT OVERLAY — sits ON the video -->
+    <!-- AUTO-NEXT OVERLAY -->
     <div id="autonext-overlay">
       <div id="autonext-box">
         <div id="autonext-thumb"></div>
@@ -2528,19 +2527,19 @@ async function openPlayer(id,type,title,m,season,ep){
   buildSrvBar(id,type);
   loadSrv(id,type,0);
 
-  // ── Show player & request fullscreen IMMEDIATELY before any async ops ──
-  // This keeps the user-gesture chain unbroken so fullscreen is allowed.
+  // Show player modal, then immediately request fullscreen
   document.getElementById('player-modal').classList.add('open');
+  document.getElementById('srv-fs-panel').classList.remove('open');
   document.body.style.overflow='hidden';
+  // requestFullscreen on the modal — works on desktop/TV (Chrome, Firefox, Edge)
   const _fsEl=document.getElementById('player-modal');
   try{
     if(_fsEl.requestFullscreen) _fsEl.requestFullscreen({navigationUI:'hide'}).catch(()=>{});
     else if(_fsEl.webkitRequestFullscreen) _fsEl.webkitRequestFullscreen();
     else if(_fsEl.mozRequestFullScreen) _fsEl.mozRequestFullScreen();
-    else if(_fsEl.msRequestFullscreen) _fsEl.msRequestFullscreen();
   }catch(_){}
 
-  // ── Episode controls row (async after fullscreen is triggered) ──
+  // ── Episode controls row ──
   const epRow=document.getElementById('p-ep-row');
   if(type==='tv'){
     epRow.style.display='flex';
@@ -2621,7 +2620,7 @@ function buildSrvBar(id,type){
       fsPanel.classList.remove('open');
     };
     bar.appendChild(btn);
-    // Floating panel button (fullscreen)
+    // Floating panel button
     const fbtn=document.createElement('button');
     fbtn.className='srv-fs-btn'+(i===0?' on':'');
     fbtn.textContent=s.n;
@@ -2636,15 +2635,23 @@ function buildSrvBar(id,type){
   });
 }
 function toggleSrvFsPanel(){
-  document.getElementById('srv-fs-panel').classList.toggle('open');
+  const panel=document.getElementById('srv-fs-panel');
+  panel.classList.toggle('open');
 }
-// Close panel when clicking outside
+// Close server panel when clicking outside it
 document.addEventListener('click',e=>{
   const panel=document.getElementById('srv-fs-panel');
   const toggleBtn=document.getElementById('srv-toggle-btn');
-  if(panel&&!panel.contains(e.target)&&!toggleBtn?.contains(e.target)){
+  if(panel&&panel.classList.contains('open')&&!panel.contains(e.target)&&!toggleBtn?.contains(e.target)){
     panel.classList.remove('open');
   }
+});
+// When user exits fullscreen (Esc or browser button), close srv-fs-panel — server bar reappears via CSS
+document.addEventListener('fullscreenchange',()=>{
+  if(!document.fullscreenElement) document.getElementById('srv-fs-panel').classList.remove('open');
+});
+document.addEventListener('webkitfullscreenchange',()=>{
+  if(!document.webkitFullscreenElement) document.getElementById('srv-fs-panel').classList.remove('open');
 });
 function loadSrv(id,type,i){
   const url=SERVERS[i].f(id,type,curPlayerSeason,curPlayerEp);
@@ -2751,13 +2758,18 @@ function cancelAutoNext(){
 }
 function closePlayer(){
   clearInterval(progTimer);clearTimeout(nextEpTimer);cancelAutoNext();
-  // Final progress save so nothing is lost when user closes player
   if(_cwSaveFn){try{_cwSaveFn(true);}catch(_){} _cwSaveFn=null;}
   document.getElementById('player-iframe').src='';
   document.getElementById('ep-panel').classList.remove('open');
+  document.getElementById('srv-fs-panel').classList.remove('open');
   document.getElementById('player-modal').classList.remove('open');
   document.body.style.overflow='';
-  try{if(document.fullscreenElement)document.exitFullscreen();}catch(e){}
+  // Exit fullscreen if active
+  try{
+    if(document.fullscreenElement) document.exitFullscreen();
+    else if(document.webkitFullscreenElement) document.webkitExitFullscreen();
+    else if(document.mozFullScreenElement) document.mozCancelFullScreen();
+  }catch(e){}
   if(user)loadContinueWatching();
 }
 
