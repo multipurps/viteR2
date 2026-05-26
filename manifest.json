@@ -9,10 +9,19 @@
   "orientation": "portrait",
   "background_color": "#080810",
   "theme_color": "#080810",
+  "lang": "en",
+  "dir": "ltr",
+  "categories": ["entertainment", "video"],
   "icons": [
     {
       "src": "assets/icon.png",
-      "sizes": "512x512",
+      "sizes": "1024x1024",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/icon.png",
+      "sizes": "1024x1024",
       "type": "image/png",
       "purpose": "maskable"
     },
