@@ -10,6 +10,7 @@
 <meta name="apple-mobile-web-app-title" content="Zeeyus">
 <meta name="mobile-web-app-capable" content="yes">
 <link rel="apple-touch-icon" href="assets/icon.png">
+<link rel="manifest" href="manifest.json">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
 <!-- supabase loaded dynamically below -->
@@ -3480,31 +3481,6 @@ function _boot(){
 }
 
 
-// ── ANDROID PWA MANIFEST ──
-(()=>{
-  try{
-    if(document.querySelector('link[rel="manifest"]'))return;
-    const manifest={
-      name:'Zeeyus',short_name:'Zeeyus',
-      description:'Your personal streaming platform',
-      start_url:'./index.html',display:'standalone',
-      orientation:'portrait',
-      background_color:'#080810',theme_color:'#080810',
-      icons:[
-        {src:'assets/icon.png',sizes:'512x512',type:'image/png',purpose:'any maskable'},
-        {src:'assets/icon.png',sizes:'192x192',type:'image/png'}
-      ]
-    };
-    const blob=new Blob([JSON.stringify(manifest)],{type:'application/manifest+json'});
-    const link=document.createElement('link');
-    link.rel='manifest';link.href=URL.createObjectURL(blob);
-    document.head.appendChild(link);
-    // Android theme color
-    const meta=document.createElement('meta');
-    meta.name='theme-color';meta.content='#080810';
-    document.head.appendChild(meta);
-  }catch(e){}
-})();
 if(document.readyState==='loading'){
   document.addEventListener('DOMContentLoaded',_boot);
 }else{
