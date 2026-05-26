@@ -956,14 +956,16 @@ body.tv-mode .row:hover .card-w{opacity:1;}
 /* ── Floating episodes button — TV shows only, fullscreen only ── */
 #ep-toggle-btn{
   position:absolute;bottom:20px;right:72px;z-index:20;
-  width:42px;height:42px;border-radius:50%;
+  min-width:42px;height:auto;padding:8px 10px;
+  border-radius:10px;
   background:rgba(0,0,0,.65);border:1px solid rgba(255,255,255,.2);
-  align-items:center;justify-content:center;
+  display:none;align-items:center;justify-content:center;
+  flex-direction:column;gap:2px;
   cursor:pointer;backdrop-filter:blur(10px);
   transition:background .2s;
 }
 #ep-toggle-btn:hover{background:rgba(255,255,255,.15);}
-#ep-toggle-btn svg{width:20px;height:20px;stroke:white;fill:none;stroke-width:2;}
+#ep-toggle-btn svg{width:18px;height:18px;stroke:white;fill:none;stroke-width:2;}
 /* Show ep button only in fullscreen and only when it's a TV show (controlled via JS display) */
 #player-modal:-webkit-full-screen #ep-toggle-btn.tv-show,
 #player-modal:fullscreen #ep-toggle-btn.tv-show { display:flex !important; }
@@ -1073,22 +1075,26 @@ body.tv-mode .row:hover .card-w{opacity:1;}
 .ep-panel-topbar{display:none;}
 
 @media(min-width:900px){
-  /* Override side-panel → centered popup */
+  /* Override side-panel → right-side floating popup */
   #ep-panel{
-    top:50%;left:50%;
-    right:auto;bottom:auto;
+    top:50%;
+    left:auto;
+    right:4%;
+    bottom:auto;
     width:470px;
     max-height:74vh;
     border-radius:14px;
     border:1px solid rgba(255,255,255,0.1);
     box-shadow:0 24px 80px rgba(0,0,0,0.9);
-    transform:translate(-50%,-50%) scale(0.93);
+    transform:translateY(-50%) scale(0.93);
     opacity:0;
     transition:opacity .22s ease,transform .22s cubic-bezier(.34,1.56,.64,1);
     overflow:hidden;
+    display:flex;
+    flex-direction:column;
   }
   #ep-panel.open{
-    transform:translate(-50%,-50%) scale(1);
+    transform:translateY(-50%) scale(1);
     opacity:1;
   }
 
@@ -1160,7 +1166,13 @@ body.tv-mode .row:hover .card-w{opacity:1;}
   .ep-tb-close svg{width:13px;height:13px;stroke:#fff;fill:none;stroke-width:2;}
 
   /* Episode cards — full-bleed cinematic style */
-  #ep-panel-list{padding:8px 8px 16px;}
+  #ep-panel-list{
+    padding:8px 8px 16px;
+    flex:1;
+    min-height:0;
+    overflow-y:auto;
+    overscroll-behavior:contain;
+  }
 
   #ep-panel .ep-card{
     flex-direction:column;position:relative;
@@ -1601,6 +1613,7 @@ body.tv-mode .row:hover .card-w{opacity:1;}
     <!-- Floating episodes button — visible in fullscreen via CSS (TV shows only) -->
     <button id="ep-toggle-btn" onclick="toggleFsEpPanel();document.getElementById('srv-fs-panel').classList.remove('open');" title="Episodes" style="display:none;">
       <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+      <span style="font-size:10px;font-weight:700;letter-spacing:.03em;margin-top:2px;">Episodes</span>
     </button>
     <div id="srv-fs-panel"></div>
     <!-- AUTO-NEXT OVERLAY -->
