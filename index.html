@@ -960,148 +960,269 @@ body.tv-mode .row:hover .card-w{opacity:1;}
   background:rgba(0,0,0,.65);border:1px solid rgba(255,255,255,.2);
   align-items:center;justify-content:center;
   cursor:pointer;backdrop-filter:blur(10px);
-  transition:background .2s;display:none;
+  transition:background .2s;
 }
 #ep-toggle-btn:hover{background:rgba(255,255,255,.15);}
 #ep-toggle-btn svg{width:20px;height:20px;stroke:white;fill:none;stroke-width:2;}
+/* Show ep button only in fullscreen and only when it's a TV show (controlled via JS display) */
 #player-modal:-webkit-full-screen #ep-toggle-btn.tv-show,
-#player-modal:fullscreen #ep-toggle-btn.tv-show{display:flex!important;}
+#player-modal:fullscreen #ep-toggle-btn.tv-show { display:flex !important; }
 
-/* ══ EPISODE OVERLAY — centered, Netflix-style ══ */
+/* ══ NETFLIX-STYLE EPISODE SIDE PANEL ══ */
 #ep-panel{
-  position:absolute;
-  top:0;bottom:0;right:0;
-  width:clamp(300px,38%,480px);
-  background:rgba(10,10,18,.96);
-  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
-  display:flex;flex-direction:column;
-  transform:translateX(105%);
-  transition:transform .3s cubic-bezier(.4,0,.2,1);
-  z-index:30;
-  /* not visible until .open */
+  position:absolute;top:0;right:0;bottom:0;
+  width:min(400px,90%);
+  background:rgba(8,8,18,.97);
+  backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
+  border-left:1px solid rgba(255,255,255,.07);
+  transform:translateX(102%);
+  transition:transform .32s cubic-bezier(.4,0,.2,1);
+  z-index:25;display:flex;flex-direction:column;
+  box-shadow:-12px 0 40px rgba(0,0,0,.6);
 }
 #ep-panel.open{transform:translateX(0);}
-
-/* Top bar: search + season + autoplay + close */
-.ep-panel-topbar{
-  display:flex;align-items:center;gap:8px;
-  padding:14px 14px 10px;
-  border-bottom:1px solid rgba(255,255,255,.08);
+.ep-panel-hd{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:20px 18px 14px;
+  border-bottom:1px solid rgba(255,255,255,.07);
   flex-shrink:0;
 }
-.ep-panel-search{
-  flex:1;height:34px;
-  background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);
-  border-radius:999px;padding:0 14px 0 32px;
-  font-size:12px;color:#fff;outline:none;
-  font-family:inherit;
-}
-.ep-panel-search::placeholder{color:rgba(255,255,255,.35);}
-.ep-search-wrap{position:relative;flex:1;}
-.ep-search-wrap svg{position:absolute;left:10px;top:50%;transform:translateY(-50%);width:14px;height:14px;stroke:rgba(255,255,255,.4);fill:none;stroke-width:2;pointer-events:none;}
-.ep-season-btn{
-  flex-shrink:0;height:34px;padding:0 12px;
-  background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);
-  border-radius:999px;font-size:12px;font-weight:700;color:#fff;
-  cursor:pointer;display:flex;align-items:center;gap:4px;white-space:nowrap;
-}
-.ep-season-btn svg{width:12px;height:12px;stroke:#fff;fill:none;stroke-width:2.5;}
-.ep-autoplay-wrap{
-  display:flex;align-items:center;gap:5px;flex-shrink:0;
-}
-.ep-autoplay-lbl{font-size:11px;font-weight:600;color:rgba(255,255,255,.6);}
-/* Toggle switch */
-.ep-toggle-sw{
-  width:34px;height:19px;border-radius:999px;
-  background:rgba(255,255,255,.15);cursor:pointer;
-  position:relative;transition:background .2s;flex-shrink:0;
-}
-.ep-toggle-sw.on{background:#e50914;}
-.ep-toggle-sw::after{
-  content:'';position:absolute;top:2px;left:2px;
-  width:15px;height:15px;border-radius:50%;background:#fff;
-  transition:transform .2s;
-}
-.ep-toggle-sw.on::after{transform:translateX(15px);}
+.ep-panel-hd-title{font-size:14px;font-weight:700;color:var(--text);}
 .ep-panel-close{
-  flex-shrink:0;width:30px;height:30px;
-  background:rgba(255,255,255,.08);border-radius:50%;
-  display:flex;align-items:center;justify-content:center;
-  cursor:pointer;transition:background .2s;
+  width:30px;height:30px;background:rgba(255,255,255,.08);
+  border-radius:50%;display:flex;align-items:center;justify-content:center;
+  cursor:pointer;transition:background .2s;flex-shrink:0;
 }
 .ep-panel-close:hover{background:rgba(255,255,255,.18);}
-.ep-panel-close svg{width:14px;height:14px;stroke:#fff;stroke-width:2;fill:none;}
-
-/* Scrollable list */
+.ep-panel-close svg{width:14px;height:14px;stroke:white;stroke-width:2;fill:none;}
 #ep-panel-list{
   flex:1;overflow-y:auto;
-  scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.1) transparent;
+  padding:6px 0 24px;
+  scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.12) transparent;
 }
-#ep-panel-list::-webkit-scrollbar{width:2px;}
-#ep-panel-list::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:2px;}
+#ep-panel-list::-webkit-scrollbar{width:3px;}
+#ep-panel-list::-webkit-scrollbar-thumb{background:rgba(255,255,255,.12);border-radius:3px;}
 
-/* Episode card */
+/* Each episode row */
 .ep-card{
-  display:flex;flex-direction:column;
-  padding:10px 12px;cursor:pointer;
-  border-bottom:1px solid rgba(255,255,255,.05);
-  transition:background .15s;outline:none;
+  display:flex;gap:12px;align-items:flex-start;
+  padding:11px 16px;cursor:pointer;
+  border-bottom:1px solid rgba(255,255,255,.04);
+  transition:background .15s;position:relative;outline:none;
 }
-.ep-card:hover{background:rgba(255,255,255,.06);}
-.ep-card.playing{
-  border:2px solid rgba(255,165,0,.7);
-  border-radius:8px;margin:6px 10px;padding:10px;
-}
-.ep-card.ep-focused{background:rgba(255,255,255,.1);}
+.ep-card:hover{background:rgba(255,255,255,.07);}
+.ep-card.playing{background:rgba(255,255,255,.05);}
+.ep-card.ep-focused{background:rgba(255,255,255,.12);outline:2px solid rgba(255,255,255,.25);outline-offset:-2px;border-radius:4px;}
 
-/* Card inner: thumb LEFT, text RIGHT — like screenshot */
-.ep-card-inner{display:flex;gap:10px;align-items:flex-start;}
-.ep-card-thumb-wrap{
-  flex-shrink:0;width:120px;height:68px;border-radius:6px;
-  overflow:hidden;background:rgba(255,255,255,.06);position:relative;
-}
-.ep-card-thumb-wrap img{width:100%;height:100%;object-fit:cover;display:block;}
-.ep-thumb-overlay{
-  position:absolute;inset:0;background:rgba(0,0,0,.4);
-  display:flex;align-items:center;justify-content:center;
-  opacity:0;transition:opacity .2s;
-}
-.ep-card:hover .ep-thumb-overlay,.ep-card.ep-focused .ep-thumb-overlay{opacity:1;}
-.ep-thumb-overlay svg{width:24px;height:24px;fill:white;}
-.ep-thumb-done{
-  position:absolute;inset:0;background:rgba(0,0,0,.5);
-  display:flex;align-items:center;justify-content:center;
-}
-.ep-thumb-done svg{width:18px;height:18px;stroke:#ccc;fill:none;stroke-width:2.5;}
-.ep-thumb-prog{
-  position:absolute;bottom:0;left:0;right:0;height:3px;
-  background:rgba(255,255,255,.12);
-}
-.ep-thumb-prog-fill{height:100%;background:#e50914;}
-
-/* Text side */
-.ep-card-right{flex:1;min-width:0;}
-.ep-top-row{display:flex;align-items:center;gap:6px;margin-bottom:3px;}
+/* Left: text info */
+.ep-card-left{flex:1;min-width:0;}
+.ep-top-row{display:flex;align-items:center;gap:7px;margin-bottom:3px;flex-wrap:wrap;}
 .ep-watching-badge{
-  font-size:9px;font-weight:800;letter-spacing:.06em;
+  font-size:9px;font-weight:800;letter-spacing:.07em;
   padding:2px 6px;border-radius:3px;
   background:#e50914;color:#fff;text-transform:uppercase;flex-shrink:0;
 }
 .ep-card-title{
-  font-size:12px;font-weight:600;color:#fff;
+  font-size:12px;font-weight:600;color:var(--text);
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
 }
-.ep-card-meta{font-size:10px;color:rgba(255,255,255,.45);margin-bottom:3px;}
+.ep-card-meta{font-size:10px;color:var(--text3);margin-bottom:4px;}
 .ep-card-desc{
-  font-size:10px;color:rgba(255,255,255,.5);line-height:1.5;
+  font-size:11px;color:var(--text3);line-height:1.5;
   display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
 }
-/* Progress bar below text for current ep */
 .ep-prog-wrap{
-  height:2px;background:rgba(255,255,255,.12);
-  border-radius:2px;margin-top:6px;overflow:hidden;
+  height:2px;background:rgba(255,255,255,.15);
+  border-radius:2px;margin-top:7px;overflow:hidden;
 }
 .ep-prog-fill{height:100%;background:#e50914;border-radius:2px;}
+
+/* Right: thumbnail */
+.ep-thumb-wrap{
+  flex-shrink:0;width:104px;height:58px;border-radius:5px;
+  overflow:hidden;background:rgba(255,255,255,.06);position:relative;
+}
+.ep-thumb-wrap img{width:100%;height:100%;object-fit:cover;display:block;}
+.ep-thumb-overlay{
+  position:absolute;inset:0;
+  display:flex;align-items:center;justify-content:center;
+  background:rgba(0,0,0,.35);opacity:0;transition:opacity .2s;
+}
+.ep-card:hover .ep-thumb-overlay,.ep-card.ep-focused .ep-thumb-overlay{opacity:1;}
+.ep-thumb-overlay svg{width:24px;height:24px;fill:white;}
+.ep-thumb-done{
+  position:absolute;inset:0;background:rgba(0,0,0,.55);
+  display:flex;align-items:center;justify-content:center;
+}
+.ep-thumb-done svg{width:18px;height:18px;stroke:#aaa;fill:none;stroke-width:2.5;}
+/* Progress bar on thumbnail bottom edge */
+.ep-thumb-prog{
+  position:absolute;bottom:0;left:0;right:0;height:3px;
+  background:rgba(255,255,255,.15);
+}
+.ep-thumb-prog-fill{height:100%;background:#e50914;}
+
+/* ══ DESKTOP EP PANEL REDESIGN ══ */
+#ep-panel-backdrop{
+  position:absolute;inset:0;z-index:24;
+  display:none;background:rgba(0,0,0,0.4);
+}
+#ep-panel-backdrop.open{display:block;}
+
+/* Top bar — hidden on mobile, shown on desktop via media query */
+.ep-panel-topbar{display:none;}
+
+@media(min-width:900px){
+  /* Override side-panel → centered popup */
+  #ep-panel{
+    top:50%;left:50%;
+    right:auto;bottom:auto;
+    width:470px;
+    max-height:74vh;
+    border-radius:14px;
+    border:1px solid rgba(255,255,255,0.1);
+    box-shadow:0 24px 80px rgba(0,0,0,0.9);
+    transform:translate(-50%,-50%) scale(0.93);
+    opacity:0;
+    transition:opacity .22s ease,transform .22s cubic-bezier(.34,1.56,.64,1);
+    overflow:hidden;
+  }
+  #ep-panel.open{
+    transform:translate(-50%,-50%) scale(1);
+    opacity:1;
+  }
+
+  /* Hide old mobile header on desktop */
+  #ep-panel .ep-panel-hd{display:none;}
+
+  /* New top bar */
+  .ep-panel-topbar{
+    display:flex;align-items:center;gap:8px;
+    padding:12px 12px 10px;flex-shrink:0;
+    border-bottom:1px solid rgba(255,255,255,0.07);
+    background:rgba(8,8,20,0.98);
+  }
+  .ep-tb-search{
+    flex:1;display:flex;align-items:center;gap:7px;
+    background:rgba(255,255,255,0.08);
+    border:1px solid rgba(255,255,255,0.13);
+    border-radius:999px;padding:6px 12px;min-width:0;
+  }
+  .ep-tb-search svg{width:13px;height:13px;stroke:rgba(255,255,255,0.4);fill:none;stroke-width:2;flex-shrink:0;}
+  .ep-tb-search input{
+    background:none;border:none;outline:none;
+    color:#fff;font-size:12px;font-family:inherit;width:100%;min-width:0;
+  }
+  .ep-tb-search input::placeholder{color:rgba(255,255,255,0.32);}
+
+  .ep-tb-season{
+    display:flex;align-items:center;gap:5px;
+    background:rgba(255,255,255,0.08);
+    border:1px solid rgba(255,255,255,0.13);
+    border-radius:999px;padding:6px 11px;
+    font-size:12px;font-weight:700;color:#fff;
+    cursor:pointer;flex-shrink:0;white-space:nowrap;position:relative;
+  }
+  .ep-tb-season svg{width:11px;height:11px;stroke:rgba(255,255,255,0.55);fill:none;stroke-width:2.5;}
+  .ep-tb-season select{
+    position:absolute;inset:0;opacity:0;cursor:pointer;
+    width:100%;border:none;background:none;font-family:inherit;
+  }
+
+  .ep-tb-autoplay{
+    display:flex;align-items:center;gap:7px;
+    font-size:12px;font-weight:600;color:#fff;
+    flex-shrink:0;white-space:nowrap;
+  }
+  .ep-tb-toggle{
+    width:34px;height:18px;border-radius:999px;
+    background:rgba(255,255,255,0.18);
+    border:1px solid rgba(255,255,255,0.22);
+    position:relative;cursor:pointer;
+    transition:background .2s,border-color .2s;flex-shrink:0;
+  }
+  .ep-tb-toggle.on{background:#22c55e;border-color:#22c55e;}
+  .ep-tb-toggle::after{
+    content:'';position:absolute;
+    top:2px;left:2px;width:12px;height:12px;
+    border-radius:50%;background:#fff;
+    transition:transform .2s;
+  }
+  .ep-tb-toggle.on::after{transform:translateX(16px);}
+
+  .ep-tb-close{
+    width:28px;height:28px;border-radius:50%;
+    background:rgba(255,255,255,0.08);
+    display:flex;align-items:center;justify-content:center;
+    cursor:pointer;flex-shrink:0;transition:background .2s;
+  }
+  .ep-tb-close:hover{background:rgba(255,255,255,0.18);}
+  .ep-tb-close svg{width:13px;height:13px;stroke:#fff;fill:none;stroke-width:2;}
+
+  /* Episode cards — full-bleed cinematic style */
+  #ep-panel-list{padding:8px 8px 16px;}
+
+  #ep-panel .ep-card{
+    flex-direction:column;position:relative;
+    min-height:116px;border-radius:10px;
+    margin:0 0 7px 0;overflow:hidden;
+    border:2px solid transparent;padding:0;
+    background:rgba(255,255,255,0.04);
+    border-bottom:none;
+    transition:border-color .15s,background .15s;
+  }
+  #ep-panel .ep-card.playing{
+    border-color:rgba(255,255,255,0.88);
+    background:transparent;
+  }
+  #ep-panel .ep-card:hover{
+    background:transparent;
+    border-color:rgba(255,255,255,0.32);
+  }
+  #ep-panel .ep-card.ep-focused{
+    border-color:rgba(255,255,255,0.88);
+    outline:none;border-radius:10px;
+  }
+  /* Thumbnail fills the entire card */
+  #ep-panel .ep-thumb-wrap{
+    position:absolute;inset:0;
+    width:100%;height:100%;
+    border-radius:0;background:#111;
+  }
+  #ep-panel .ep-thumb-wrap img{
+    width:100%;height:100%;
+    object-fit:cover;display:block;
+    filter:brightness(0.62);
+  }
+  #ep-panel .ep-card.playing .ep-thumb-wrap img{filter:brightness(0.48);}
+  #ep-panel .ep-thumb-overlay{display:none;}
+  #ep-panel .ep-thumb-prog{display:none;}
+  /* Text overlay */
+  #ep-panel .ep-card-left{
+    position:relative;z-index:2;
+    padding:10px 12px 14px;
+    min-height:116px;
+    display:flex;flex-direction:column;justify-content:flex-end;
+    background:linear-gradient(to top,rgba(0,0,0,0.88) 50%,rgba(0,0,0,0.12) 100%);
+  }
+  #ep-panel .ep-top-row{margin-bottom:4px;flex-wrap:nowrap;gap:7px;}
+  #ep-panel .ep-card-title{
+    font-size:13px;font-weight:700;
+    white-space:normal;
+    display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+  }
+  #ep-panel .ep-card-meta{font-size:11px;color:rgba(255,255,255,0.6);margin-bottom:3px;}
+  #ep-panel .ep-card-desc{
+    font-size:11px;color:rgba(255,255,255,0.55);line-height:1.45;
+    display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+  }
+  /* Progress bar pinned to very bottom edge of card */
+  #ep-panel .ep-prog-wrap{
+    position:absolute;bottom:0;left:0;right:0;
+    height:3px;margin:0;border-radius:0;
+    background:rgba(255,255,255,0.15);z-index:3;
+  }
+}
 
 /* ══ AUTO-NEXT OVERLAY ══ */
 #autonext-overlay{
@@ -1500,24 +1621,35 @@ body.tv-mode .row:hover .card-w{opacity:1;}
         </div>
       </div>
     </div>
-    <!-- EPISODE PANEL — right side overlay, hidden until button pressed -->
+    <!-- BACKDROP: click outside panel to close -->
+    <div id="ep-panel-backdrop" onclick="closeFsEpPanel()"></div>
+    <!-- NETFLIX-STYLE EPISODE SIDE PANEL -->
     <div id="ep-panel">
+      <!-- Mobile header (hidden on desktop) -->
+      <div class="ep-panel-hd">
+        <div>
+          <div class="ep-panel-hd-title" id="ep-panel-show-title">Episodes</div>
+          <div id="ep-panel-season-label" style="font-size:11px;color:var(--text3);margin-top:2px;"></div>
+        </div>
+        <button class="ep-panel-close" onclick="closeFsEpPanel()"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+      </div>
+      <!-- Desktop top bar -->
       <div class="ep-panel-topbar">
-        <div class="ep-search-wrap">
+        <div class="ep-tb-search">
           <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-          <input class="ep-panel-search" id="ep-search-input" placeholder="Search episodes…" oninput="_filterEpCards(this.value)">
+          <input type="text" id="ep-tb-search-input" placeholder="Search" autocomplete="off" oninput="filterEpPanel(this.value)">
         </div>
-        <button class="ep-season-btn" id="ep-season-btn" onclick="_epSeasonDd()">
-          <span id="ep-season-lbl">S1</span>
+        <div class="ep-tb-season" id="ep-tb-season-wrap">
+          <span id="ep-tb-season-label">S1</span>
           <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
-        </button>
-        <div class="ep-autoplay-wrap">
-          <span class="ep-autoplay-lbl">Auto play</span>
-          <div class="ep-toggle-sw on" id="ep-autoplay-sw" onclick="this.classList.toggle('on')"></div>
+          <select id="ep-tb-season-sel" onchange="changeEpPanelSeason(this.value)"></select>
         </div>
-        <button class="ep-panel-close" onclick="closeFsEpPanel()">
+        <div class="ep-tb-autoplay">Auto play
+          <div class="ep-tb-toggle on" id="ep-tb-autoplay-toggle" onclick="toggleEpPanelAutoplay(this)"></div>
+        </div>
+        <div class="ep-tb-close" onclick="closeFsEpPanel()">
           <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-        </button>
+        </div>
       </div>
       <div id="ep-panel-list" tabindex="0"></div>
     </div>
@@ -2785,12 +2917,16 @@ document.addEventListener('fullscreenchange',()=>{
   if(!document.fullscreenElement){
     document.getElementById('srv-fs-panel').classList.remove('open');
     document.getElementById('ep-panel').classList.remove('open');
+    const bd=document.getElementById('ep-panel-backdrop');
+    if(bd)bd.classList.remove('open');
   }
 });
 document.addEventListener('webkitfullscreenchange',()=>{
   if(!document.webkitFullscreenElement){
     document.getElementById('srv-fs-panel').classList.remove('open');
     document.getElementById('ep-panel').classList.remove('open');
+    const bd=document.getElementById('ep-panel-backdrop');
+    if(bd)bd.classList.remove('open');
   }
 });
 function loadSrv(id,type,i){
@@ -2804,22 +2940,22 @@ function loadSrv(id,type,i){
   }
   iframe.src=USE_PROXY?PROXY+encodeURIComponent(url):url;
 }
-// ── EP PANEL ──
-let _epPanelCwData=null;
-let _epFocusIdx=0,_epPanelTvId=null,_epPanelType=null,_epPanelTitle=null;
-let _epAllCards=[]; // store all rendered cards for filter
-
+// ── EP PANEL: fetch CW data then build ──
+let _epPanelCwData=null; // cached so we don't re-fetch on every rebuild
 async function buildEpPanel(tvId,type,showTitle){
-  _epPanelTvId=tvId;_epPanelType=type;_epPanelTitle=showTitle;
+  // Update header (mobile)
+  const titleEl=document.getElementById('ep-panel-show-title');
+  const seasonEl=document.getElementById('ep-panel-season-label');
+  if(titleEl) titleEl.textContent=showTitle||'Episodes';
+  if(seasonEl) seasonEl.textContent=`Season ${curPlayerSeason}`;
 
-  // Update season label
-  const sl=document.getElementById('ep-season-lbl');
-  if(sl) sl.textContent=`S${curPlayerSeason}`;
+  // Populate desktop season selector
+  _populateEpSeasonSel(tvId);
 
   const list=document.getElementById('ep-panel-list');
-  list.innerHTML='<div style="padding:20px 14px;color:rgba(255,255,255,.4);font-size:12px;">Loading…</div>';
+  list.innerHTML='<div style="padding:20px 16px;color:var(--text3);font-size:13px;">Loading…</div>';
 
-  // Fetch CW progress from Supabase
+  // Fetch CW progress from Supabase for this show
   try{
     const res=await sb.from('zeeyus_continue').select('progress,season,episode')
       .eq('user_id',user?.id||'').eq('media_id',String(tvId)).eq('media_type',type).single();
@@ -2827,18 +2963,18 @@ async function buildEpPanel(tvId,type,showTitle){
   }catch(_){_epPanelCwData=null;}
 
   list.innerHTML='';
-  _epAllCards=[];
-  let autoScrollIdx=0;
+  let focusIdx=0;
 
   epPanelEps.forEach((ep,i)=>{
     const isPlaying=ep.episode_number===curPlayerEp;
     const cw=_epPanelCwData;
+    // Determine watch state
     let pct=0,done=false;
     if(cw){
       if(cw.season>curPlayerSeason||(cw.season===curPlayerSeason&&cw.episode>ep.episode_number)) done=true;
       else if(cw.season===curPlayerSeason&&cw.episode===ep.episode_number) pct=cw.progress||0;
     }
-    if(isPlaying) autoScrollIdx=i;
+    if(isPlaying) focusIdx=i;
 
     const thumb=ep.still_path?IMG+'w300'+ep.still_path:'';
     const runtime=ep.runtime?`${ep.runtime}m left`:'';
@@ -2847,51 +2983,48 @@ async function buildEpPanel(tvId,type,showTitle){
     el.className='ep-card'+(isPlaying?' playing':'');
     el.tabIndex=0;
     el.dataset.idx=i;
-    el.dataset.title=(ep.name||'').toLowerCase();
 
     el.innerHTML=`
-      <div class="ep-card-inner">
-        <div class="ep-card-thumb-wrap">
-          ${thumb
-            ?`<img src="${thumb}" alt="" loading="lazy" onerror="this.style.display='none'">`
-            :`<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;"><svg viewBox="0 0 24 24" style="width:20px;height:20px;fill:none;stroke:rgba(255,255,255,.3);stroke-width:1.5"><polygon points="5 3 19 12 5 21 5 3"/></svg></div>`}
-          <div class="ep-thumb-overlay"><svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg></div>
-          ${done?`<div class="ep-thumb-done"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>`:''}
-          ${pct>0&&!done?`<div class="ep-thumb-prog"><div class="ep-thumb-prog-fill" style="width:${pct}%"></div></div>`:''}
+      <div class="ep-card-left">
+        <div class="ep-top-row">
+          ${isPlaying?'<span class="ep-watching-badge">Watching</span>':''}
+          <span class="ep-card-title">${ep.episode_number}. ${ep.name||'Episode '+ep.episode_number}</span>
         </div>
-        <div class="ep-card-right">
-          <div class="ep-top-row">
-            ${isPlaying?'<span class="ep-watching-badge">Watching</span>':''}
-            <span class="ep-card-title">${ep.episode_number}. ${ep.name||'Episode '+ep.episode_number}</span>
-          </div>
-          ${runtime?`<div class="ep-card-meta">${runtime}</div>`:''}
-          ${ep.overview?`<div class="ep-card-desc">${ep.overview}</div>`:''}
-          ${pct>0&&!done?`<div class="ep-prog-wrap"><div class="ep-prog-fill" style="width:${pct}%"></div></div>`:''}
-        </div>
+        ${runtime?`<div class="ep-card-meta">${runtime}</div>`:''}
+        ${ep.overview?`<div class="ep-card-desc">${ep.overview}</div>`:''}
+        ${pct>0&&!done?`<div class="ep-prog-wrap"><div class="ep-prog-fill" style="width:${pct}%"></div></div>`:''}
+      </div>
+      <div class="ep-thumb-wrap">
+        ${thumb
+          ?`<img src="${thumb}" alt="" loading="lazy" onerror="this.style.display='none'">`
+          :`<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;">
+              <svg viewBox="0 0 24 24" style="width:20px;height:20px;fill:none;stroke:var(--text3);stroke-width:1.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            </div>`}
+        ${done
+          ?`<div class="ep-thumb-done"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>`
+          :`<div class="ep-thumb-overlay"><svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg></div>`}
+        ${pct>0&&!done
+          ?`<div class="ep-thumb-prog"><div class="ep-thumb-prog-fill" style="width:${pct}%"></div></div>`
+          :''}
       </div>`;
 
     el.onclick=()=>_playEpFromPanel(tvId,type,showTitle,ep);
     el.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();_playEpFromPanel(tvId,type,showTitle,ep);}};
     list.appendChild(el);
-    _epAllCards.push(el);
   });
 
-  // Scroll playing episode into center view
-  _epFocusIdx=autoScrollIdx;
+  // Scroll currently playing episode into view
   setTimeout(()=>{
     const playing=list.querySelector('.ep-card.playing');
     if(playing) playing.scrollIntoView({block:'center',behavior:'smooth'});
   },120);
+
+  // Set keyboard focus on current episode
+  _epFocusIdx=focusIdx;
+  _epPanelTvId=tvId;_epPanelType=type;_epPanelTitle=showTitle;
 }
 
-function _filterEpCards(q){
-  const term=q.trim().toLowerCase();
-  _epAllCards.forEach(el=>{
-    const title=el.dataset.title||'';
-    el.style.display=(!term||title.includes(term))?'':'none';
-  });
-}
-
+// Play episode and close panel
 function _playEpFromPanel(tvId,type,showTitle,ep){
   curPlayerEp=ep.episode_number;
   document.getElementById('p-title').textContent=showTitle+` · S${curPlayerSeason} E${curPlayerEp}`;
@@ -2901,31 +3034,20 @@ function _playEpFromPanel(tvId,type,showTitle,ep){
   document.getElementById('p-next-btn').style.display=
     epPanelEps.find(e=>e.episode_number===curPlayerEp+1)?'flex':'none';
   closeFsEpPanel();
-  // Update CW position
-  if(user&&curPlayerMedia){
-    sb.from('zeeyus_continue').upsert({
-      user_id:user.id,media_id:String(tvId),media_type:type,
-      media_data:curPlayerMedia,progress:1,season:curPlayerSeason,episode:curPlayerEp,
-      updated_at:new Date().toISOString()
-    },{onConflict:'user_id,media_id,media_type'}).catch(()=>{});
-  }
-  setTimeout(()=>buildEpPanel(tvId,type,showTitle),500);
+  // Rebuild panel in background so progress updates
+  setTimeout(()=>buildEpPanel(tvId,type,showTitle),400);
 }
 
-function _epSeasonDd(){
-  // Cycle seasons if multi-season show — simple for now
-  toast('Season switching: use the title page to select a different season');
-}
-
+// ── Fullscreen episode panel toggle ──
+let _epFocusIdx=0,_epPanelTvId=null,_epPanelType=null,_epPanelTitle=null;
 function toggleFsEpPanel(){
   const panel=document.getElementById('ep-panel');
-  if(panel.classList.contains('open')){
-    closeFsEpPanel();
-  } else {
-    // Clear search on open
-    const inp=document.getElementById('ep-search-input');
-    if(inp){inp.value='';_filterEpCards('');}
+  if(panel.classList.contains('open')){closeFsEpPanel();}
+  else{
     panel.classList.add('open');
+    const bd=document.getElementById('ep-panel-backdrop');
+    if(bd)bd.classList.add('open');
+    // Keyboard focus on list for remote nav
     setTimeout(()=>{
       const cards=document.querySelectorAll('#ep-panel-list .ep-card');
       if(cards[_epFocusIdx]) cards[_epFocusIdx].focus();
@@ -2934,21 +3056,84 @@ function toggleFsEpPanel(){
 }
 function closeFsEpPanel(){
   document.getElementById('ep-panel').classList.remove('open');
+  const bd=document.getElementById('ep-panel-backdrop');
+  if(bd)bd.classList.remove('open');
+  // Clear search input when closing
+  const si=document.getElementById('ep-tb-search-input');
+  if(si){si.value='';filterEpPanel('');}
 }
+// Keep old names working
 function openEpPanel(){toggleFsEpPanel();}
 function closeEpPanel(){closeFsEpPanel();}
 
-// Remote/keyboard nav inside episode panel
+// ── DESKTOP EP PANEL: populate season selector ──
+function _populateEpSeasonSel(tvId){
+  const sel=document.getElementById('ep-tb-season-sel');
+  const lbl=document.getElementById('ep-tb-season-label');
+  if(!sel||!lbl) return;
+  // Get number of seasons from curPlayerMedia
+  const numSeasons=curPlayerMedia?.number_of_seasons||curPlayerMedia?.seasons?.length||1;
+  sel.innerHTML='';
+  for(let s=1;s<=numSeasons;s++){
+    const opt=document.createElement('option');
+    opt.value=s;opt.textContent=`Season ${s}`;
+    if(s===curPlayerSeason) opt.selected=true;
+    sel.appendChild(opt);
+  }
+  lbl.textContent=`S${curPlayerSeason}`;
+}
+
+// ── Filter episode list by search ──
+function filterEpPanel(query){
+  const cards=document.querySelectorAll('#ep-panel-list .ep-card');
+  const q=(query||'').toLowerCase().trim();
+  cards.forEach(card=>{
+    const title=card.querySelector('.ep-card-title')?.textContent.toLowerCase()||'';
+    card.style.display=(!q||title.includes(q))?'':'none';
+  });
+}
+
+// ── Change season from desktop top bar selector ──
+async function changeEpPanelSeason(seasonNum){
+  if(!_epPanelTvId) return;
+  curPlayerSeason=parseInt(seasonNum);
+  curPlayerEp=1;
+  const lbl=document.getElementById('ep-tb-season-label');
+  if(lbl) lbl.textContent=`S${curPlayerSeason}`;
+  document.getElementById('p-ep-label').textContent=`S${curPlayerSeason} · E${curPlayerEp}`;
+  const pTitle=document.getElementById('p-title');
+  if(pTitle) pTitle.textContent=(_epPanelTitle||'')+` · S${curPlayerSeason} E${curPlayerEp}`;
+  // Fetch new season episodes
+  try{
+    const d=await api(`/tv/${_epPanelTvId}/season/${curPlayerSeason}`,'');
+    epPanelEps=d.episodes||[];
+  }catch(e){epPanelEps=[];}
+  // Play first ep of new season
+  const curSrv=[...document.querySelectorAll('.srv-btn')].findIndex(b=>b.classList.contains('on'));
+  loadSrv(_epPanelTvId,_epPanelType,curSrv>=0?curSrv:0);
+  await buildEpPanel(_epPanelTvId,_epPanelType,_epPanelTitle);
+}
+
+// ── Autoplay toggle from desktop top bar ──
+let _epAutoPlayOn=true;
+function toggleEpPanelAutoplay(el){
+  _epAutoPlayOn=!_epAutoPlayOn;
+  el.classList.toggle('on',_epAutoPlayOn);
+  if(!_epAutoPlayOn) cancelAutoNext();
+  else scheduleAutoNext();
+}
+
+// ── Remote/keyboard navigation inside episode panel ──
 document.addEventListener('keydown',e=>{
   const panel=document.getElementById('ep-panel');
   if(!panel||!panel.classList.contains('open')) return;
-  const cards=[...document.querySelectorAll('#ep-panel-list .ep-card:not([style*="display: none"])')];
+  const cards=[...document.querySelectorAll('#ep-panel-list .ep-card')];
   if(!cards.length) return;
-  if(e.key==='ArrowDown'||e.key==='PageDown'){
+  if(e.key==='ArrowDown'||e.key==='ArrowRight'||e.key==='PageDown'){
     e.preventDefault();
     _epFocusIdx=Math.min(_epFocusIdx+1,cards.length-1);
     cards[_epFocusIdx].focus();cards[_epFocusIdx].scrollIntoView({block:'nearest',behavior:'smooth'});
-  } else if(e.key==='ArrowUp'||e.key==='PageUp'){
+  } else if(e.key==='ArrowUp'||e.key==='ArrowLeft'||e.key==='PageUp'){
     e.preventDefault();
     _epFocusIdx=Math.max(_epFocusIdx-1,0);
     cards[_epFocusIdx].focus();cards[_epFocusIdx].scrollIntoView({block:'nearest',behavior:'smooth'});
@@ -3028,6 +3213,8 @@ function closePlayer(){
   if(_cwSaveFn){try{_cwSaveFn(true);}catch(_){} _cwSaveFn=null;}
   document.getElementById('player-iframe').src='';
   document.getElementById('ep-panel').classList.remove('open');
+  const _epbd=document.getElementById('ep-panel-backdrop');
+  if(_epbd)_epbd.classList.remove('open');
   document.getElementById('srv-fs-panel').classList.remove('open');
   document.getElementById('player-modal').classList.remove('open');
   document.body.style.overflow='';
