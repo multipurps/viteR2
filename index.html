@@ -10,7 +10,6 @@
 <meta name="apple-mobile-web-app-title" content="Zeeyus">
 <meta name="mobile-web-app-capable" content="yes">
 <link rel="apple-touch-icon" href="assets/icon.png">
-<link rel="manifest" href="manifest.json">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
 <!-- supabase loaded dynamically below -->
@@ -961,107 +960,148 @@ body.tv-mode .row:hover .card-w{opacity:1;}
   background:rgba(0,0,0,.65);border:1px solid rgba(255,255,255,.2);
   align-items:center;justify-content:center;
   cursor:pointer;backdrop-filter:blur(10px);
-  transition:background .2s;
+  transition:background .2s;display:none;
 }
 #ep-toggle-btn:hover{background:rgba(255,255,255,.15);}
 #ep-toggle-btn svg{width:20px;height:20px;stroke:white;fill:none;stroke-width:2;}
-/* Show ep button only in fullscreen and only when it's a TV show (controlled via JS display) */
 #player-modal:-webkit-full-screen #ep-toggle-btn.tv-show,
-#player-modal:fullscreen #ep-toggle-btn.tv-show { display:flex !important; }
+#player-modal:fullscreen #ep-toggle-btn.tv-show{display:flex!important;}
 
-/* ══ NETFLIX-STYLE EPISODE SIDE PANEL ══ */
+/* ══ EPISODE OVERLAY — centered, Netflix-style ══ */
 #ep-panel{
-  position:absolute;top:0;right:0;bottom:0;
-  width:min(400px,90%);
-  background:rgba(8,8,18,.97);
-  backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
-  border-left:1px solid rgba(255,255,255,.07);
-  transform:translateX(102%);
-  transition:transform .32s cubic-bezier(.4,0,.2,1);
-  z-index:25;display:flex;flex-direction:column;
-  box-shadow:-12px 0 40px rgba(0,0,0,.6);
+  position:absolute;
+  top:0;bottom:0;right:0;
+  width:clamp(300px,38%,480px);
+  background:rgba(10,10,18,.96);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  display:flex;flex-direction:column;
+  transform:translateX(105%);
+  transition:transform .3s cubic-bezier(.4,0,.2,1);
+  z-index:30;
+  /* not visible until .open */
 }
 #ep-panel.open{transform:translateX(0);}
-.ep-panel-hd{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:20px 18px 14px;
-  border-bottom:1px solid rgba(255,255,255,.07);
+
+/* Top bar: search + season + autoplay + close */
+.ep-panel-topbar{
+  display:flex;align-items:center;gap:8px;
+  padding:14px 14px 10px;
+  border-bottom:1px solid rgba(255,255,255,.08);
   flex-shrink:0;
 }
-.ep-panel-hd-title{font-size:14px;font-weight:700;color:var(--text);}
+.ep-panel-search{
+  flex:1;height:34px;
+  background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);
+  border-radius:999px;padding:0 14px 0 32px;
+  font-size:12px;color:#fff;outline:none;
+  font-family:inherit;
+}
+.ep-panel-search::placeholder{color:rgba(255,255,255,.35);}
+.ep-search-wrap{position:relative;flex:1;}
+.ep-search-wrap svg{position:absolute;left:10px;top:50%;transform:translateY(-50%);width:14px;height:14px;stroke:rgba(255,255,255,.4);fill:none;stroke-width:2;pointer-events:none;}
+.ep-season-btn{
+  flex-shrink:0;height:34px;padding:0 12px;
+  background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);
+  border-radius:999px;font-size:12px;font-weight:700;color:#fff;
+  cursor:pointer;display:flex;align-items:center;gap:4px;white-space:nowrap;
+}
+.ep-season-btn svg{width:12px;height:12px;stroke:#fff;fill:none;stroke-width:2.5;}
+.ep-autoplay-wrap{
+  display:flex;align-items:center;gap:5px;flex-shrink:0;
+}
+.ep-autoplay-lbl{font-size:11px;font-weight:600;color:rgba(255,255,255,.6);}
+/* Toggle switch */
+.ep-toggle-sw{
+  width:34px;height:19px;border-radius:999px;
+  background:rgba(255,255,255,.15);cursor:pointer;
+  position:relative;transition:background .2s;flex-shrink:0;
+}
+.ep-toggle-sw.on{background:#e50914;}
+.ep-toggle-sw::after{
+  content:'';position:absolute;top:2px;left:2px;
+  width:15px;height:15px;border-radius:50%;background:#fff;
+  transition:transform .2s;
+}
+.ep-toggle-sw.on::after{transform:translateX(15px);}
 .ep-panel-close{
-  width:30px;height:30px;background:rgba(255,255,255,.08);
-  border-radius:50%;display:flex;align-items:center;justify-content:center;
-  cursor:pointer;transition:background .2s;flex-shrink:0;
+  flex-shrink:0;width:30px;height:30px;
+  background:rgba(255,255,255,.08);border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;transition:background .2s;
 }
 .ep-panel-close:hover{background:rgba(255,255,255,.18);}
-.ep-panel-close svg{width:14px;height:14px;stroke:white;stroke-width:2;fill:none;}
+.ep-panel-close svg{width:14px;height:14px;stroke:#fff;stroke-width:2;fill:none;}
+
+/* Scrollable list */
 #ep-panel-list{
   flex:1;overflow-y:auto;
-  padding:6px 0 24px;
-  scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.12) transparent;
+  scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.1) transparent;
 }
-#ep-panel-list::-webkit-scrollbar{width:3px;}
-#ep-panel-list::-webkit-scrollbar-thumb{background:rgba(255,255,255,.12);border-radius:3px;}
+#ep-panel-list::-webkit-scrollbar{width:2px;}
+#ep-panel-list::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:2px;}
 
-/* Each episode row */
+/* Episode card */
 .ep-card{
-  display:flex;gap:12px;align-items:flex-start;
-  padding:11px 16px;cursor:pointer;
-  border-bottom:1px solid rgba(255,255,255,.04);
-  transition:background .15s;position:relative;outline:none;
+  display:flex;flex-direction:column;
+  padding:10px 12px;cursor:pointer;
+  border-bottom:1px solid rgba(255,255,255,.05);
+  transition:background .15s;outline:none;
 }
-.ep-card:hover{background:rgba(255,255,255,.07);}
-.ep-card.playing{background:rgba(255,255,255,.05);}
-.ep-card.ep-focused{background:rgba(255,255,255,.12);outline:2px solid rgba(255,255,255,.25);outline-offset:-2px;border-radius:4px;}
+.ep-card:hover{background:rgba(255,255,255,.06);}
+.ep-card.playing{
+  border:2px solid rgba(255,165,0,.7);
+  border-radius:8px;margin:6px 10px;padding:10px;
+}
+.ep-card.ep-focused{background:rgba(255,255,255,.1);}
 
-/* Left: text info */
-.ep-card-left{flex:1;min-width:0;}
-.ep-top-row{display:flex;align-items:center;gap:7px;margin-bottom:3px;flex-wrap:wrap;}
-.ep-watching-badge{
-  font-size:9px;font-weight:800;letter-spacing:.07em;
-  padding:2px 6px;border-radius:3px;
-  background:#e50914;color:#fff;text-transform:uppercase;flex-shrink:0;
-}
-.ep-card-title{
-  font-size:12px;font-weight:600;color:var(--text);
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-}
-.ep-card-meta{font-size:10px;color:var(--text3);margin-bottom:4px;}
-.ep-card-desc{
-  font-size:11px;color:var(--text3);line-height:1.5;
-  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
-}
-.ep-prog-wrap{
-  height:2px;background:rgba(255,255,255,.15);
-  border-radius:2px;margin-top:7px;overflow:hidden;
-}
-.ep-prog-fill{height:100%;background:#e50914;border-radius:2px;}
-
-/* Right: thumbnail */
-.ep-thumb-wrap{
-  flex-shrink:0;width:104px;height:58px;border-radius:5px;
+/* Card inner: thumb LEFT, text RIGHT — like screenshot */
+.ep-card-inner{display:flex;gap:10px;align-items:flex-start;}
+.ep-card-thumb-wrap{
+  flex-shrink:0;width:120px;height:68px;border-radius:6px;
   overflow:hidden;background:rgba(255,255,255,.06);position:relative;
 }
-.ep-thumb-wrap img{width:100%;height:100%;object-fit:cover;display:block;}
+.ep-card-thumb-wrap img{width:100%;height:100%;object-fit:cover;display:block;}
 .ep-thumb-overlay{
-  position:absolute;inset:0;
+  position:absolute;inset:0;background:rgba(0,0,0,.4);
   display:flex;align-items:center;justify-content:center;
-  background:rgba(0,0,0,.35);opacity:0;transition:opacity .2s;
+  opacity:0;transition:opacity .2s;
 }
 .ep-card:hover .ep-thumb-overlay,.ep-card.ep-focused .ep-thumb-overlay{opacity:1;}
 .ep-thumb-overlay svg{width:24px;height:24px;fill:white;}
 .ep-thumb-done{
-  position:absolute;inset:0;background:rgba(0,0,0,.55);
+  position:absolute;inset:0;background:rgba(0,0,0,.5);
   display:flex;align-items:center;justify-content:center;
 }
-.ep-thumb-done svg{width:18px;height:18px;stroke:#aaa;fill:none;stroke-width:2.5;}
-/* Progress bar on thumbnail bottom edge */
+.ep-thumb-done svg{width:18px;height:18px;stroke:#ccc;fill:none;stroke-width:2.5;}
 .ep-thumb-prog{
   position:absolute;bottom:0;left:0;right:0;height:3px;
-  background:rgba(255,255,255,.15);
+  background:rgba(255,255,255,.12);
 }
 .ep-thumb-prog-fill{height:100%;background:#e50914;}
+
+/* Text side */
+.ep-card-right{flex:1;min-width:0;}
+.ep-top-row{display:flex;align-items:center;gap:6px;margin-bottom:3px;}
+.ep-watching-badge{
+  font-size:9px;font-weight:800;letter-spacing:.06em;
+  padding:2px 6px;border-radius:3px;
+  background:#e50914;color:#fff;text-transform:uppercase;flex-shrink:0;
+}
+.ep-card-title{
+  font-size:12px;font-weight:600;color:#fff;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.ep-card-meta{font-size:10px;color:rgba(255,255,255,.45);margin-bottom:3px;}
+.ep-card-desc{
+  font-size:10px;color:rgba(255,255,255,.5);line-height:1.5;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+}
+/* Progress bar below text for current ep */
+.ep-prog-wrap{
+  height:2px;background:rgba(255,255,255,.12);
+  border-radius:2px;margin-top:6px;overflow:hidden;
+}
+.ep-prog-fill{height:100%;background:#e50914;border-radius:2px;}
 
 /* ══ AUTO-NEXT OVERLAY ══ */
 #autonext-overlay{
@@ -1460,14 +1500,24 @@ body.tv-mode .row:hover .card-w{opacity:1;}
         </div>
       </div>
     </div>
-    <!-- NETFLIX-STYLE EPISODE SIDE PANEL -->
+    <!-- EPISODE PANEL — right side overlay, hidden until button pressed -->
     <div id="ep-panel">
-      <div class="ep-panel-hd">
-        <div>
-          <div class="ep-panel-hd-title" id="ep-panel-show-title">Episodes</div>
-          <div id="ep-panel-season-label" style="font-size:11px;color:var(--text3);margin-top:2px;"></div>
+      <div class="ep-panel-topbar">
+        <div class="ep-search-wrap">
+          <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <input class="ep-panel-search" id="ep-search-input" placeholder="Search episodes…" oninput="_filterEpCards(this.value)">
         </div>
-        <button class="ep-panel-close" onclick="closeFsEpPanel()"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+        <button class="ep-season-btn" id="ep-season-btn" onclick="_epSeasonDd()">
+          <span id="ep-season-lbl">S1</span>
+          <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="ep-autoplay-wrap">
+          <span class="ep-autoplay-lbl">Auto play</span>
+          <div class="ep-toggle-sw on" id="ep-autoplay-sw" onclick="this.classList.toggle('on')"></div>
+        </div>
+        <button class="ep-panel-close" onclick="closeFsEpPanel()">
+          <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
       </div>
       <div id="ep-panel-list" tabindex="0"></div>
     </div>
@@ -2754,19 +2804,22 @@ function loadSrv(id,type,i){
   }
   iframe.src=USE_PROXY?PROXY+encodeURIComponent(url):url;
 }
-// ── EP PANEL: fetch CW data then build ──
-let _epPanelCwData=null; // cached so we don't re-fetch on every rebuild
+// ── EP PANEL ──
+let _epPanelCwData=null;
+let _epFocusIdx=0,_epPanelTvId=null,_epPanelType=null,_epPanelTitle=null;
+let _epAllCards=[]; // store all rendered cards for filter
+
 async function buildEpPanel(tvId,type,showTitle){
-  // Update header
-  const titleEl=document.getElementById('ep-panel-show-title');
-  const seasonEl=document.getElementById('ep-panel-season-label');
-  if(titleEl) titleEl.textContent=showTitle||'Episodes';
-  if(seasonEl) seasonEl.textContent=`Season ${curPlayerSeason}`;
+  _epPanelTvId=tvId;_epPanelType=type;_epPanelTitle=showTitle;
+
+  // Update season label
+  const sl=document.getElementById('ep-season-lbl');
+  if(sl) sl.textContent=`S${curPlayerSeason}`;
 
   const list=document.getElementById('ep-panel-list');
-  list.innerHTML='<div style="padding:20px 16px;color:var(--text3);font-size:13px;">Loading…</div>';
+  list.innerHTML='<div style="padding:20px 14px;color:rgba(255,255,255,.4);font-size:12px;">Loading…</div>';
 
-  // Fetch CW progress from Supabase for this show
+  // Fetch CW progress from Supabase
   try{
     const res=await sb.from('zeeyus_continue').select('progress,season,episode')
       .eq('user_id',user?.id||'').eq('media_id',String(tvId)).eq('media_type',type).single();
@@ -2774,18 +2827,18 @@ async function buildEpPanel(tvId,type,showTitle){
   }catch(_){_epPanelCwData=null;}
 
   list.innerHTML='';
-  let focusIdx=0;
+  _epAllCards=[];
+  let autoScrollIdx=0;
 
   epPanelEps.forEach((ep,i)=>{
     const isPlaying=ep.episode_number===curPlayerEp;
     const cw=_epPanelCwData;
-    // Determine watch state
     let pct=0,done=false;
     if(cw){
       if(cw.season>curPlayerSeason||(cw.season===curPlayerSeason&&cw.episode>ep.episode_number)) done=true;
       else if(cw.season===curPlayerSeason&&cw.episode===ep.episode_number) pct=cw.progress||0;
     }
-    if(isPlaying) focusIdx=i;
+    if(isPlaying) autoScrollIdx=i;
 
     const thumb=ep.still_path?IMG+'w300'+ep.still_path:'';
     const runtime=ep.runtime?`${ep.runtime}m left`:'';
@@ -2794,48 +2847,51 @@ async function buildEpPanel(tvId,type,showTitle){
     el.className='ep-card'+(isPlaying?' playing':'');
     el.tabIndex=0;
     el.dataset.idx=i;
+    el.dataset.title=(ep.name||'').toLowerCase();
 
     el.innerHTML=`
-      <div class="ep-card-left">
-        <div class="ep-top-row">
-          ${isPlaying?'<span class="ep-watching-badge">Watching</span>':''}
-          <span class="ep-card-title">${ep.episode_number}. ${ep.name||'Episode '+ep.episode_number}</span>
+      <div class="ep-card-inner">
+        <div class="ep-card-thumb-wrap">
+          ${thumb
+            ?`<img src="${thumb}" alt="" loading="lazy" onerror="this.style.display='none'">`
+            :`<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;"><svg viewBox="0 0 24 24" style="width:20px;height:20px;fill:none;stroke:rgba(255,255,255,.3);stroke-width:1.5"><polygon points="5 3 19 12 5 21 5 3"/></svg></div>`}
+          <div class="ep-thumb-overlay"><svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg></div>
+          ${done?`<div class="ep-thumb-done"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>`:''}
+          ${pct>0&&!done?`<div class="ep-thumb-prog"><div class="ep-thumb-prog-fill" style="width:${pct}%"></div></div>`:''}
         </div>
-        ${runtime?`<div class="ep-card-meta">${runtime}</div>`:''}
-        ${ep.overview?`<div class="ep-card-desc">${ep.overview}</div>`:''}
-        ${pct>0&&!done?`<div class="ep-prog-wrap"><div class="ep-prog-fill" style="width:${pct}%"></div></div>`:''}
-      </div>
-      <div class="ep-thumb-wrap">
-        ${thumb
-          ?`<img src="${thumb}" alt="" loading="lazy" onerror="this.style.display='none'">`
-          :`<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;">
-              <svg viewBox="0 0 24 24" style="width:20px;height:20px;fill:none;stroke:var(--text3);stroke-width:1.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-            </div>`}
-        ${done
-          ?`<div class="ep-thumb-done"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>`
-          :`<div class="ep-thumb-overlay"><svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg></div>`}
-        ${pct>0&&!done
-          ?`<div class="ep-thumb-prog"><div class="ep-thumb-prog-fill" style="width:${pct}%"></div></div>`
-          :''}
+        <div class="ep-card-right">
+          <div class="ep-top-row">
+            ${isPlaying?'<span class="ep-watching-badge">Watching</span>':''}
+            <span class="ep-card-title">${ep.episode_number}. ${ep.name||'Episode '+ep.episode_number}</span>
+          </div>
+          ${runtime?`<div class="ep-card-meta">${runtime}</div>`:''}
+          ${ep.overview?`<div class="ep-card-desc">${ep.overview}</div>`:''}
+          ${pct>0&&!done?`<div class="ep-prog-wrap"><div class="ep-prog-fill" style="width:${pct}%"></div></div>`:''}
+        </div>
       </div>`;
 
     el.onclick=()=>_playEpFromPanel(tvId,type,showTitle,ep);
     el.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();_playEpFromPanel(tvId,type,showTitle,ep);}};
     list.appendChild(el);
+    _epAllCards.push(el);
   });
 
-  // Scroll currently playing episode into view
+  // Scroll playing episode into center view
+  _epFocusIdx=autoScrollIdx;
   setTimeout(()=>{
     const playing=list.querySelector('.ep-card.playing');
     if(playing) playing.scrollIntoView({block:'center',behavior:'smooth'});
   },120);
-
-  // Set keyboard focus on current episode
-  _epFocusIdx=focusIdx;
-  _epPanelTvId=tvId;_epPanelType=type;_epPanelTitle=showTitle;
 }
 
-// Play episode and close panel
+function _filterEpCards(q){
+  const term=q.trim().toLowerCase();
+  _epAllCards.forEach(el=>{
+    const title=el.dataset.title||'';
+    el.style.display=(!term||title.includes(term))?'':'none';
+  });
+}
+
 function _playEpFromPanel(tvId,type,showTitle,ep){
   curPlayerEp=ep.episode_number;
   document.getElementById('p-title').textContent=showTitle+` · S${curPlayerSeason} E${curPlayerEp}`;
@@ -2845,18 +2901,31 @@ function _playEpFromPanel(tvId,type,showTitle,ep){
   document.getElementById('p-next-btn').style.display=
     epPanelEps.find(e=>e.episode_number===curPlayerEp+1)?'flex':'none';
   closeFsEpPanel();
-  // Rebuild panel in background so progress updates
-  setTimeout(()=>buildEpPanel(tvId,type,showTitle),400);
+  // Update CW position
+  if(user&&curPlayerMedia){
+    sb.from('zeeyus_continue').upsert({
+      user_id:user.id,media_id:String(tvId),media_type:type,
+      media_data:curPlayerMedia,progress:1,season:curPlayerSeason,episode:curPlayerEp,
+      updated_at:new Date().toISOString()
+    },{onConflict:'user_id,media_id,media_type'}).catch(()=>{});
+  }
+  setTimeout(()=>buildEpPanel(tvId,type,showTitle),500);
 }
 
-// ── Fullscreen episode panel toggle ──
-let _epFocusIdx=0,_epPanelTvId=null,_epPanelType=null,_epPanelTitle=null;
+function _epSeasonDd(){
+  // Cycle seasons if multi-season show — simple for now
+  toast('Season switching: use the title page to select a different season');
+}
+
 function toggleFsEpPanel(){
   const panel=document.getElementById('ep-panel');
-  if(panel.classList.contains('open')){closeFsEpPanel();}
-  else{
+  if(panel.classList.contains('open')){
+    closeFsEpPanel();
+  } else {
+    // Clear search on open
+    const inp=document.getElementById('ep-search-input');
+    if(inp){inp.value='';_filterEpCards('');}
     panel.classList.add('open');
-    // Keyboard focus on list for remote nav
     setTimeout(()=>{
       const cards=document.querySelectorAll('#ep-panel-list .ep-card');
       if(cards[_epFocusIdx]) cards[_epFocusIdx].focus();
@@ -2866,21 +2935,20 @@ function toggleFsEpPanel(){
 function closeFsEpPanel(){
   document.getElementById('ep-panel').classList.remove('open');
 }
-// Keep old names working
 function openEpPanel(){toggleFsEpPanel();}
 function closeEpPanel(){closeFsEpPanel();}
 
-// ── Remote/keyboard navigation inside episode panel ──
+// Remote/keyboard nav inside episode panel
 document.addEventListener('keydown',e=>{
   const panel=document.getElementById('ep-panel');
   if(!panel||!panel.classList.contains('open')) return;
-  const cards=[...document.querySelectorAll('#ep-panel-list .ep-card')];
+  const cards=[...document.querySelectorAll('#ep-panel-list .ep-card:not([style*="display: none"])')];
   if(!cards.length) return;
-  if(e.key==='ArrowDown'||e.key==='ArrowRight'||e.key==='PageDown'){
+  if(e.key==='ArrowDown'||e.key==='PageDown'){
     e.preventDefault();
     _epFocusIdx=Math.min(_epFocusIdx+1,cards.length-1);
     cards[_epFocusIdx].focus();cards[_epFocusIdx].scrollIntoView({block:'nearest',behavior:'smooth'});
-  } else if(e.key==='ArrowUp'||e.key==='ArrowLeft'||e.key==='PageUp'){
+  } else if(e.key==='ArrowUp'||e.key==='PageUp'){
     e.preventDefault();
     _epFocusIdx=Math.max(_epFocusIdx-1,0);
     cards[_epFocusIdx].focus();cards[_epFocusIdx].scrollIntoView({block:'nearest',behavior:'smooth'});
@@ -3481,6 +3549,31 @@ function _boot(){
 }
 
 
+// ── ANDROID PWA MANIFEST ──
+(()=>{
+  try{
+    if(document.querySelector('link[rel="manifest"]'))return;
+    const manifest={
+      name:'Zeeyus',short_name:'Zeeyus',
+      description:'Your personal streaming platform',
+      start_url:'./index.html',display:'standalone',
+      orientation:'portrait',
+      background_color:'#080810',theme_color:'#080810',
+      icons:[
+        {src:'assets/icon.png',sizes:'512x512',type:'image/png',purpose:'any maskable'},
+        {src:'assets/icon.png',sizes:'192x192',type:'image/png'}
+      ]
+    };
+    const blob=new Blob([JSON.stringify(manifest)],{type:'application/manifest+json'});
+    const link=document.createElement('link');
+    link.rel='manifest';link.href=URL.createObjectURL(blob);
+    document.head.appendChild(link);
+    // Android theme color
+    const meta=document.createElement('meta');
+    meta.name='theme-color';meta.content='#080810';
+    document.head.appendChild(meta);
+  }catch(e){}
+})();
 if(document.readyState==='loading'){
   document.addEventListener('DOMContentLoaded',_boot);
 }else{
