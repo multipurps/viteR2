@@ -956,17 +956,16 @@ body.tv-mode .row:hover .card-w{opacity:1;}
 /* ── Floating episodes button — TV shows only, fullscreen only ── */
 #ep-toggle-btn{
   position:absolute;bottom:20px;right:72px;z-index:20;
-  min-width:42px;height:auto;padding:8px 10px;
-  border-radius:10px;
-  background:rgba(0,0,0,.65);border:1px solid rgba(255,255,255,.2);
+  padding:8px 16px;
+  border-radius:8px;
+  background:rgba(0,0,0,.65);border:1px solid rgba(255,255,255,.22);
   display:none;align-items:center;justify-content:center;
-  flex-direction:column;gap:2px;
+  font-size:13px;font-weight:700;color:#fff;letter-spacing:.02em;
   cursor:pointer;backdrop-filter:blur(10px);
-  transition:background .2s;
+  transition:background .2s;white-space:nowrap;
 }
 #ep-toggle-btn:hover{background:rgba(255,255,255,.15);}
-#ep-toggle-btn svg{width:18px;height:18px;stroke:white;fill:none;stroke-width:2;}
-/* Show ep button only in fullscreen and only when it's a TV show (controlled via JS display) */
+/* Show only in fullscreen and only for TV shows */
 #player-modal:-webkit-full-screen #ep-toggle-btn.tv-show,
 #player-modal:fullscreen #ep-toggle-btn.tv-show { display:flex !important; }
 
@@ -1067,81 +1066,93 @@ body.tv-mode .row:hover .card-w{opacity:1;}
 /* ══ DESKTOP EP PANEL REDESIGN ══ */
 #ep-panel-backdrop{
   position:absolute;inset:0;z-index:24;
-  display:none;background:rgba(0,0,0,0.4);
+  display:none;
 }
 #ep-panel-backdrop.open{display:block;}
 
-/* Top bar — hidden on mobile, shown on desktop via media query */
+/* Topbar + entire ep-panel: hidden on mobile */
 .ep-panel-topbar{display:none;}
 
+@media(max-width:899px){
+  /* Hide ep-panel entirely on mobile — desktop/TV only feature */
+  #ep-panel{display:none !important;}
+  #ep-panel-backdrop{display:none !important;}
+  /* Hide the Episodes trigger button on mobile too */
+  .p-ep-action{display:none !important;}
+  #ep-toggle-btn{display:none !important;}
+}
+
 @media(min-width:900px){
-  /* Override side-panel → right-side floating popup */
+  /* Panel: NO solid background — floats transparently over video */
   #ep-panel{
-    top:50%;
-    left:auto;
-    right:4%;
-    bottom:auto;
-    width:470px;
-    max-height:74vh;
-    border-radius:14px;
-    border:1px solid rgba(255,255,255,0.1);
-    box-shadow:0 24px 80px rgba(0,0,0,0.9);
-    transform:translateY(-50%) scale(0.93);
+    top:6%;left:50%;
+    right:auto;bottom:auto;
+    width:490px;
+    max-height:84vh;
+    background:none !important;
+    border:none !important;
+    box-shadow:none !important;
+    border-radius:0;
+    transform:translateX(-50%) scale(0.94);
     opacity:0;
-    transition:opacity .22s ease,transform .22s cubic-bezier(.34,1.56,.64,1);
-    overflow:hidden;
-    display:flex;
-    flex-direction:column;
+    transition:opacity .2s ease,transform .2s cubic-bezier(.34,1.56,.64,1);
+    display:flex;flex-direction:column;
+    overflow:visible;
   }
   #ep-panel.open{
-    transform:translateY(-50%) scale(1);
+    transform:translateX(-50%) scale(1);
     opacity:1;
   }
-
-  /* Hide old mobile header on desktop */
+  /* Hide old mobile header */
   #ep-panel .ep-panel-hd{display:none;}
 
-  /* New top bar */
+  /* ── Top bar: each pill floats independently, no shared container bg ── */
   .ep-panel-topbar{
-    display:flex;align-items:center;gap:8px;
-    padding:12px 12px 10px;flex-shrink:0;
-    border-bottom:1px solid rgba(255,255,255,0.07);
-    background:rgba(8,8,20,0.98);
+    display:flex;align-items:center;gap:9px;
+    padding:0 0 12px;flex-shrink:0;
+    background:none;
   }
   .ep-tb-search{
-    flex:1;display:flex;align-items:center;gap:7px;
-    background:rgba(255,255,255,0.08);
-    border:1px solid rgba(255,255,255,0.13);
-    border-radius:999px;padding:6px 12px;min-width:0;
+    flex:1;display:flex;align-items:center;gap:8px;
+    background:rgba(10,10,20,0.82);
+    border:1px solid rgba(255,255,255,0.15);
+    border-radius:999px;padding:8px 14px;min-width:0;
+    backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
   }
-  .ep-tb-search svg{width:13px;height:13px;stroke:rgba(255,255,255,0.4);fill:none;stroke-width:2;flex-shrink:0;}
+  .ep-tb-search svg{width:14px;height:14px;stroke:rgba(255,255,255,0.45);fill:none;stroke-width:2;flex-shrink:0;}
   .ep-tb-search input{
     background:none;border:none;outline:none;
-    color:#fff;font-size:12px;font-family:inherit;width:100%;min-width:0;
+    color:#fff;font-size:13px;font-family:inherit;width:100%;
   }
   .ep-tb-search input::placeholder{color:rgba(255,255,255,0.32);}
 
   .ep-tb-season{
     display:flex;align-items:center;gap:5px;
-    background:rgba(255,255,255,0.08);
-    border:1px solid rgba(255,255,255,0.13);
-    border-radius:999px;padding:6px 11px;
-    font-size:12px;font-weight:700;color:#fff;
-    cursor:pointer;flex-shrink:0;white-space:nowrap;position:relative;
+    background:rgba(10,10,20,0.82);
+    border:1px solid rgba(255,255,255,0.15);
+    border-radius:999px;padding:8px 13px;
+    font-size:13px;font-weight:700;color:#fff;
+    cursor:pointer;flex-shrink:0;white-space:nowrap;
+    position:relative;
+    backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
   }
-  .ep-tb-season svg{width:11px;height:11px;stroke:rgba(255,255,255,0.55);fill:none;stroke-width:2.5;}
+  .ep-tb-season svg{width:12px;height:12px;stroke:rgba(255,255,255,0.55);fill:none;stroke-width:2.5;}
   .ep-tb-season select{
     position:absolute;inset:0;opacity:0;cursor:pointer;
     width:100%;border:none;background:none;font-family:inherit;
   }
 
   .ep-tb-autoplay{
-    display:flex;align-items:center;gap:7px;
-    font-size:12px;font-weight:600;color:#fff;
+    display:flex;align-items:center;gap:8px;
+    background:rgba(10,10,20,0.82);
+    border:1px solid rgba(255,255,255,0.15);
+    border-radius:999px;padding:8px 13px;
+    font-size:13px;font-weight:600;color:#fff;
     flex-shrink:0;white-space:nowrap;
+    backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
   }
   .ep-tb-toggle{
-    width:34px;height:18px;border-radius:999px;
+    width:36px;height:20px;border-radius:999px;
     background:rgba(255,255,255,0.18);
     border:1px solid rgba(255,255,255,0.22);
     position:relative;cursor:pointer;
@@ -1150,85 +1161,97 @@ body.tv-mode .row:hover .card-w{opacity:1;}
   .ep-tb-toggle.on{background:#22c55e;border-color:#22c55e;}
   .ep-tb-toggle::after{
     content:'';position:absolute;
-    top:2px;left:2px;width:12px;height:12px;
+    top:2px;left:2px;width:14px;height:14px;
     border-radius:50%;background:#fff;
-    transition:transform .2s;
+    transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,0.4);
   }
   .ep-tb-toggle.on::after{transform:translateX(16px);}
 
   .ep-tb-close{
-    width:28px;height:28px;border-radius:50%;
-    background:rgba(255,255,255,0.08);
+    width:36px;height:36px;border-radius:50%;
+    background:rgba(10,10,20,0.82);
+    border:1px solid rgba(255,255,255,0.15);
     display:flex;align-items:center;justify-content:center;
-    cursor:pointer;flex-shrink:0;transition:background .2s;
+    cursor:pointer;flex-shrink:0;
+    backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+    transition:background .2s;
   }
-  .ep-tb-close:hover{background:rgba(255,255,255,0.18);}
+  .ep-tb-close:hover{background:rgba(255,255,255,0.15);}
   .ep-tb-close svg{width:13px;height:13px;stroke:#fff;fill:none;stroke-width:2;}
 
-  /* Episode cards — full-bleed cinematic style */
+  /* ── Episode list: scrolls, no background ── */
   #ep-panel-list{
-    padding:8px 8px 16px;
-    flex:1;
-    min-height:0;
-    overflow-y:auto;
+    flex:1;min-height:0;
+    overflow-y:auto;overflow-x:visible;
+    padding:0;
+    scrollbar-width:none;
+    display:flex;flex-direction:column;
     overscroll-behavior:contain;
   }
+  #ep-panel-list::-webkit-scrollbar{display:none;}
 
+  /* ── Cards: thumbnail fills card ── */
   #ep-panel .ep-card{
-    flex-direction:column;position:relative;
-    min-height:116px;border-radius:10px;
-    margin:0 0 7px 0;overflow:hidden;
+    position:relative;flex-direction:column;
+    min-height:78px;border-radius:12px;
+    margin:0 0 5px;overflow:hidden;
     border:2px solid transparent;padding:0;
-    background:rgba(255,255,255,0.04);
-    border-bottom:none;
-    transition:border-color .15s,background .15s;
+    background:rgba(0,0,0,0.28);
+    border-bottom:none;flex-shrink:0;
+    transition:border-color .15s;
   }
+  /* Active card: taller, white border, overlaps neighbors with negative margin */
   #ep-panel .ep-card.playing{
-    border-color:rgba(255,255,255,0.88);
-    background:transparent;
+    min-height:170px;
+    border-color:rgba(255,255,255,0.9) !important;
+    z-index:2;position:relative;
+    margin-top:-3px;margin-bottom:-3px;
   }
-  #ep-panel .ep-card:hover{
-    background:transparent;
-    border-color:rgba(255,255,255,0.32);
-  }
-  #ep-panel .ep-card.ep-focused{
-    border-color:rgba(255,255,255,0.88);
-    outline:none;border-radius:10px;
-  }
-  /* Thumbnail fills the entire card */
+  #ep-panel .ep-card:hover:not(.playing){border-color:rgba(255,255,255,0.25);}
+  #ep-panel .ep-card.ep-focused:not(.playing){border-color:rgba(255,255,255,0.45);outline:none;}
+
+  /* Thumbnail fills full card */
   #ep-panel .ep-thumb-wrap{
-    position:absolute;inset:0;
-    width:100%;height:100%;
-    border-radius:0;background:#111;
+    position:absolute;inset:0;width:100%;height:100%;
+    border-radius:0;background:#08080f;
   }
   #ep-panel .ep-thumb-wrap img{
-    width:100%;height:100%;
-    object-fit:cover;display:block;
-    filter:brightness(0.62);
+    width:100%;height:100%;object-fit:cover;display:block;
+    filter:brightness(0.48);
   }
-  #ep-panel .ep-card.playing .ep-thumb-wrap img{filter:brightness(0.48);}
-  #ep-panel .ep-thumb-overlay{display:none;}
-  #ep-panel .ep-thumb-prog{display:none;}
-  /* Text overlay */
+  #ep-panel .ep-card.playing .ep-thumb-wrap img{filter:brightness(0.42);}
+  #ep-panel .ep-thumb-overlay,
+  #ep-panel .ep-thumb-prog,
+  #ep-panel .ep-thumb-done{display:none;}
+
+  /* Text overlay at bottom */
   #ep-panel .ep-card-left{
     position:relative;z-index:2;
-    padding:10px 12px 14px;
-    min-height:116px;
+    padding:10px 13px 12px;
+    height:100%;min-height:inherit;
     display:flex;flex-direction:column;justify-content:flex-end;
-    background:linear-gradient(to top,rgba(0,0,0,0.88) 50%,rgba(0,0,0,0.12) 100%);
+    background:linear-gradient(to top,rgba(0,0,0,0.86) 50%,rgba(0,0,0,0.05) 100%);
   }
-  #ep-panel .ep-top-row{margin-bottom:4px;flex-wrap:nowrap;gap:7px;}
-  #ep-panel .ep-card-title{
-    font-size:13px;font-weight:700;
-    white-space:normal;
+  /* Inactive cards: hide description, badge and progress — just title + meta */
+  #ep-panel .ep-card:not(.playing) .ep-card-desc{display:none;}
+  #ep-panel .ep-card:not(.playing) .ep-prog-wrap{display:none;}
+  #ep-panel .ep-card:not(.playing) .ep-watching-badge{display:none;}
+  #ep-panel .ep-card:not(.playing) .ep-card-left{
+    padding:7px 13px 9px;
+    background:linear-gradient(to top,rgba(0,0,0,0.76) 55%,transparent 100%);
+  }
+  #ep-panel .ep-top-row{margin-bottom:3px;flex-wrap:nowrap;gap:7px;}
+  #ep-panel .ep-card-title{font-size:13px;font-weight:700;}
+  #ep-panel .ep-card.playing .ep-card-title{
+    font-size:14px;font-weight:700;
     display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
   }
   #ep-panel .ep-card-meta{font-size:11px;color:rgba(255,255,255,0.6);margin-bottom:3px;}
-  #ep-panel .ep-card-desc{
-    font-size:11px;color:rgba(255,255,255,0.55);line-height:1.45;
+  #ep-panel .ep-card.playing .ep-card-desc{
+    font-size:11px;color:rgba(255,255,255,0.6);line-height:1.45;
     display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
   }
-  /* Progress bar pinned to very bottom edge of card */
+  /* Progress bar pinned to card bottom */
   #ep-panel .ep-prog-wrap{
     position:absolute;bottom:0;left:0;right:0;
     height:3px;margin:0;border-radius:0;
@@ -1612,8 +1635,7 @@ body.tv-mode .row:hover .card-w{opacity:1;}
     </button>
     <!-- Floating episodes button — visible in fullscreen via CSS (TV shows only) -->
     <button id="ep-toggle-btn" onclick="toggleFsEpPanel();document.getElementById('srv-fs-panel').classList.remove('open');" title="Episodes" style="display:none;">
-      <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-      <span style="font-size:10px;font-weight:700;letter-spacing:.03em;margin-top:2px;">Episodes</span>
+      Episodes
     </button>
     <div id="srv-fs-panel"></div>
     <!-- AUTO-NEXT OVERLAY -->
