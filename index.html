@@ -978,7 +978,9 @@ body.tv-mode .row:hover .card-w{opacity:1;}
   border-left:1px solid rgba(255,255,255,.07);
   transform:translateX(102%);
   transition:transform .32s cubic-bezier(.4,0,.2,1);
-  z-index:25;display:flex;flex-direction:column;
+  z-index:25;
+  display:none; /* hidden everywhere — desktop media query overrides this */
+  flex-direction:column;
   box-shadow:-12px 0 40px rgba(0,0,0,.6);
 }
 #ep-panel.open{transform:translateX(0);}
@@ -1063,63 +1065,110 @@ body.tv-mode .row:hover .card-w{opacity:1;}
 }
 .ep-thumb-prog-fill{height:100%;background:#e50914;}
 
-/* ══ DESKTOP EP PANEL REDESIGN ══ */
+/* ══ EPISODE PANEL — DESKTOP/TV ONLY ══ */
+
+/* Backdrop: transparent clickable layer behind panel */
 #ep-panel-backdrop{
   position:absolute;inset:0;z-index:24;
   display:none;
+  background:transparent;
 }
 #ep-panel-backdrop.open{display:block;}
 
-/* Topbar + entire ep-panel: hidden on mobile */
+/* Topbar hidden on mobile */
 .ep-panel-topbar{display:none;}
 
+/* ── Mobile: hide everything episode-related ── */
 @media(max-width:899px){
-  /* Hide ep-panel entirely on mobile — desktop/TV only feature */
   #ep-panel{display:none !important;}
   #ep-panel-backdrop{display:none !important;}
-  /* Hide the Episodes trigger button on mobile too */
   .p-ep-action{display:none !important;}
   #ep-toggle-btn{display:none !important;}
 }
 
+/* ── Desktop/TV: floating side overlay ── */
 @media(min-width:900px){
-  /* Panel: NO solid background — floats transparently over video */
+
+  /*
+   * Panel is position:absolute inside #p-wrap (position:relative).
+   * Right side, 30px spacing from all player edges.
+   * NOT centered. NOT touching edge. NOT fullscreen.
+   * Panel stays fixed — only the list inside scrolls.
+   */
   #ep-panel{
-    top:6%;left:50%;
-    right:auto;bottom:auto;
-    width:490px;
-    max-height:84vh;
+    position:absolute;
+    top:30px;
+    right:30px;
+    bottom:30px;
+    left:auto;
+    width:460px;
+    max-width:calc(100% - 80px);
+
+    /* No solid background — floats over video */
     background:none !important;
     border:none !important;
     box-shadow:none !important;
     border-radius:0;
-    transform:translateX(-50%) scale(0.94);
-    opacity:0;
-    transition:opacity .2s ease,transform .2s cubic-bezier(.34,1.56,.64,1);
-    display:flex;flex-direction:column;
+
+    /* Layout: column so topbar is fixed, list scrolls below */
+    display:flex;
+    flex-direction:column;
     overflow:visible;
+
+    /* Hidden by default — no layout space when hidden */
+    opacity:0;
+    visibility:hidden;
+    pointer-events:none;
+
+    /* Animation: fade + slight slide from right — NO scale, NO bounce */
+    transform:translateX(18px);
+    transition:
+      opacity 250ms ease,
+      transform 250ms ease,
+      visibility 0ms linear 250ms;
+
+    z-index:25;
   }
+
+  /* Open state */
   #ep-panel.open{
-    transform:translateX(-50%) scale(1);
     opacity:1;
+    visibility:visible;
+    pointer-events:all;
+    transform:translateX(0);
+    transition:
+      opacity 250ms ease,
+      transform 250ms ease,
+      visibility 0ms linear 0ms;
   }
+
   /* Hide old mobile header */
   #ep-panel .ep-panel-hd{display:none;}
 
-  /* ── Top bar: each pill floats independently, no shared container bg ── */
+  /* ── Top bar: individual floating pills, no shared container background ── */
   .ep-panel-topbar{
-    display:flex;align-items:center;gap:9px;
-    padding:0 0 12px;flex-shrink:0;
+    display:flex;
+    align-items:center;
+    gap:9px;
+    padding:0 0 10px;
+    flex-shrink:0;
     background:none;
   }
+
   .ep-tb-search{
     flex:1;display:flex;align-items:center;gap:8px;
     background:rgba(10,10,20,0.82);
     border:1px solid rgba(255,255,255,0.15);
-    border-radius:999px;padding:8px 14px;min-width:0;
-    backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+    border-radius:999px;
+    padding:8px 14px;
+    min-width:0;
+    backdrop-filter:blur(14px);
+    -webkit-backdrop-filter:blur(14px);
   }
-  .ep-tb-search svg{width:14px;height:14px;stroke:rgba(255,255,255,0.45);fill:none;stroke-width:2;flex-shrink:0;}
+  .ep-tb-search svg{
+    width:14px;height:14px;
+    stroke:rgba(255,255,255,0.45);fill:none;stroke-width:2;flex-shrink:0;
+  }
   .ep-tb-search input{
     background:none;border:none;outline:none;
     color:#fff;font-size:13px;font-family:inherit;width:100%;
@@ -1130,40 +1179,48 @@ body.tv-mode .row:hover .card-w{opacity:1;}
     display:flex;align-items:center;gap:5px;
     background:rgba(10,10,20,0.82);
     border:1px solid rgba(255,255,255,0.15);
-    border-radius:999px;padding:8px 13px;
+    border-radius:999px;
+    padding:8px 13px;
     font-size:13px;font-weight:700;color:#fff;
     cursor:pointer;flex-shrink:0;white-space:nowrap;
     position:relative;
-    backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+    backdrop-filter:blur(14px);
+    -webkit-backdrop-filter:blur(14px);
   }
-  .ep-tb-season svg{width:12px;height:12px;stroke:rgba(255,255,255,0.55);fill:none;stroke-width:2.5;}
+  .ep-tb-season svg{
+    width:12px;height:12px;
+    stroke:rgba(255,255,255,0.55);fill:none;stroke-width:2.5;
+  }
   .ep-tb-season select{
-    position:absolute;inset:0;opacity:0;cursor:pointer;
-    width:100%;border:none;background:none;font-family:inherit;
+    position:absolute;inset:0;opacity:0;
+    cursor:pointer;width:100%;border:none;background:none;font-family:inherit;
   }
 
   .ep-tb-autoplay{
     display:flex;align-items:center;gap:8px;
     background:rgba(10,10,20,0.82);
     border:1px solid rgba(255,255,255,0.15);
-    border-radius:999px;padding:8px 13px;
+    border-radius:999px;
+    padding:8px 13px;
     font-size:13px;font-weight:600;color:#fff;
     flex-shrink:0;white-space:nowrap;
-    backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+    backdrop-filter:blur(14px);
+    -webkit-backdrop-filter:blur(14px);
   }
   .ep-tb-toggle{
     width:36px;height:20px;border-radius:999px;
     background:rgba(255,255,255,0.18);
     border:1px solid rgba(255,255,255,0.22);
-    position:relative;cursor:pointer;
-    transition:background .2s,border-color .2s;flex-shrink:0;
+    position:relative;cursor:pointer;flex-shrink:0;
+    transition:background 200ms,border-color 200ms;
   }
   .ep-tb-toggle.on{background:#22c55e;border-color:#22c55e;}
   .ep-tb-toggle::after{
     content:'';position:absolute;
     top:2px;left:2px;width:14px;height:14px;
     border-radius:50%;background:#fff;
-    transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,0.4);
+    transition:transform 200ms;
+    box-shadow:0 1px 3px rgba(0,0,0,0.4);
   }
   .ep-tb-toggle.on::after{transform:translateX(16px);}
 
@@ -1173,89 +1230,126 @@ body.tv-mode .row:hover .card-w{opacity:1;}
     border:1px solid rgba(255,255,255,0.15);
     display:flex;align-items:center;justify-content:center;
     cursor:pointer;flex-shrink:0;
-    backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
-    transition:background .2s;
+    backdrop-filter:blur(14px);
+    -webkit-backdrop-filter:blur(14px);
+    transition:background 200ms;
   }
   .ep-tb-close:hover{background:rgba(255,255,255,0.15);}
   .ep-tb-close svg{width:13px;height:13px;stroke:#fff;fill:none;stroke-width:2;}
 
-  /* ── Episode list: scrolls, no background ── */
+  /*
+   * Episode list: panel itself is fixed in position.
+   * Only this list scrolls. flex:1 + min-height:0 is required for
+   * overflow-y:auto to work inside a flex parent with constrained height.
+   */
   #ep-panel-list{
-    flex:1;min-height:0;
-    overflow-y:auto;overflow-x:visible;
+    flex:1;
+    min-height:0;
+    overflow-y:auto;
+    overflow-x:hidden;
     padding:0;
     scrollbar-width:none;
-    display:flex;flex-direction:column;
+    display:flex;
+    flex-direction:column;
     overscroll-behavior:contain;
   }
   #ep-panel-list::-webkit-scrollbar{display:none;}
 
-  /* ── Cards: thumbnail fills card ── */
+  /* ── Episode cards ── */
   #ep-panel .ep-card{
-    position:relative;flex-direction:column;
-    min-height:78px;border-radius:12px;
-    margin:0 0 5px;overflow:hidden;
-    border:2px solid transparent;padding:0;
-    background:rgba(0,0,0,0.28);
-    border-bottom:none;flex-shrink:0;
-    transition:border-color .15s;
+    position:relative;
+    flex-direction:column;
+    min-height:80px;
+    border-radius:12px;
+    margin:0 0 6px;
+    overflow:hidden;
+    border:2px solid transparent;
+    padding:0;
+    background:rgba(0,0,0,0.30);
+    border-bottom:none;
+    flex-shrink:0;
+    transition:border-color 150ms;
   }
-  /* Active card: taller, white border, overlaps neighbors with negative margin */
-  #ep-panel .ep-card.playing{
-    min-height:170px;
-    border-color:rgba(255,255,255,0.9) !important;
-    z-index:2;position:relative;
-    margin-top:-3px;margin-bottom:-3px;
-  }
-  #ep-panel .ep-card:hover:not(.playing){border-color:rgba(255,255,255,0.25);}
-  #ep-panel .ep-card.ep-focused:not(.playing){border-color:rgba(255,255,255,0.45);outline:none;}
 
-  /* Thumbnail fills full card */
+  /* Active/currently-watching card: taller, white border, higher z-index */
+  #ep-panel .ep-card.playing{
+    min-height:168px;
+    border-color:rgba(255,255,255,0.88) !important;
+    z-index:2;
+    position:relative;
+    margin-top:-3px;
+    margin-bottom:-3px;
+  }
+
+  #ep-panel .ep-card:hover:not(.playing){
+    border-color:rgba(255,255,255,0.22);
+  }
+  #ep-panel .ep-card.ep-focused:not(.playing){
+    border-color:rgba(255,255,255,0.4);
+    outline:none;
+  }
+
+  /* Thumbnail fills entire card */
   #ep-panel .ep-thumb-wrap{
-    position:absolute;inset:0;width:100%;height:100%;
-    border-radius:0;background:#08080f;
+    position:absolute;inset:0;
+    width:100%;height:100%;
+    border-radius:0;
+    background:#06060e;
   }
   #ep-panel .ep-thumb-wrap img{
-    width:100%;height:100%;object-fit:cover;display:block;
-    filter:brightness(0.48);
+    width:100%;height:100%;
+    object-fit:cover;display:block;
+    filter:brightness(0.46);
   }
-  #ep-panel .ep-card.playing .ep-thumb-wrap img{filter:brightness(0.42);}
+  #ep-panel .ep-card.playing .ep-thumb-wrap img{
+    filter:brightness(0.40);
+  }
   #ep-panel .ep-thumb-overlay,
   #ep-panel .ep-thumb-prog,
   #ep-panel .ep-thumb-done{display:none;}
 
-  /* Text overlay at bottom */
+  /* Text content overlaid at bottom of card */
   #ep-panel .ep-card-left{
     position:relative;z-index:2;
     padding:10px 13px 12px;
     height:100%;min-height:inherit;
     display:flex;flex-direction:column;justify-content:flex-end;
-    background:linear-gradient(to top,rgba(0,0,0,0.86) 50%,rgba(0,0,0,0.05) 100%);
+    background:linear-gradient(to top,rgba(0,0,0,0.88) 50%,rgba(0,0,0,0.04) 100%);
   }
-  /* Inactive cards: hide description, badge and progress — just title + meta */
+
+  /* Inactive cards: only title + runtime visible */
   #ep-panel .ep-card:not(.playing) .ep-card-desc{display:none;}
   #ep-panel .ep-card:not(.playing) .ep-prog-wrap{display:none;}
   #ep-panel .ep-card:not(.playing) .ep-watching-badge{display:none;}
   #ep-panel .ep-card:not(.playing) .ep-card-left{
-    padding:7px 13px 9px;
-    background:linear-gradient(to top,rgba(0,0,0,0.76) 55%,transparent 100%);
+    padding:7px 13px 10px;
+    background:linear-gradient(to top,rgba(0,0,0,0.78) 55%,transparent 100%);
   }
+
   #ep-panel .ep-top-row{margin-bottom:3px;flex-wrap:nowrap;gap:7px;}
-  #ep-panel .ep-card-title{font-size:13px;font-weight:700;}
+
+  #ep-panel .ep-card-title{
+    font-size:13px;font-weight:700;color:#fff;
+  }
   #ep-panel .ep-card.playing .ep-card-title{
     font-size:14px;font-weight:700;
     display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
   }
-  #ep-panel .ep-card-meta{font-size:11px;color:rgba(255,255,255,0.6);margin-bottom:3px;}
+  #ep-panel .ep-card-meta{
+    font-size:11px;color:rgba(255,255,255,0.6);margin-bottom:3px;
+  }
   #ep-panel .ep-card.playing .ep-card-desc{
     font-size:11px;color:rgba(255,255,255,0.6);line-height:1.45;
     display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
   }
-  /* Progress bar pinned to card bottom */
+
+  /* Progress bar: pinned to very bottom edge of card */
   #ep-panel .ep-prog-wrap{
-    position:absolute;bottom:0;left:0;right:0;
+    position:absolute;
+    bottom:0;left:0;right:0;
     height:3px;margin:0;border-radius:0;
-    background:rgba(255,255,255,0.15);z-index:3;
+    background:rgba(255,255,255,0.15);
+    z-index:3;
   }
 }
 
@@ -2837,10 +2931,10 @@ async function openPlayer(id,type,title,m,season,ep){
     else if(_fsEl.mozRequestFullScreen) _fsEl.mozRequestFullScreen();
   }catch(_){}
 
-  // ── Episode controls row ──
+  // ── Episode controls row (desktop/TV only) ──
   const epRow=document.getElementById('p-ep-row');
   const epToggleBtn=document.getElementById('ep-toggle-btn');
-  if(type==='tv'){
+  if(type==='tv' && window.innerWidth >= 900){
     epRow.style.display='flex';
     if(epToggleBtn){epToggleBtn.style.display='';epToggleBtn.classList.add('tv-show');}
     document.getElementById('p-ep-label').textContent=`S${curPlayerSeason} · E${curPlayerEp}`;
@@ -3076,6 +3170,7 @@ function _playEpFromPanel(tvId,type,showTitle,ep){
 // ── Fullscreen episode panel toggle ──
 let _epFocusIdx=0,_epPanelTvId=null,_epPanelType=null,_epPanelTitle=null;
 function toggleFsEpPanel(){
+  if(window.innerWidth < 900) return; // desktop/TV only
   const panel=document.getElementById('ep-panel');
   if(panel.classList.contains('open')){closeFsEpPanel();}
   else{
