@@ -955,7 +955,7 @@ body.tv-mode .row:hover .card-w{opacity:1;}
 
 /* ── Floating episodes button — TV shows only, fullscreen only ── */
 #ep-toggle-btn{
-  position:absolute;bottom:20px;right:72px;z-index:20;
+  position:absolute;bottom:20px;right:88px;z-index:20;
   padding:8px 16px;
   border-radius:8px;
   background:rgba(0,0,0,.65);border:1px solid rgba(255,255,255,.22);
@@ -1097,12 +1097,14 @@ body.tv-mode .row:hover .card-w{opacity:1;}
    */
   #ep-panel{
     position:absolute;
-    top:30px;
+    top:50%;
     right:30px;
-    bottom:30px;
     left:auto;
-    width:460px;
+    bottom:auto;
+    width:380px;
     max-width:calc(100% - 80px);
+    max-height:calc(100% - 80px);
+    transform:translateX(18px) translateY(-50%);
 
     /* No solid background — floats over video */
     background:none !important;
@@ -1121,7 +1123,6 @@ body.tv-mode .row:hover .card-w{opacity:1;}
     pointer-events:none;
 
     /* Animation: fade + slight slide from right — NO scale, NO bounce */
-    transform:translateX(18px);
     transition:
       opacity 250ms ease,
       transform 250ms ease,
@@ -1135,7 +1136,7 @@ body.tv-mode .row:hover .card-w{opacity:1;}
     opacity:1;
     visibility:visible;
     pointer-events:all;
-    transform:translateX(0);
+    transform:translateX(0) translateY(-50%);
     transition:
       opacity 250ms ease,
       transform 250ms ease,
