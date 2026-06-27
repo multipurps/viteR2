@@ -210,102 +210,34 @@ input{font-family:inherit;-webkit-user-select:auto;user-select:auto;}
 .dd-item svg{width:18px;height:18px;stroke:var(--text2);fill:none;stroke-width:1.8;flex-shrink:0;}
 .dd-item.danger{color:#ff7070;}
 .dd-item.danger svg{stroke:#ff7070;}
-
 /* ══ DESKTOP PROFILE PANEL ══ */
-#dt-prof-overlay{
-  position:fixed;inset:0;z-index:490;
-  background:rgba(0,0,0,.55);
-  backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);
-  display:none;
-}
+#dt-prof-overlay{position:fixed;inset:0;z-index:490;background:rgba(0,0,0,.55);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);display:none;}
 #dt-prof-overlay.open{display:block;}
-#dt-prof-panel{
-  position:fixed;top:0;right:0;bottom:0;
-  width:400px;max-width:92vw;
-  background:var(--bg2);
-  border-left:1px solid var(--border);
-  z-index:500;
-  display:flex;flex-direction:column;
-  transform:translateX(100%);
-  transition:transform .32s cubic-bezier(.4,0,.2,1);
-  overflow:hidden;
-}
+#dt-prof-panel{position:fixed;top:0;right:0;bottom:0;width:400px;max-width:92vw;background:var(--bg2);border-left:1px solid var(--border);z-index:500;display:flex;flex-direction:column;transform:translateX(100%);transition:transform .32s cubic-bezier(.4,0,.2,1);overflow:hidden;}
 #dt-prof-panel.open{transform:translateX(0);}
-.dtp-head{
-  display:flex;align-items:center;gap:14px;
-  padding:22px 20px 18px;
-  border-bottom:1px solid var(--border);
-  flex-shrink:0;
-}
-.dtp-avatar{
-  width:52px;height:52px;border-radius:50%;flex-shrink:0;
-  background:var(--purple);
-  display:flex;align-items:center;justify-content:center;
-  font-size:22px;font-weight:700;color:#fff;
-  border:2px solid rgba(255,255,255,.12);
-}
+.dtp-head{display:flex;align-items:center;gap:14px;padding:22px 20px 18px;border-bottom:1px solid var(--border);flex-shrink:0;}
+.dtp-avatar{width:52px;height:52px;border-radius:50%;flex-shrink:0;background:var(--purple);display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;color:#fff;border:2px solid rgba(255,255,255,.12);}
 .dtp-info{flex:1;min-width:0;}
 .dtp-name{font-size:16px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .dtp-email{font-size:12px;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px;}
-.dtp-close{
-  width:34px;height:34px;border-radius:50%;flex-shrink:0;
-  background:rgba(255,255,255,.07);
-  display:flex;align-items:center;justify-content:center;cursor:pointer;
-  transition:background .15s;
-}
+.dtp-close{width:34px;height:34px;border-radius:50%;flex-shrink:0;background:rgba(255,255,255,.07);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .15s;}
 .dtp-close:hover{background:rgba(255,255,255,.14);}
 .dtp-close svg{width:16px;height:16px;stroke:var(--text2);fill:none;stroke-width:2;}
-.dtp-tabs{
-  display:flex;
-  border-bottom:1px solid var(--border);
-  flex-shrink:0;
-}
-.dtp-tab{
-  flex:1;padding:12px 10px;text-align:center;
-  font-size:13px;font-weight:600;color:var(--text3);
-  cursor:pointer;transition:all .2s;
-  border-bottom:2px solid transparent;
-}
+.dtp-tabs{display:flex;border-bottom:1px solid var(--border);flex-shrink:0;}
+.dtp-tab{flex:1;padding:12px 10px;text-align:center;font-size:13px;font-weight:600;color:var(--text3);cursor:pointer;transition:all .2s;border-bottom:2px solid transparent;}
 .dtp-tab.on{color:var(--lime);border-bottom-color:var(--lime);}
-.dtp-tab-badge{
-  display:inline-block;margin-left:5px;
-  font-size:10px;font-weight:700;
-  background:rgba(255,255,255,.1);
-  padding:1px 6px;border-radius:20px;vertical-align:middle;
-}
+.dtp-tab-badge{display:inline-block;margin-left:5px;font-size:10px;font-weight:700;background:rgba(255,255,255,.1);padding:1px 6px;border-radius:20px;vertical-align:middle;}
 .dtp-body{flex:1;overflow-y:auto;padding:16px;}
 .dtp-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
-.dtp-card{
-  cursor:pointer;border-radius:8px;overflow:hidden;
-  background:var(--card);border:1px solid var(--border);
-  transition:transform .2s;position:relative;
-}
+.dtp-card{cursor:pointer;border-radius:8px;overflow:hidden;background:var(--card);border:1px solid var(--border);transition:transform .2s;position:relative;}
 .dtp-card:hover{transform:scale(1.04);}
 .dtp-card img{width:100%;aspect-ratio:2/3;object-fit:cover;display:block;}
-.dtp-card-label{
-  position:absolute;bottom:0;left:0;right:0;
-  background:linear-gradient(to top,rgba(0,0,0,.9),transparent);
-  padding:16px 6px 6px;
-  font-size:10px;font-weight:600;line-height:1.3;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-}
-.dtp-card-ep{
-  position:absolute;top:5px;left:5px;
-  background:var(--purple);color:#fff;
-  font-size:9px;font-weight:700;
-  padding:2px 5px;border-radius:4px;
-}
+.dtp-card-label{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(to top,rgba(0,0,0,.9),transparent);padding:16px 6px 6px;font-size:10px;font-weight:600;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.dtp-card-ep{position:absolute;top:5px;left:5px;background:var(--purple);color:#fff;font-size:9px;font-weight:700;padding:2px 5px;border-radius:4px;}
 .dtp-empty{text-align:center;padding:40px 20px;color:var(--text3);font-size:13px;}
-.dtp-empty svg{width:40px;height:40px;stroke:var(--text3);fill:none;stroke-width:1.2;margin:0 auto 12px;display:block;opacity:.5;}
 .dtp-loading{text-align:center;padding:30px;color:var(--text3);font-size:13px;}
 .dtp-footer{padding:16px 20px;border-top:1px solid var(--border);flex-shrink:0;}
-.dtp-signout{
-  width:100%;padding:12px;border-radius:10px;
-  background:rgba(255,60,60,.08);border:1px solid rgba(255,60,60,.2);
-  color:#ff5555;font-size:13px;font-weight:600;
-  display:flex;align-items:center;justify-content:center;gap:8px;
-  cursor:pointer;transition:background .2s;
-}
+.dtp-signout{width:100%;padding:12px;border-radius:10px;background:rgba(255,60,60,.08);border:1px solid rgba(255,60,60,.2);color:#ff5555;font-size:13px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;transition:background .2s;}
 .dtp-signout:hover{background:rgba(255,60,60,.16);}
 .dtp-signout svg{width:16px;height:16px;stroke:#ff5555;fill:none;stroke-width:2;}
 
@@ -1936,20 +1868,13 @@ const SERVERS=[
   {n:'SuperEmbed', f:(id,t,s,e)=>t==='tv'?`https://multiembed.mov/?video_id=${id}&tmdb=1&s=${s||1}&e=${e||1}`:`https://multiembed.mov/?video_id=${id}&tmdb=1`},
   {n:'2Embed',     f:(id,t,s,e)=>t==='tv'?`https://www.2embed.cc/embedtv/${id}&s=${s||1}&e=${e||1}`:`https://www.2embed.cc/embed/${id}`},
 ];
-// ── SEASON OVERRIDES — for shows TMDB hasn't caught up on yet ──
-const SEASON_OVERRIDES={
-  197428:2  // Blood Sisters (S2 dropped June 5 2026, TMDB still shows 1)
-};
-const EPISODE_FALLBACKS={
-  197428:{
-    2:[
-      {episode_number:1,name:'Episode 1',overview:'Sarah and Kemi resurface as the Ademola family\'s reach grows deadlier. Old alliances fracture and new enemies emerge.',runtime:54,still_path:null},
-      {episode_number:2,name:'Episode 2',overview:'Loyalties are tested as the truth about what happened begins unravelling, putting everyone who knows at risk.',runtime:54,still_path:null},
-      {episode_number:3,name:'Episode 3',overview:'With danger closing in from every direction, Sarah and Kemi must make impossible choices to protect themselves and each other.',runtime:54,still_path:null},
-      {episode_number:4,name:'Episode 4',overview:'The deadly secrets of the Ademola family collide with Sarah and Kemi\'s desperate fight for survival in a shocking conclusion.',runtime:54,still_path:null},
-    ]
-  }
-};
+const SEASON_OVERRIDES={197428:2};
+const EPISODE_FALLBACKS={197428:{2:[
+  {episode_number:1,name:'Episode 1',overview:'Sarah and Kemi resurface as the Ademola family\'s reach grows deadlier.',runtime:54,still_path:null},
+  {episode_number:2,name:'Episode 2',overview:'Loyalties are tested as the truth begins unravelling.',runtime:54,still_path:null},
+  {episode_number:3,name:'Episode 3',overview:'With danger closing in, Sarah and Kemi must make impossible choices.',runtime:54,still_path:null},
+  {episode_number:4,name:'Episode 4',overview:'The deadly secrets of the Ademola family collide in a shocking conclusion.',runtime:54,still_path:null},
+]}};
 const GM={28:'Action',12:'Adventure',16:'Animation',35:'Comedy',80:'Crime',99:'Documentary',18:'Drama',10751:'Family',14:'Fantasy',36:'History',27:'Horror',10749:'Romance',878:'Sci-Fi',53:'Thriller',10752:'War',10759:'Action & Adventure',10765:'Sci-Fi & Fantasy'};
 const gn=ids=>ids&&ids[0]?GM[ids[0]]||'':'';
 const poster=(p,s='w342')=>p?IMG+s+p:`data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='2' height='3'%3E%3Crect width='2' height='3' fill='%231a1a28'/%3E%3C/svg%3E`;
@@ -2010,7 +1935,7 @@ async function initAuth(){
 }
 async function onUserLoaded(){
   await loadUserData();
-  await enforceSession();
+  // Show profile btn FIRST — before anything else that could throw
   const pb=document.getElementById('profile-btn');
   pb.style.display='flex';pb.style.visibility='visible';pb.style.opacity='1';
   document.getElementById('signin-nav-btn').style.display='none';
@@ -2020,8 +1945,9 @@ async function onUserLoaded(){
   document.getElementById('dd-avatar').textContent=uname[0].toUpperCase();
   const navAv=document.getElementById('nav-avatar');
   if(navAv)navAv.textContent=uname[0].toUpperCase();
-  // Cache for instant restore on TV/slow devices
   try{localStorage.setItem('zeeyus_last_user',JSON.stringify({email:user.email,name:uname}));}catch(e){}
+  // enforceSession is wrapped — if zeeyus_sessions table missing it won't break login
+  try{await enforceSession();}catch(e){console.warn('enforceSession:',e.message);}
 }
 async function enforceSession(){
   if(!user)return;
@@ -2081,19 +2007,15 @@ async function loadUserData(){
 // ── PROFILE DROPDOWN ──
 // ── DESKTOP PROFILE PANEL ──
 let _dtProfTab='watchlist',_dtProfData={watchlist:null,history:null};
-
-function toggleProfileDd(){openDtProfile();}// legacy shim
-
+function toggleProfileDd(){openDtProfile();}
 function openDtProfile(){
   if(!user){requireAuth(()=>openDtProfile());return;}
-  const panel=document.getElementById('dt-prof-panel');
-  const overlay=document.getElementById('dt-prof-overlay');
   const uname=(user.user_metadata&&(user.user_metadata.full_name||user.user_metadata.name))||user.email.split('@')[0]||'User';
   document.getElementById('dtp-avatar').textContent=uname[0].toUpperCase();
   document.getElementById('dtp-name').textContent=uname;
   document.getElementById('dtp-email').textContent=user.email||'';
-  panel.classList.add('open');
-  overlay.classList.add('open');
+  document.getElementById('dt-prof-panel').classList.add('open');
+  document.getElementById('dt-prof-overlay').classList.add('open');
   document.body.style.overflow='hidden';
   _dtProfData={watchlist:null,history:null};
   _dtProfTab='watchlist';
@@ -2102,11 +2024,10 @@ function openDtProfile(){
   _loadDtProfileData();
 }
 function closeDtProfile(){
-  const panel=document.getElementById('dt-prof-panel');
-  const overlay=document.getElementById('dt-prof-overlay');
-  if(!panel)return;
-  panel.classList.remove('open');
-  overlay.classList.remove('open');
+  const p=document.getElementById('dt-prof-panel');
+  const o=document.getElementById('dt-prof-overlay');
+  if(p)p.classList.remove('open');
+  if(o)o.classList.remove('open');
   document.body.style.overflow='';
 }
 function switchDtTab(tab){
@@ -2128,19 +2049,14 @@ async function _loadDtProfileData(){
     document.getElementById('dtp-badge-wl').textContent=_dtProfData.watchlist.length;
     document.getElementById('dtp-badge-hs').textContent=_dtProfData.history.length;
     _renderDtProfTab();
-  }catch(e){
-    body.innerHTML='<div class="dtp-empty">Could not load data.</div>';
-  }
+  }catch(e){body.innerHTML='<div class="dtp-empty">Could not load data.</div>';}
 }
 function _renderDtProfTab(){
   const body=document.getElementById('dtp-body');
   const items=_dtProfTab==='watchlist'?_dtProfData.watchlist:_dtProfData.history;
   if(!items){body.innerHTML='<div class="dtp-loading">Loading...</div>';return;}
   if(!items.length){
-    const icon=_dtProfTab==='watchlist'
-      ?'<path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>'
-      :'<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>';
-    body.innerHTML=`<div class="dtp-empty"><svg viewBox="0 0 24 24">${icon}</svg>Your ${_dtProfTab==='watchlist'?'watchlist':'history'} is empty.</div>`;
+    body.innerHTML=`<div class="dtp-empty">Your ${_dtProfTab==='watchlist'?'watchlist':'history'} is empty.</div>`;
     return;
   }
   const grid=document.createElement('div');
@@ -2155,7 +2071,7 @@ function _renderDtProfTab(){
     const epBadge=(_dtProfTab==='history'&&row.season)?`<div class="dtp-card-ep">S${row.season} E${row.episode||1}</div>`:'';
     card.innerHTML=p
       ?`<img src="${p}" alt="${title}" loading="lazy">${epBadge}<div class="dtp-card-label">${title}</div>`
-      :`<div style="width:100%;aspect-ratio:2/3;background:var(--card);display:flex;align-items:center;justify-content:center;"><svg viewBox="0 0 24 24" style="width:24px;height:24px;fill:none;stroke:var(--text3);stroke-width:1.5"><polygon points="5 3 19 12 5 21 5 3"/></svg></div>${epBadge}<div class="dtp-card-label">${title}</div>`;
+      :`<div style="width:100%;aspect-ratio:2/3;background:var(--card);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--text3);padding:8px;text-align:center;">${title}</div>${epBadge}`;
     card.onclick=()=>{closeDtProfile();openDetail(m,type);};
     grid.appendChild(card);
   });
@@ -2862,8 +2778,7 @@ async function openDetail(m,type){
   const yr=(full.release_date||full.first_air_date||'').slice(0,4);
   const rt=full.vote_average?'★ '+full.vote_average.toFixed(1):'';
   const runtime=full.runtime?`${full.runtime}m`:(full.episode_run_time&&full.episode_run_time[0]?`~${full.episode_run_time[0]}m/ep`:'');
-  const _seasonCount=Math.max(full.number_of_seasons||0,SEASON_OVERRIDES[m.id]||0);
-  const seasons=_seasonCount?`${_seasonCount} Season${_seasonCount>1?'s':''}`:'';
+  const seasons=full.number_of_seasons?`${full.number_of_seasons} Season${full.number_of_seasons>1?'s':''}` :'';
   document.getElementById('tp-meta').innerHTML=
     `${yr?`<span class="tp-pill">${yr}</span>`:''}${rt?`<span class="tp-star">${rt}</span>`:''}${runtime?`<span class="tp-pill">${runtime}</span>`:''}${seasons?`<span class="tp-pill">${seasons}</span>`:''}`;
   document.getElementById('tp-overview').textContent=full.overview||m.overview||'';
@@ -2913,7 +2828,6 @@ async function getCwProgress(id,type){
   return data||null;
 }
 async function loadTpSeasons(tvId,totalSeasons){
-  totalSeasons=Math.max(totalSeasons,SEASON_OVERRIDES[tvId]||0);
   const sel=document.getElementById('tp-season-sel');
   sel.innerHTML='';
   for(let i=1;i<=totalSeasons;i++){
@@ -2934,8 +2848,7 @@ async function loadTpEpisodes(tvId,season){
 
   try{
     const d=await api(`/tv/${tvId}/season/${season}`,'');
-    let eps=d.episodes||[];
-    if(!eps.length&&EPISODE_FALLBACKS[tvId]&&EPISODE_FALLBACKS[tvId][season])eps=EPISODE_FALLBACKS[tvId][season];
+    const eps=d.episodes||[];
     const title=curDetail?curDetail.title||curDetail.name||'':'';
     list.innerHTML='';
     eps.forEach(ep=>{
@@ -3358,12 +3271,8 @@ function _populateEpSeasonSel(tvId){
   const sel=document.getElementById('ep-tb-season-sel');
   const lbl=document.getElementById('ep-tb-season-label');
   if(!sel||!lbl) return;
-  // Get number of seasons from curPlayerMedia, with override for TMDB-lagging shows
-  const _tvId=curPlayerMedia?.id;
-  const numSeasons=Math.max(
-    curPlayerMedia?.number_of_seasons||curPlayerMedia?.seasons?.length||1,
-    (_tvId&&SEASON_OVERRIDES[_tvId])||0
-  );
+  // Get number of seasons from curPlayerMedia
+  const numSeasons=curPlayerMedia?.number_of_seasons||curPlayerMedia?.seasons?.length||1;
   sel.innerHTML='';
   for(let s=1;s<=numSeasons;s++){
     const opt=document.createElement('option');
@@ -3607,10 +3516,9 @@ async function openEpPicker(m){
   const title=m.title||m.name||'';
   document.getElementById('ep-picker-show-title').textContent=title;
   document.getElementById('ep-picker-more-btn').onclick=()=>{closeEpPicker();openDetail(m,'tv');};
-  // Fetch season count, with override for TMDB-lagging shows
+  // Fetch season count
   let totalSeasons=1;
   try{const d=await api(`/tv/${m.id}`,'');totalSeasons=d.number_of_seasons||1;}catch(e){}
-  totalSeasons=Math.max(totalSeasons,SEASON_OVERRIDES[m.id]||0);
   const sel=document.getElementById('ep-picker-season-sel');
   sel.innerHTML='';
   for(let i=1;i<=totalSeasons;i++){
@@ -3626,8 +3534,7 @@ async function loadPickerEps(tvId,season){
   list.innerHTML='<div style="padding:20px 18px;font-size:13px;color:var(--text3);">Loading...</div>';
   try{
     const d=await api(`/tv/${tvId}/season/${season}`,'');
-    let eps=d.episodes||[];
-    if(!eps.length&&EPISODE_FALLBACKS[tvId]&&EPISODE_FALLBACKS[tvId][season])eps=EPISODE_FALLBACKS[tvId][season];
+    const eps=d.episodes||[];
     const title=epPickerMedia?epPickerMedia.title||epPickerMedia.name||'':'';
     list.innerHTML='';
     eps.forEach(ep=>{
@@ -4231,7 +4138,6 @@ if('serviceWorker' in navigator){
     Profile<div class="bnav-dot"></div>
   </div>
 </nav>
-<!-- DESKTOP PROFILE PANEL -->
 <div id="dt-prof-overlay" onclick="closeDtProfile()"></div>
 <div id="dt-prof-panel">
   <div class="dtp-head">
@@ -4245,23 +4151,15 @@ if('serviceWorker' in navigator){
     </div>
   </div>
   <div class="dtp-tabs">
-    <div class="dtp-tab on" id="dtp-tab-wl" onclick="switchDtTab('watchlist')">
-      Watchlist <span class="dtp-tab-badge" id="dtp-badge-wl">0</span>
-    </div>
-    <div class="dtp-tab" id="dtp-tab-hs" onclick="switchDtTab('history')">
-      History <span class="dtp-tab-badge" id="dtp-badge-hs">0</span>
-    </div>
+    <div class="dtp-tab on" id="dtp-tab-wl" onclick="switchDtTab('watchlist')">Watchlist <span class="dtp-tab-badge" id="dtp-badge-wl">0</span></div>
+    <div class="dtp-tab" id="dtp-tab-hs" onclick="switchDtTab('history')">History <span class="dtp-tab-badge" id="dtp-badge-hs">0</span></div>
   </div>
-  <div class="dtp-body" id="dtp-body">
-    <div class="dtp-loading">Loading...</div>
-  </div>
+  <div class="dtp-body" id="dtp-body"><div class="dtp-loading">Loading...</div></div>
   <div class="dtp-footer">
-    <button class="dtp-signout" onclick="doSignout();closeDtProfile()">
-      <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-      Sign Out
+    <button class="dtp-signout" onclick="doSignout()">
+      <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Sign Out
     </button>
   </div>
 </div>
-
 </body>
 </html>
