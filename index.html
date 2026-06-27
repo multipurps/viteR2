@@ -1856,32 +1856,16 @@ function _initSupabase(){
 
 const SERVERS=[
   // 1. VidLink — best UI, no autoplay so browser doesn't force-mute
-  {n:'VidLink',   f:(id,t,s,e)=>t==='tv'?`https://vidlink.pro/tv/${id}/${s||1}/${e||1}`:`https://vidlink.pro/movie/${id}`},
+  {n:'VidLink',      f:(id,t,s,e)=>t==='tv'?`https://vidlink.pro/tv/${id}/${s||1}/${e||1}`:`https://vidlink.pro/movie/${id}`},
   // 2. VidSrc — most stable, huge library
-  {n:'VidSrc',    f:(id,t,s,e)=>t==='tv'?`https://vidsrc.to/embed/tv/${id}/${s||1}/${e||1}`:`https://vidsrc.to/embed/movie/${id}`},
-  // 3. EmbedSu — clean, fast, reliable
-  {n:'EmbedSu',   f:(id,t,s,e)=>t==='tv'?`https://embed.su/embed/tv/${id}/${s||1}/${e||1}`:`https://embed.su/embed/movie/${id}`},
-  // 4. VidSrc.cc — good backup when vidsrc.to is slow
-  {n:'VidSrc.cc', f:(id,t,s,e)=>t==='tv'?`https://vidsrc.cc/v2/embed/tv/${id}/${s||1}/${e||1}`:`https://vidsrc.cc/v2/embed/movie/${id}`},
-  // 5. AutoEmbed — solid last resort, wide coverage
-  {n:'AutoEmbed', f:(id,t,s,e)=>t==='tv'?`https://autoembed.co/tv/tmdb/${id}-${s||1}-${e||1}`:`https://autoembed.co/movie/tmdb/${id}`},
+  {n:'VidSrc',       f:(id,t,s,e)=>t==='tv'?`https://vidsrc.to/embed/tv/${id}/${s||1}/${e||1}`:`https://vidsrc.to/embed/movie/${id}`},
+  // 3. AutoEmbed — solid, wide Nollywood coverage
+  {n:'AutoEmbed',    f:(id,t,s,e)=>t==='tv'?`https://autoembed.co/tv/tmdb/${id}-${s||1}-${e||1}`:`https://autoembed.co/movie/tmdb/${id}`},
+  // 4. SuperEmbed — multi-server player, huge library, TMDB native
+  {n:'SuperEmbed',   f:(id,t,s,e)=>t==='tv'?`https://multiembed.mov/?video_id=${id}&tmdb=1&s=${s||1}&e=${e||1}`:`https://multiembed.mov/?video_id=${id}&tmdb=1`},
+  // 5. 2Embed — reliable backup, TMDB native
+  {n:'2Embed',       f:(id,t,s,e)=>t==='tv'?`https://www.2embed.cc/embedtv/${id}&s=${s||1}&e=${e||1}`:`https://www.2embed.cc/embed/${id}`},
 ];
-// ── SEASON OVERRIDES — for shows TMDB hasn't caught up on yet ──
-// Key = TMDB series ID, Value = actual season count
-const SEASON_OVERRIDES={
-  197428:2  // Blood Sisters (S2 dropped June 5 2026, TMDB still shows 1)
-};
-// ── EPISODE FALLBACKS — hardcoded episode lists for overridden seasons ──
-const EPISODE_FALLBACKS={
-  197428:{
-    2:[
-      {episode_number:1,name:'Episode 1',overview:'Sarah and Kemi resurface as the Ademola family\'s reach grows deadlier. Old alliances fracture and new enemies emerge.',runtime:54,still_path:null},
-      {episode_number:2,name:'Episode 2',overview:'Loyalties are tested as the truth about what happened begins unravelling, putting everyone who knows at risk.',runtime:54,still_path:null},
-      {episode_number:3,name:'Episode 3',overview:'With danger closing in from every direction, Sarah and Kemi must make impossible choices to protect themselves and each other.',runtime:54,still_path:null},
-      {episode_number:4,name:'Episode 4',overview:'The deadly secrets of the Ademola family collide with Sarah and Kemi\'s desperate fight for survival in a shocking conclusion.',runtime:54,still_path:null},
-    ]
-  }
-};
 const GM={28:'Action',12:'Adventure',16:'Animation',35:'Comedy',80:'Crime',99:'Documentary',18:'Drama',10751:'Family',14:'Fantasy',36:'History',27:'Horror',10749:'Romance',878:'Sci-Fi',53:'Thriller',10752:'War',10759:'Action & Adventure',10765:'Sci-Fi & Fantasy'};
 const gn=ids=>ids&&ids[0]?GM[ids[0]]||'':'';
 const poster=(p,s='w342')=>p?IMG+s+p:`data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='2' height='3'%3E%3Crect width='2' height='3' fill='%231a1a28'/%3E%3C/svg%3E`;
@@ -2720,8 +2704,7 @@ async function openDetail(m,type){
   const yr=(full.release_date||full.first_air_date||'').slice(0,4);
   const rt=full.vote_average?'★ '+full.vote_average.toFixed(1):'';
   const runtime=full.runtime?`${full.runtime}m`:(full.episode_run_time&&full.episode_run_time[0]?`~${full.episode_run_time[0]}m/ep`:'');
-  const _seasonCount=Math.max(full.number_of_seasons||0,SEASON_OVERRIDES[m.id]||0);
-  const seasons=_seasonCount?`${_seasonCount} Season${_seasonCount>1?'s':''}` :'';
+  const seasons=full.number_of_seasons?`${full.number_of_seasons} Season${full.number_of_seasons>1?'s':''}` :'';
   document.getElementById('tp-meta').innerHTML=
     `${yr?`<span class="tp-pill">${yr}</span>`:''}${rt?`<span class="tp-star">${rt}</span>`:''}${runtime?`<span class="tp-pill">${runtime}</span>`:''}${seasons?`<span class="tp-pill">${seasons}</span>`:''}`;
   document.getElementById('tp-overview').textContent=full.overview||m.overview||'';
@@ -2771,8 +2754,6 @@ async function getCwProgress(id,type){
   return data||null;
 }
 async function loadTpSeasons(tvId,totalSeasons){
-  // If TMDB hasn't caught up yet, use our known override
-  totalSeasons=Math.max(totalSeasons,SEASON_OVERRIDES[tvId]||0);
   const sel=document.getElementById('tp-season-sel');
   sel.innerHTML='';
   for(let i=1;i<=totalSeasons;i++){
@@ -2793,11 +2774,7 @@ async function loadTpEpisodes(tvId,season){
 
   try{
     const d=await api(`/tv/${tvId}/season/${season}`,'');
-    let eps=d.episodes||[];
-    // TMDB hasn't added this season yet — use our hardcoded fallback
-    if(!eps.length&&EPISODE_FALLBACKS[tvId]&&EPISODE_FALLBACKS[tvId][season]){
-      eps=EPISODE_FALLBACKS[tvId][season];
-    }
+    const eps=d.episodes||[];
     const title=curDetail?curDetail.title||curDetail.name||'':'';
     list.innerHTML='';
     eps.forEach(ep=>{
@@ -3084,13 +3061,8 @@ document.addEventListener('webkitfullscreenchange',()=>{
 });
 function loadSrv(id,type,i){
   const url=SERVERS[i].f(id,type,curPlayerSeason,curPlayerEp);
-  // EmbedSu requires allow-same-origin which some browsers block; set sandbox to allow it
   const iframe=document.getElementById('player-iframe');
-  if(SERVERS[i].n==='EmbedSu'){
-    iframe.setAttribute('sandbox','allow-scripts allow-same-origin allow-forms allow-popups allow-presentation');
-  } else {
-    iframe.removeAttribute('sandbox');
-  }
+  iframe.removeAttribute('sandbox');
   iframe.src=USE_PROXY?PROXY+encodeURIComponent(url):url;
 }
 // ── EP PANEL: fetch CW data then build ──
@@ -3225,12 +3197,8 @@ function _populateEpSeasonSel(tvId){
   const sel=document.getElementById('ep-tb-season-sel');
   const lbl=document.getElementById('ep-tb-season-label');
   if(!sel||!lbl) return;
-  // Get number of seasons from curPlayerMedia, with override for TMDB-lagging shows
-  const _tvId=curPlayerMedia?.id;
-  const numSeasons=Math.max(
-    curPlayerMedia?.number_of_seasons||curPlayerMedia?.seasons?.length||1,
-    (_tvId&&SEASON_OVERRIDES[_tvId])||0
-  );
+  // Get number of seasons from curPlayerMedia
+  const numSeasons=curPlayerMedia?.number_of_seasons||curPlayerMedia?.seasons?.length||1;
   sel.innerHTML='';
   for(let s=1;s<=numSeasons;s++){
     const opt=document.createElement('option');
@@ -3474,10 +3442,9 @@ async function openEpPicker(m){
   const title=m.title||m.name||'';
   document.getElementById('ep-picker-show-title').textContent=title;
   document.getElementById('ep-picker-more-btn').onclick=()=>{closeEpPicker();openDetail(m,'tv');};
-  // Fetch season count, with override for TMDB-lagging shows
+  // Fetch season count
   let totalSeasons=1;
   try{const d=await api(`/tv/${m.id}`,'');totalSeasons=d.number_of_seasons||1;}catch(e){}
-  totalSeasons=Math.max(totalSeasons,SEASON_OVERRIDES[m.id]||0);
   const sel=document.getElementById('ep-picker-season-sel');
   sel.innerHTML='';
   for(let i=1;i<=totalSeasons;i++){
@@ -3493,10 +3460,7 @@ async function loadPickerEps(tvId,season){
   list.innerHTML='<div style="padding:20px 18px;font-size:13px;color:var(--text3);">Loading...</div>';
   try{
     const d=await api(`/tv/${tvId}/season/${season}`,'');
-    let eps=d.episodes||[];
-    if(!eps.length&&EPISODE_FALLBACKS[tvId]&&EPISODE_FALLBACKS[tvId][season]){
-      eps=EPISODE_FALLBACKS[tvId][season];
-    }
+    const eps=d.episodes||[];
     const title=epPickerMedia?epPickerMedia.title||epPickerMedia.name||'':'';
     list.innerHTML='';
     eps.forEach(ep=>{
