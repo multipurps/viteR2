@@ -227,7 +227,7 @@ input{font-family:inherit;-webkit-user-select:auto;user-select:auto;}
 .dtp-tab{flex:1;padding:12px 10px;text-align:center;font-size:13px;font-weight:600;color:var(--text3);cursor:pointer;transition:all .2s;border-bottom:2px solid transparent;}
 .dtp-tab.on{color:var(--lime);border-bottom-color:var(--lime);}
 .dtp-tab-badge{display:inline-block;margin-left:5px;font-size:10px;font-weight:700;background:rgba(255,255,255,.1);padding:1px 6px;border-radius:20px;vertical-align:middle;}
-.dtp-body{flex:1;overflow-y:auto;padding:16px;}
+.dtp-body{flex:1;overflow-y:auto;padding:16px;overscroll-behavior:contain;}
 .dtp-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
 .dtp-card{cursor:pointer;border-radius:8px;overflow:hidden;background:var(--card);border:1px solid var(--border);transition:transform .2s;position:relative;}
 .dtp-card:hover{transform:scale(1.04);}
@@ -656,6 +656,7 @@ body.tv-mode .row{overflow-x:hidden;cursor:default;scroll-snap-type:none;}
 #search-content{
   flex:1;overflow-y:auto;
   padding:0 clamp(16px,4vw,52px) 20px;
+  overscroll-behavior:contain;
 }
 #search-default-grid{
   display:grid;
@@ -1935,7 +1936,6 @@ async function initAuth(){
 }
 async function onUserLoaded(){
   await loadUserData();
-  // Show profile btn FIRST — before anything else that could throw
   const pb=document.getElementById('profile-btn');
   pb.style.display='flex';pb.style.visibility='visible';pb.style.opacity='1';
   document.getElementById('signin-nav-btn').style.display='none';
@@ -1946,7 +1946,6 @@ async function onUserLoaded(){
   const navAv=document.getElementById('nav-avatar');
   if(navAv)navAv.textContent=uname[0].toUpperCase();
   try{localStorage.setItem('zeeyus_last_user',JSON.stringify({email:user.email,name:uname}));}catch(e){}
-  // enforceSession is wrapped — if zeeyus_sessions table missing it won't break login
   try{await enforceSession();}catch(e){console.warn('enforceSession:',e.message);}
 }
 async function enforceSession(){
@@ -3432,6 +3431,7 @@ let searchDefaultLoaded=false;
 async function openSearch(){
   stopHeroTrailer();
   document.getElementById('search-overlay').classList.add('open');
+  document.body.style.overflow='hidden'; // prevent background scroll on desktop
   document.getElementById('search-results-grid').style.display='none';
   document.getElementById('search-default-grid').style.display='grid';
   setTimeout(()=>document.getElementById('search-input').focus(),100);
@@ -3478,6 +3478,7 @@ function doRecentSearch(q){
 }
 function closeSearch(){
   document.getElementById('search-overlay').classList.remove('open');
+  document.body.style.overflow=''; // restore background scroll
   document.getElementById('search-input').value='';
   document.getElementById('search-results-grid').style.display='none';
   document.getElementById('search-default-grid').style.display='grid';
@@ -3501,7 +3502,20 @@ async function doSearch(q){
   document.getElementById('s-label').textContent='Results for "'+q+'"';
   const d=await api('/search/multi','query='+encodeURIComponent(q));
   const g=document.getElementById('search-results-grid');g.innerHTML='';
-  (d.results||[]).filter(m=>m.poster_path&&(m.media_type==='movie'||m.media_type==='tv')).slice(0,30).forEach(m=>{
+  const ql=q.toLowerCase().trim();
+  const results=(d.results||[])
+    .filter(m=>m.poster_path&&(m.media_type==='movie'||m.media_type==='tv'))
+    .sort((a,b)=>{
+      const an=(a.title||a.name||'').toLowerCase();
+      const bn=(b.title||b.name||'').toLowerCase();
+      // 0 = exact match, 1 = starts with query, 2 = everything else
+      const aRank=an===ql?0:an.startsWith(ql)?1:2;
+      const bRank=bn===ql?0:bn.startsWith(ql)?1:2;
+      if(aRank!==bRank)return aRank-bRank;
+      return (b.popularity||0)-(a.popularity||0);
+    })
+    .slice(0,30);
+  results.forEach(m=>{
     const el=mkCard(m,m.media_type);
     el.onclick=()=>{closeSearch();openDetail(m,m.media_type);};
     g.appendChild(el);
