@@ -227,7 +227,7 @@ input{font-family:inherit;-webkit-user-select:auto;user-select:auto;}
 .dtp-tab{flex:1;padding:12px 10px;text-align:center;font-size:13px;font-weight:600;color:var(--text3);cursor:pointer;transition:all .2s;border-bottom:2px solid transparent;}
 .dtp-tab.on{color:var(--lime);border-bottom-color:var(--lime);}
 .dtp-tab-badge{display:inline-block;margin-left:5px;font-size:10px;font-weight:700;background:rgba(255,255,255,.1);padding:1px 6px;border-radius:20px;vertical-align:middle;}
-.dtp-body{flex:1;overflow-y:auto;padding:16px;overscroll-behavior:contain;}
+.dtp-body{flex:1;min-height:0;overflow-y:auto;padding:16px;overscroll-behavior:contain;}
 .dtp-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
 .dtp-card{cursor:pointer;border-radius:8px;overflow:hidden;background:var(--card);border:1px solid var(--border);transition:transform .2s;position:relative;}
 .dtp-card:hover{transform:scale(1.04);}
@@ -493,16 +493,28 @@ body.tv-mode .row{overflow-x:hidden;cursor:default;scroll-snap-type:none;}
 .load-more-btn:hover{background:rgba(255,255,255,.14);}
 
 /* ══ AUTH MODAL ══ */
-#auth-modal{position:fixed;inset:0;z-index:800;background:rgba(0,0,0,.82);backdrop-filter:blur(10px);display:none;align-items:center;justify-content:center;padding:20px;}
+#auth-modal{position:fixed;inset:0;z-index:800;background:rgba(0,0,0,.75);backdrop-filter:blur(10px);display:none;align-items:flex-end;justify-content:center;}
 #auth-modal.open{display:flex;}
-.auth-box{width:100%;max-width:400px;background:var(--bg2);border:1px solid var(--border);border-radius:18px;padding:clamp(22px,5vw,38px);animation:popIn .3s cubic-bezier(.34,1.56,.64,1);position:relative;}
-@keyframes popIn{from{transform:scale(.9);opacity:0;}to{transform:scale(1);opacity:1;}}
-.auth-close{position:absolute;top:14px;right:14px;width:30px;height:30px;background:rgba(255,255,255,.08);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;}
+.auth-box{
+  width:100%;max-width:480px;
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:22px 22px 0 0;
+  padding:10px clamp(22px,5vw,38px) clamp(28px,6vw,44px);
+  position:relative;
+  max-height:96dvh;overflow-y:auto;
+  animation:authSlideUp .38s cubic-bezier(.32,1,.5,1);
+}
+@media(min-width:600px){
+  .auth-box{border-radius:22px;margin-bottom:3vh;max-height:92dvh;}
+}
+@keyframes authSlideUp{from{transform:translateY(60px);opacity:0;}to{transform:translateY(0);opacity:1;}}
+.auth-drag-handle{width:40px;height:4px;border-radius:2px;background:rgba(255,255,255,.18);margin:0 auto 18px;}
+.auth-close{position:absolute;top:18px;right:18px;width:30px;height:30px;background:rgba(255,255,255,.08);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;}
 .auth-close svg{width:14px;height:14px;stroke:var(--text2);stroke-width:2;fill:none;}
-.auth-logo{width:130px;margin:0 auto 22px;display:block;}
+.auth-logo{width:120px;margin:0 auto 18px;display:block;}
 .auth-heading{font-family:'DM Serif Display',serif;font-size:22px;text-align:center;margin-bottom:5px;}
-.auth-sub{font-size:13px;color:var(--text3);text-align:center;margin-bottom:22px;}
-.auth-tabs{display:flex;gap:3px;background:var(--bg3);border-radius:8px;padding:3px;margin-bottom:18px;}
+.auth-sub{font-size:13px;color:var(--text3);text-align:center;margin-bottom:20px;}
+.auth-tabs{display:flex;gap:3px;background:var(--bg3);border-radius:8px;padding:3px;margin-bottom:16px;}
 .auth-tab{flex:1;padding:8px;text-align:center;border-radius:6px;font-size:13px;font-weight:600;color:var(--text3);transition:all .2s;cursor:pointer;}
 .auth-tab.active{background:var(--purple);color:#fff;}
 .auth-input{width:100%;height:46px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:0 14px;font-size:14px;color:var(--text);outline:none;margin-bottom:10px;transition:border-color .2s;}
@@ -511,6 +523,18 @@ body.tv-mode .row{overflow-x:hidden;cursor:default;scroll-snap-type:none;}
 .auth-btn{width:100%;height:46px;background:var(--lime);color:#0a0a0a;border-radius:var(--r);font-weight:800;font-size:15px;margin-top:4px;transition:all .2s;cursor:pointer;}
 .auth-btn:hover{background:#c4e048;}
 .auth-btn:disabled{opacity:.5;cursor:not-allowed;}
+.auth-divider{display:flex;align-items:center;gap:10px;margin:14px 0;color:var(--text3);font-size:12px;}
+.auth-divider::before,.auth-divider::after{content:'';flex:1;height:1px;background:var(--border);}
+.auth-google-btn{
+  width:100%;height:46px;border-radius:var(--r);
+  background:#fff;color:#1a1a1a;
+  font-size:14px;font-weight:700;
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  cursor:pointer;transition:background .2s;border:1px solid var(--border);
+  margin-top:2px;
+}
+.auth-google-btn:hover{background:#f0f0f0;}
+.auth-google-btn svg{width:20px;height:20px;flex-shrink:0;}
 .auth-err{color:#ff7070;font-size:12px;margin-top:6px;text-align:center;min-height:16px;}
 .pending-view{text-align:center;padding:10px 0;}
 .pending-view .p-icon{font-size:44px;margin-bottom:14px;}
@@ -654,7 +678,7 @@ body.tv-mode .row{overflow-x:hidden;cursor:default;scroll-snap-type:none;}
   flex-shrink:0;
 }
 #search-content{
-  flex:1;overflow-y:auto;
+  flex:1;min-height:0;overflow-y:auto;
   padding:0 clamp(16px,4vw,52px) 20px;
   overscroll-behavior:contain;
 }
@@ -1596,6 +1620,7 @@ body.tv-mode .row:hover .card-w{opacity:1;}
   <div class="row" id="nw-drama-row" style="display:none"></div>
 </div>
 <div class="section"><div class="sec-hd"><h2 class="sec-title">Trending <span>This Week</span></h2><span class="sec-all" onclick="openSeeAll('Trending This Week','trending')">See all</span></div><div class="row" id="trending-row"></div></div>
+  <div class="section"><div class="sec-hd"><h2 class="sec-title">South African <span>Series</span></h2><span class="sec-all" onclick="openSeeAll('South African Series','za_series','tv')">See all</span></div><div class="row" id="za-series-row"></div></div>
   <div class="section"><div class="sec-hd"><h2 class="sec-title">Top 10 <span>Movies</span></h2></div><div class="row" id="top10m-row"></div></div>
   <div class="section"><div class="sec-hd"><h2 class="sec-title">Top 10 <span>Shows</span></h2></div><div class="row" id="top10s-row"></div></div>
   <div class="section"><div class="sec-hd"><h2 class="sec-title">New <span>Releases</span></h2><span class="sec-all" onclick="openSeeAll('New Releases','new_releases')">See all</span></div><div class="row" id="newrel-row"></div></div>
@@ -1869,13 +1894,6 @@ const SERVERS=[
   {n:'SuperEmbed', f:(id,t,s,e)=>t==='tv'?`https://multiembed.mov/?video_id=${id}&tmdb=1&s=${s||1}&e=${e||1}`:`https://multiembed.mov/?video_id=${id}&tmdb=1`},
   {n:'2Embed',     f:(id,t,s,e)=>t==='tv'?`https://www.2embed.cc/embedtv/${id}&s=${s||1}&e=${e||1}`:`https://www.2embed.cc/embed/${id}`},
 ];
-const SEASON_OVERRIDES={197428:2};
-const EPISODE_FALLBACKS={197428:{2:[
-  {episode_number:1,name:'Episode 1',overview:'Sarah and Kemi resurface as the Ademola family\'s reach grows deadlier.',runtime:54,still_path:null},
-  {episode_number:2,name:'Episode 2',overview:'Loyalties are tested as the truth begins unravelling.',runtime:54,still_path:null},
-  {episode_number:3,name:'Episode 3',overview:'With danger closing in, Sarah and Kemi must make impossible choices.',runtime:54,still_path:null},
-  {episode_number:4,name:'Episode 4',overview:'The deadly secrets of the Ademola family collide in a shocking conclusion.',runtime:54,still_path:null},
-]}};
 const GM={28:'Action',12:'Adventure',16:'Animation',35:'Comedy',80:'Crime',99:'Documentary',18:'Drama',10751:'Family',14:'Fantasy',36:'History',27:'Horror',10749:'Romance',878:'Sci-Fi',53:'Thriller',10752:'War',10759:'Action & Adventure',10765:'Sci-Fi & Fantasy'};
 const gn=ids=>ids&&ids[0]?GM[ids[0]]||'':'';
 const poster=(p,s='w342')=>p?IMG+s+p:`data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='2' height='3'%3E%3Crect width='2' height='3' fill='%231a1a28'/%3E%3C/svg%3E`;
@@ -1935,18 +1953,38 @@ async function initAuth(){
   }catch(e){console.warn('initAuth failed:',e.message);}
 }
 async function onUserLoaded(){
+  // APPROVAL GATE — must pass before anything else is shown
+  const approved=await checkApproved();
+  if(!approved){
+    // Show pending screen, hide nav profile btn
+    document.getElementById('profile-btn').style.display='none';
+    document.getElementById('signin-nav-btn').style.display='flex';
+    // Open auth modal on the pending view
+    document.getElementById('auth-forms-wrap').style.display='none';
+    document.getElementById('auth-pending-view').style.display='block';
+    document.getElementById('auth-modal').classList.add('open');
+    document.body.style.overflow='hidden';
+    return;
+  }
   await loadUserData();
   const pb=document.getElementById('profile-btn');
   pb.style.display='flex';pb.style.visibility='visible';pb.style.opacity='1';
   document.getElementById('signin-nav-btn').style.display='none';
-  document.getElementById('dd-email').textContent=user.email||'';
   const uname=(user.user_metadata&&(user.user_metadata.full_name||user.user_metadata.name))||user.email.split('@')[0]||'User';
   document.getElementById('dd-name').textContent=uname;
   document.getElementById('dd-avatar').textContent=uname[0].toUpperCase();
+  document.getElementById('dd-email').textContent=user.email||'';
   const navAv=document.getElementById('nav-avatar');
   if(navAv)navAv.textContent=uname[0].toUpperCase();
   try{localStorage.setItem('zeeyus_last_user',JSON.stringify({email:user.email,name:uname}));}catch(e){}
   try{await enforceSession();}catch(e){console.warn('enforceSession:',e.message);}
+}
+async function doGoogleSignIn(){
+  const {error}=await sb.auth.signInWithOAuth({
+    provider:'google',
+    options:{redirectTo:window.location.href}
+  });
+  if(error)toast('Google sign in failed: '+error.message);
 }
 async function enforceSession(){
   if(!user)return;
@@ -2054,10 +2092,7 @@ function _renderDtProfTab(){
   const body=document.getElementById('dtp-body');
   const items=_dtProfTab==='watchlist'?_dtProfData.watchlist:_dtProfData.history;
   if(!items){body.innerHTML='<div class="dtp-loading">Loading...</div>';return;}
-  if(!items.length){
-    body.innerHTML=`<div class="dtp-empty">Your ${_dtProfTab==='watchlist'?'watchlist':'history'} is empty.</div>`;
-    return;
-  }
+  if(!items.length){body.innerHTML=`<div class="dtp-empty">Your ${_dtProfTab==='watchlist'?'watchlist':'history'} is empty.</div>`;return;}
   const grid=document.createElement('div');
   grid.className='dtp-grid';
   items.forEach(row=>{
@@ -2065,17 +2100,14 @@ function _renderDtProfTab(){
     const type=row.media_type||m._type||'movie';
     const title=m.title||m.name||'';
     const p=m.poster_path?IMG+'w185'+m.poster_path:'';
-    const card=document.createElement('div');
-    card.className='dtp-card';
+    const card=document.createElement('div');card.className='dtp-card';
     const epBadge=(_dtProfTab==='history'&&row.season)?`<div class="dtp-card-ep">S${row.season} E${row.episode||1}</div>`:'';
-    card.innerHTML=p
-      ?`<img src="${p}" alt="${title}" loading="lazy">${epBadge}<div class="dtp-card-label">${title}</div>`
+    card.innerHTML=p?`<img src="${p}" alt="${title}" loading="lazy">${epBadge}<div class="dtp-card-label">${title}</div>`
       :`<div style="width:100%;aspect-ratio:2/3;background:var(--card);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--text3);padding:8px;text-align:center;">${title}</div>${epBadge}`;
     card.onclick=()=>{closeDtProfile();openDetail(m,type);};
     grid.appendChild(card);
   });
-  body.innerHTML='';
-  body.appendChild(grid);
+  body.innerHTML='';body.appendChild(grid);
 }
 
 // ── AUTH MODAL ──
@@ -2369,8 +2401,8 @@ async function loadContinueWatching(){
   const row=document.getElementById('continue-row');
   row.innerHTML='';
   if(!data||!data.length){document.getElementById('continue-sec').style.display='none';return;}
-  const activeItems=data.filter(item=>{const p=item.progress||0;return p>=1&&p<95;});
-  const finished=data.filter(item=>(item.progress||0)>=95);
+  const activeItems=data.filter(item=>{const p=item.progress||0;return p>=1&&p<99;});
+  const finished=data.filter(item=>(item.progress||0)>=99);
   finished.forEach(item=>{
     sb.from('zeeyus_continue').delete().eq('user_id',user.id).eq('media_id',String(item.media_data?.id||item.media_id)).eq('media_type',item.media_type).then(()=>{});
   });
@@ -2531,10 +2563,24 @@ async function loadRows(){
   // ── HOME ──
   fillRow('trending-row',shuffle(trending.results||[]),'movie','card');
   loadNollywoodRows().catch(()=>{});
-  const t10m=document.getElementById('top10m-row');t10m.innerHTML='';
-  allM.slice(0,10).forEach((m,i)=>t10m.appendChild(mkTop(m,i+1,'movie')));
-  const t10s=document.getElementById('top10s-row');t10s.innerHTML='';
-  allTV.slice(0,10).forEach((m,i)=>t10s.appendChild(mkTop(m,i+1,'tv')));
+  // South African series — near top, right after Nollywood/trending
+  api('/discover/tv','with_origin_country=ZA&sort_by=popularity.desc&page=1')
+    .then(d=>fillRow('za-series-row',(d.results||[]).filter(m=>m.poster_path),'tv','card'))
+    .catch(()=>{});
+  // Real Netflix Top 10 — use Netflix provider (8) + current trending, sorted by popularity
+  Promise.all([
+    api('/discover/movie','with_watch_providers=8&watch_region=US&sort_by=popularity.desc&page=1'),
+    api('/discover/tv','with_watch_providers=8&watch_region=US&sort_by=popularity.desc&page=1'),
+  ]).then(([nfM,nfS])=>{
+    const t10m=document.getElementById('top10m-row');
+    if(t10m){t10m.innerHTML='';(nfM.results||[]).filter(m=>m.poster_path).slice(0,10).forEach((m,i)=>t10m.appendChild(mkTop(m,i+1,'movie')));}
+    const t10s=document.getElementById('top10s-row');
+    if(t10s){t10s.innerHTML='';(nfS.results||[]).filter(m=>m.poster_path).slice(0,10).forEach((m,i)=>t10s.appendChild(mkTop(m,i+1,'tv')));}
+  }).catch(()=>{
+    // fallback to trending if Netflix provider query fails
+    const t10m=document.getElementById('top10m-row');if(t10m){t10m.innerHTML='';allM.slice(0,10).forEach((m,i)=>t10m.appendChild(mkTop(m,i+1,'movie')));}
+    const t10s=document.getElementById('top10s-row');if(t10s){t10s.innerHTML='';allTV.slice(0,10).forEach((m,i)=>t10s.appendChild(mkTop(m,i+1,'tv')));}
+  });
   fillRow('newrel-row',shuffle(newRel.results||[]),'movie','card');
   // ── MOVIES ──
   _buildMoviesHero(shuffle(pop.results||[]));
@@ -2677,6 +2723,7 @@ async function fetchSeeAllPage(page){
     india:      {mt:'movie',p:'with_origin_country=IN&sort_by=popularity.desc'},
     nollywood_movies:{mt:'movie',p:'with_origin_country=NG&sort_by=popularity.desc'},
     nollywood_drama: {mt:'tv',   p:'with_origin_country=NG&sort_by=popularity.desc'},
+    za_series:       {mt:'tv',   p:'with_origin_country=ZA&sort_by=popularity.desc'},
   };
 
   if(_curatedMap[type]){
@@ -3048,11 +3095,12 @@ async function openPlayer(id,type,title,m,season,ep){
       const deltaMinutes=(now-lastTickTime)/60000;
       lastTickTime=now;
       const runtime=m.runtime||m.episode_run_time?.[0]||90;
-      const deltaPct=(deltaMinutes/runtime)*100;
+      // Cap delta to 1 minute worth — prevents runaway if tab is backgrounded
+      const deltaPct=(Math.min(deltaMinutes,1.5)/runtime)*100;
       prog=Math.min(prog+deltaPct,99);
 
-      // Only remove from CW when truly done (98%+) — not at 40-60%
-      if(prog>=98){_deleteCw();clearInterval(progTimer);return;}
+      // Only remove from CW when truly done (99%+)
+      if(prog>=99){_deleteCw();clearInterval(progTimer);return;}
 
       sb.from('zeeyus_continue').upsert({
         user_id:user.id,media_id:String(id),media_type:type,
@@ -3431,7 +3479,8 @@ let searchDefaultLoaded=false;
 async function openSearch(){
   stopHeroTrailer();
   document.getElementById('search-overlay').classList.add('open');
-  document.body.style.overflow='hidden'; // prevent background scroll on desktop
+  document.documentElement.style.overflow='hidden';
+  document.body.style.overflow='hidden';
   document.getElementById('search-results-grid').style.display='none';
   document.getElementById('search-default-grid').style.display='grid';
   setTimeout(()=>document.getElementById('search-input').focus(),100);
@@ -3478,7 +3527,8 @@ function doRecentSearch(q){
 }
 function closeSearch(){
   document.getElementById('search-overlay').classList.remove('open');
-  document.body.style.overflow=''; // restore background scroll
+  document.documentElement.style.overflow='';
+  document.body.style.overflow='';
   document.getElementById('search-input').value='';
   document.getElementById('search-results-grid').style.display='none';
   document.getElementById('search-default-grid').style.display='grid';
@@ -3508,13 +3558,11 @@ async function doSearch(q){
     .sort((a,b)=>{
       const an=(a.title||a.name||'').toLowerCase();
       const bn=(b.title||b.name||'').toLowerCase();
-      // 0 = exact match, 1 = starts with query, 2 = everything else
       const aRank=an===ql?0:an.startsWith(ql)?1:2;
       const bRank=bn===ql?0:bn.startsWith(ql)?1:2;
       if(aRank!==bRank)return aRank-bRank;
       return (b.popularity||0)-(a.popularity||0);
-    })
-    .slice(0,30);
+    }).slice(0,30);
   results.forEach(m=>{
     const el=mkCard(m,m.media_type);
     el.onclick=()=>{closeSearch();openDetail(m,m.media_type);};
@@ -3989,14 +4037,20 @@ if('serviceWorker' in navigator){
 <!-- AUTH MODAL HTML (kept at bottom for z-index) -->
 <div id="auth-modal">
   <div class="auth-box">
+    <div class="auth-drag-handle"></div>
     <button class="auth-close" onclick="closeAuthModal()"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
     <img src="assets/logo.png" class="auth-logo" alt="Zeeyus">
     <div id="auth-forms-wrap">
       <h2 class="auth-heading">Start Watching</h2>
       <p class="auth-sub">Sign in or request access to continue.</p>
+      <button class="auth-google-btn" onclick="doGoogleSignIn()">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+        Continue with Google
+      </button>
+      <div class="auth-divider">or</div>
       <div class="auth-tabs">
         <div class="auth-tab active" id="atab-in" onclick="switchAuthTab('in')">Sign In</div>
-        <div class="auth-tab" id="atab-up" onclick="switchAuthTab('up')">Create Account</div>
+        <div class="auth-tab" id="atab-up" onclick="switchAuthTab('up')">Request Access</div>
       </div>
       <div id="aform-in">
         <input class="auth-input" type="email" id="in-email" placeholder="Email" autocomplete="email">
