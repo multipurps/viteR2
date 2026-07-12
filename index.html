@@ -495,18 +495,8 @@ body.tv-mode .row{overflow-x:hidden;cursor:default;scroll-snap-type:none;}
 /* ══ AUTH MODAL ══ */
 #auth-modal{position:fixed;inset:0;z-index:800;background:rgba(0,0,0,.75);backdrop-filter:blur(10px);display:none;align-items:flex-end;justify-content:center;}
 #auth-modal.open{display:flex;}
-.auth-box{
-  width:100%;max-width:480px;
-  background:var(--bg2);border:1px solid var(--border);
-  border-radius:22px 22px 0 0;
-  padding:10px clamp(22px,5vw,38px) clamp(28px,6vw,44px);
-  position:relative;
-  max-height:96dvh;overflow-y:auto;
-  animation:authSlideUp .38s cubic-bezier(.32,1,.5,1);
-}
-@media(min-width:600px){
-  .auth-box{border-radius:22px;margin-bottom:3vh;max-height:92dvh;}
-}
+.auth-box{width:100%;max-width:480px;background:var(--bg2);border:1px solid var(--border);border-radius:22px 22px 0 0;padding:10px clamp(22px,5vw,38px) clamp(28px,6vw,44px);position:relative;max-height:96dvh;overflow-y:auto;animation:authSlideUp .38s cubic-bezier(.32,1,.5,1);}
+@media(min-width:600px){.auth-box{border-radius:22px;margin-bottom:3vh;}}
 @keyframes authSlideUp{from{transform:translateY(60px);opacity:0;}to{transform:translateY(0);opacity:1;}}
 .auth-drag-handle{width:40px;height:4px;border-radius:2px;background:rgba(255,255,255,.18);margin:0 auto 18px;}
 .auth-close{position:absolute;top:18px;right:18px;width:30px;height:30px;background:rgba(255,255,255,.08);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;}
@@ -525,14 +515,7 @@ body.tv-mode .row{overflow-x:hidden;cursor:default;scroll-snap-type:none;}
 .auth-btn:disabled{opacity:.5;cursor:not-allowed;}
 .auth-divider{display:flex;align-items:center;gap:10px;margin:14px 0;color:var(--text3);font-size:12px;}
 .auth-divider::before,.auth-divider::after{content:'';flex:1;height:1px;background:var(--border);}
-.auth-google-btn{
-  width:100%;height:46px;border-radius:var(--r);
-  background:#fff;color:#1a1a1a;
-  font-size:14px;font-weight:700;
-  display:flex;align-items:center;justify-content:center;gap:10px;
-  cursor:pointer;transition:background .2s;border:1px solid var(--border);
-  margin-top:2px;
-}
+.auth-google-btn{width:100%;height:46px;border-radius:var(--r);background:#fff;color:#1a1a1a;font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:10px;cursor:pointer;transition:background .2s;border:1px solid var(--border);}
 .auth-google-btn:hover{background:#f0f0f0;}
 .auth-google-btn svg{width:20px;height:20px;flex-shrink:0;}
 .auth-err{color:#ff7070;font-size:12px;margin-top:6px;text-align:center;min-height:16px;}
@@ -1620,7 +1603,6 @@ body.tv-mode .row:hover .card-w{opacity:1;}
   <div class="row" id="nw-drama-row" style="display:none"></div>
 </div>
 <div class="section"><div class="sec-hd"><h2 class="sec-title">Trending <span>This Week</span></h2><span class="sec-all" onclick="openSeeAll('Trending This Week','trending')">See all</span></div><div class="row" id="trending-row"></div></div>
-  <div class="section"><div class="sec-hd"><h2 class="sec-title">South African <span>Series</span></h2><span class="sec-all" onclick="openSeeAll('South African Series','za_series','tv')">See all</span></div><div class="row" id="za-series-row"></div></div>
   <div class="section"><div class="sec-hd"><h2 class="sec-title">Top 10 <span>Movies</span></h2></div><div class="row" id="top10m-row"></div></div>
   <div class="section"><div class="sec-hd"><h2 class="sec-title">Top 10 <span>Shows</span></h2></div><div class="row" id="top10s-row"></div></div>
   <div class="section"><div class="sec-hd"><h2 class="sec-title">New <span>Releases</span></h2><span class="sec-all" onclick="openSeeAll('New Releases','new_releases')">See all</span></div><div class="row" id="newrel-row"></div></div>
@@ -1663,7 +1645,7 @@ body.tv-mode .row:hover .card-w{opacity:1;}
   <div class="section"><div class="sec-hd"><h2 class="sec-title">Drama <span>Series</span></h2><span class="sec-all" onclick="openSeeAll('Drama Series','18','tv')">See all</span></div><div class="row" id="tvdrama-row"></div></div>
   <div class="section"><div class="sec-hd"><h2 class="sec-title">Comedy <span>Series</span></h2><span class="sec-all" onclick="openSeeAll('Comedy Series','35','tv')">See all</span></div><div class="row" id="tvcomedy-row"></div></div>
   <div class="section"><div class="sec-hd"><h2 class="sec-title">Korean <span>Dramas</span></h2><span class="sec-all" onclick="openSeeAll('Korean Dramas','kdrama','tv')">See all</span></div><div class="row" id="kdrama-row"></div></div>
-  <div class="section"><div class="sec-hd"><h2 class="sec-title">Turkish <span>Series</span></h2><span class="sec-all" onclick="openSeeAll('Turkish Series','turkish','tv')">See all</span></div><div class="row" id="turkish-row"></div></div>
+  <div class="section"><div class="sec-hd"><h2 class="sec-title">South African <span>Series</span></h2><span class="sec-all" onclick="openSeeAll('South African Series','za_series','tv')">See all</span></div><div class="row" id="za-series-row"></div></div>
   <div class="section"><div class="sec-hd"><h2 class="sec-title">Spanish <span>Series</span></h2><span class="sec-all" onclick="openSeeAll('Spanish Series','spanish','tv')">See all</span></div><div class="row" id="spanish-row"></div></div>
   <div class="section"><div class="sec-hd"><h2 class="sec-title">Mature <span>Animation</span></h2><span class="sec-all" onclick="openSeeAll('Mature Animation','matanim','tv')">See all</span></div><div class="row" id="matanim-row"></div></div>
   <div class="section"><div class="sec-hd"><h2 class="sec-title">Adult <span>Drama</span></h2><span class="sec-all" onclick="openSeeAll('Adult Drama','adult','tv')">See all</span></div><div class="row" id="adult-row"></div></div>
@@ -1808,7 +1790,7 @@ body.tv-mode .row:hover .card-w{opacity:1;}
           <select id="ep-tb-season-sel" onchange="changeEpPanelSeason(this.value)"></select>
         </div>
         <div class="ep-tb-autoplay">Auto play
-          <div class="ep-tb-toggle on" id="ep-tb-autoplay-toggle" onclick="toggleEpPanelAutoplay(this)"></div>
+          <div class="ep-tb-toggle on" id="ep-tb-autoplay-toggle" onclick="toggleEpPanelAutoplay(this)" style="display:none"></div>
         </div>
         <div class="ep-tb-close" onclick="closeFsEpPanel()">
           <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
@@ -1953,23 +1935,8 @@ async function initAuth(){
   }catch(e){console.warn('initAuth failed:',e.message);}
 }
 async function onUserLoaded(){
-  // APPROVAL GATE — must pass before anything else is shown
-  const approved=await checkApproved();
-  if(!approved){
-    // Show pending screen, hide nav profile btn
-    document.getElementById('profile-btn').style.display='none';
-    document.getElementById('signin-nav-btn').style.display='flex';
-    // Open auth modal on the pending view
-    document.getElementById('auth-forms-wrap').style.display='none';
-    document.getElementById('auth-pending-view').style.display='block';
-    document.getElementById('auth-modal').classList.add('open');
-    document.body.style.overflow='hidden';
-    return;
-  }
-  await loadUserData();
+  // Show profile nav first so splash can clear normally
   const pb=document.getElementById('profile-btn');
-  pb.style.display='flex';pb.style.visibility='visible';pb.style.opacity='1';
-  document.getElementById('signin-nav-btn').style.display='none';
   const uname=(user.user_metadata&&(user.user_metadata.full_name||user.user_metadata.name))||user.email.split('@')[0]||'User';
   document.getElementById('dd-name').textContent=uname;
   document.getElementById('dd-avatar').textContent=uname[0].toUpperCase();
@@ -1977,14 +1944,30 @@ async function onUserLoaded(){
   const navAv=document.getElementById('nav-avatar');
   if(navAv)navAv.textContent=uname[0].toUpperCase();
   try{localStorage.setItem('zeeyus_last_user',JSON.stringify({email:user.email,name:uname}));}catch(e){}
+
+  // Approval gate — check AFTER splash can clear
+  const approved=await checkApproved();
+  if(!approved){
+    pb.style.display='none';
+    document.getElementById('signin-nav-btn').style.display='flex';
+    document.getElementById('auth-forms-wrap').style.display='none';
+    document.getElementById('auth-pending-view').style.display='block';
+    document.getElementById('auth-modal').classList.add('open');
+    document.body.style.overflow='hidden';
+    return;
+  }
+
+  pb.style.display='flex';pb.style.visibility='visible';pb.style.opacity='1';
+  document.getElementById('signin-nav-btn').style.display='none';
+  await loadUserData();
   try{await enforceSession();}catch(e){console.warn('enforceSession:',e.message);}
 }
 async function doGoogleSignIn(){
-  const {error}=await sb.auth.signInWithOAuth({
+  const{error}=await sb.auth.signInWithOAuth({
     provider:'google',
     options:{redirectTo:window.location.href}
   });
-  if(error)toast('Google sign in failed: '+error.message);
+  if(error)toast('Google sign-in failed: '+error.message);
 }
 async function enforceSession(){
   if(!user)return;
@@ -2092,19 +2075,18 @@ function _renderDtProfTab(){
   const body=document.getElementById('dtp-body');
   const items=_dtProfTab==='watchlist'?_dtProfData.watchlist:_dtProfData.history;
   if(!items){body.innerHTML='<div class="dtp-loading">Loading...</div>';return;}
-  if(!items.length){body.innerHTML=`<div class="dtp-empty">Your ${_dtProfTab==='watchlist'?'watchlist':'history'} is empty.</div>`;return;}
-  const grid=document.createElement('div');
-  grid.className='dtp-grid';
-  items.forEach(row=>{
+  if(!items.length){body.innerHTML='<div class="dtp-empty">Your '+((_dtProfTab==='watchlist')?'watchlist':'history')+' is empty.</div>';return;}
+  const grid=document.createElement('div');grid.className='dtp-grid';
+  items.forEach(function(row){
     const m=row.media_data||row;
     const type=row.media_type||m._type||'movie';
     const title=m.title||m.name||'';
     const p=m.poster_path?IMG+'w185'+m.poster_path:'';
     const card=document.createElement('div');card.className='dtp-card';
-    const epBadge=(_dtProfTab==='history'&&row.season)?`<div class="dtp-card-ep">S${row.season} E${row.episode||1}</div>`:'';
-    card.innerHTML=p?`<img src="${p}" alt="${title}" loading="lazy">${epBadge}<div class="dtp-card-label">${title}</div>`
-      :`<div style="width:100%;aspect-ratio:2/3;background:var(--card);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--text3);padding:8px;text-align:center;">${title}</div>${epBadge}`;
-    card.onclick=()=>{closeDtProfile();openDetail(m,type);};
+    const epBadge=(_dtProfTab==='history'&&row.season)?'<div class="dtp-card-ep">S'+row.season+' E'+(row.episode||1)+'</div>':'';
+    card.innerHTML=p?'<img src="'+p+'" alt="'+title+'" loading="lazy">'+epBadge+'<div class="dtp-card-label">'+title+'</div>'
+      :'<div style="width:100%;aspect-ratio:2/3;background:var(--card);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--text3);padding:8px;text-align:center;">'+title+'</div>'+epBadge;
+    card.onclick=function(){closeDtProfile();openDetail(m,type);};
     grid.appendChild(card);
   });
   body.innerHTML='';body.appendChild(grid);
@@ -2449,7 +2431,63 @@ function switchNwTab(btn,rowId){
   }
 }
 
-// ── CURATED COLLECTIONS ──
+// ── REAL NETFLIX TOP 10 (from Netflix's own public weekly data) ──
+async function _loadNetflixTop10(){
+  const CACHE='nf_top10_v2';const TTL=22*60*60*1000; // 22h cache
+  try{
+    const cached=JSON.parse(localStorage.getItem(CACHE)||'null');
+    if(cached&&Date.now()-cached.ts<TTL){_applyNetflixTop10(cached.data);return;}
+  }catch(e){}
+  const PROXY='https://api.allorigins.win/get?url=';
+  const NF_TV='https://top10.netflix.com/data/all-weeks-tv.tsv';
+  const NF_FM='https://top10.netflix.com/data/all-weeks-films.tsv';
+  try{
+    const [tvRes,fmRes]=await Promise.all([
+      fetch(PROXY+encodeURIComponent(NF_TV)),
+      fetch(PROXY+encodeURIComponent(NF_FM))
+    ]);
+    const [tvJ,fmJ]=await Promise.all([tvRes.json(),fmRes.json()]);
+    function parseTSV(text){
+      if(!text)return[];
+      const lines=text.trim().split('\n');
+      const headers=lines[0].split('\t').map(h=>h.trim());
+      return lines.slice(1).map(line=>{
+        const vals=line.split('\t');
+        const obj={};headers.forEach((h,i)=>obj[h]=vals[i]?vals[i].trim():'');
+        return obj;
+      });
+    }
+    const tvRows=parseTSV(tvJ.contents||'');
+    const fmRows=parseTSV(fmJ.contents||'');
+    const latestTvWeek=[...new Set(tvRows.map(r=>r.week))].sort().pop();
+    const latestFmWeek=[...new Set(fmRows.map(r=>r.week))].sort().pop();
+    const topTv=tvRows.filter(r=>r.week===latestTvWeek).sort((a,b)=>parseInt(a.rank)-parseInt(b.rank)).slice(0,10);
+    const topFm=fmRows.filter(r=>r.week===latestFmWeek).sort((a,b)=>parseInt(a.rank)-parseInt(b.rank)).slice(0,10);
+    // Search each title on TMDB
+    const [tvResults,fmResults]=await Promise.all([
+      Promise.all(topTv.map(r=>api('/search/tv','query='+encodeURIComponent(r.show_title)+'&page=1').then(d=>(d.results||[])[0]||null).catch(()=>null))),
+      Promise.all(topFm.map(r=>api('/search/movie','query='+encodeURIComponent(r.show_title)+'&page=1').then(d=>(d.results||[])[0]||null).catch(()=>null)))
+    ]);
+    const data={tv:tvResults.filter(Boolean),films:fmResults.filter(Boolean),week:{tv:latestTvWeek,film:latestFmWeek}};
+    try{localStorage.setItem(CACHE,JSON.stringify({ts:Date.now(),data}));}catch(e){}
+    _applyNetflixTop10(data);
+  }catch(e){
+    console.warn('Netflix Top 10 fetch failed, using popular fallback:',e.message);
+    // fallback to trending popular
+    Promise.all([api('/tv/popular','page=1'),api('/movie/popular','page=1')]).then(([tv,fm])=>{
+      const t10s=document.getElementById('top10s-row');
+      if(t10s){t10s.innerHTML='';(tv.results||[]).filter(m=>m.poster_path).slice(0,10).forEach((m,i)=>t10s.appendChild(mkTop(m,i+1,'tv')));}
+      const t10m=document.getElementById('top10m-row');
+      if(t10m){t10m.innerHTML='';(fm.results||[]).filter(m=>m.poster_path).slice(0,10).forEach((m,i)=>t10m.appendChild(mkTop(m,i+1,'movie')));}
+    }).catch(()=>{});
+  }
+}
+function _applyNetflixTop10(data){
+  const t10s=document.getElementById('top10s-row');
+  if(t10s&&data.tv&&data.tv.length){t10s.innerHTML='';data.tv.slice(0,10).forEach((m,i)=>t10s.appendChild(mkTop(m,i+1,'tv')));}
+  const t10m=document.getElementById('top10m-row');
+  if(t10m&&data.films&&data.films.length){t10m.innerHTML='';data.films.slice(0,10).forEach((m,i)=>t10m.appendChild(mkTop(m,i+1,'movie')));}
+}
 const _bestTVSeries=[
   "Breaking Bad","Game of Thrones","The Sopranos","The Wire","Stranger Things",
   "Dark","Sherlock","Peaky Blinders","Friends","The Office",
@@ -2534,7 +2572,7 @@ const _appleMovies=["Greyhound","Finch","The Banker","Emancipation","Killers of 
 async function loadRows(){
   const today=new Date().toISOString().slice(0,10);
   const month=new Date(Date.now()-30*24*60*60*1e3).toISOString().slice(0,10);
-  const [trending,pop,pop2,newRel,action,comedy,horror,romance,scifi,docs,anim,tvPop,tvPop2,tvTrend,tvCrime,tvScifi,tvDrama,tvComedy,tvReality,tvDoc,tvFam,turkish]=await Promise.all([
+  const [trending,pop,pop2,newRel,action,comedy,horror,romance,scifi,docs,anim,tvPop,tvPop2,tvTrend,tvCrime,tvScifi,tvDrama,tvComedy,tvReality,tvDoc,tvFam]=await Promise.all([
     api('/trending/all/week','page=1'),
     api('/movie/popular','page=1'),
     api('/movie/popular','page=2'),
@@ -2556,31 +2594,12 @@ async function loadRows(){
     api('/discover/tv','with_genres=10764&sort_by=popularity.desc'),
     api('/discover/tv','with_genres=99&sort_by=popularity.desc'),
     api('/discover/tv','with_genres=10751&sort_by=popularity.desc'),
-    api('/discover/tv','with_original_language=tr&sort_by=popularity.desc'),
   ]);
   const allM=shuffle([...(pop.results||[]),...(pop2.results||[])]);
   const allTV=shuffle([...(tvPop.results||[]),...(tvPop2.results||[])]);
   // ── HOME ──
   fillRow('trending-row',shuffle(trending.results||[]),'movie','card');
   loadNollywoodRows().catch(()=>{});
-  // South African series — near top, right after Nollywood/trending
-  api('/discover/tv','with_origin_country=ZA&sort_by=popularity.desc&page=1')
-    .then(d=>fillRow('za-series-row',(d.results||[]).filter(m=>m.poster_path),'tv','card'))
-    .catch(()=>{});
-  // Real Netflix Top 10 — use Netflix provider (8) + current trending, sorted by popularity
-  Promise.all([
-    api('/discover/movie','with_watch_providers=8&watch_region=US&sort_by=popularity.desc&page=1'),
-    api('/discover/tv','with_watch_providers=8&watch_region=US&sort_by=popularity.desc&page=1'),
-  ]).then(([nfM,nfS])=>{
-    const t10m=document.getElementById('top10m-row');
-    if(t10m){t10m.innerHTML='';(nfM.results||[]).filter(m=>m.poster_path).slice(0,10).forEach((m,i)=>t10m.appendChild(mkTop(m,i+1,'movie')));}
-    const t10s=document.getElementById('top10s-row');
-    if(t10s){t10s.innerHTML='';(nfS.results||[]).filter(m=>m.poster_path).slice(0,10).forEach((m,i)=>t10s.appendChild(mkTop(m,i+1,'tv')));}
-  }).catch(()=>{
-    // fallback to trending if Netflix provider query fails
-    const t10m=document.getElementById('top10m-row');if(t10m){t10m.innerHTML='';allM.slice(0,10).forEach((m,i)=>t10m.appendChild(mkTop(m,i+1,'movie')));}
-    const t10s=document.getElementById('top10s-row');if(t10s){t10s.innerHTML='';allTV.slice(0,10).forEach((m,i)=>t10s.appendChild(mkTop(m,i+1,'tv')));}
-  });
   fillRow('newrel-row',shuffle(newRel.results||[]),'movie','card');
   // ── MOVIES ──
   _buildMoviesHero(shuffle(pop.results||[]));
@@ -2612,7 +2631,19 @@ async function loadRows(){
   fillRow('tvreality-row',shuffle(tvReality.results||[]),'tv','card');
   fillRow('tvdoc-row',shuffle(tvDoc.results||[]),'tv','card');
   fillRow('tvfam-row',shuffle(tvFam.results||[]),'tv','card');
-  fillRow('turkish-row',shuffle(turkish.results||[]),'tv','card');
+  // South African series — discover + curated supplement
+  api('/discover/tv','with_origin_country=ZA&sort_by=vote_count.desc&page=1').then(d=>{
+    const items=(d.results||[]).filter(m=>m.poster_path);
+    if(items.length>=6){fillRow('za-series-row',items,'tv','card');return;}
+    const saTitles=['Blood and Water','Queen Sono','How to Ruin Christmas','Recipes for Love and Murder','Sisterhood','Reyka','Adulting','Trackers','The River','Uzalo'];
+    Promise.all(saTitles.map(t=>api('/search/tv','query='+encodeURIComponent(t)).catch(()=>({results:[]})))).then(results=>{
+      const merged=[...items];const seen=new Set(merged.map(m=>String(m.id)));
+      results.forEach(d=>{const r=(d.results||[]).find(m=>m.poster_path&&!seen.has(String(m.id)));if(r){seen.add(String(r.id));merged.push(r);}});
+      fillRow('za-series-row',merged,'tv','card');
+    });
+  }).catch(()=>{});
+  // Real Netflix Top 10 — fetched from Netflix's own public data, cached 24h
+  _loadNetflixTop10();
   fillRow('tvaction-row',shuffle(allTV.filter(m=>m.genre_ids?.includes(10759)).concat(tvTrend.results||[])),'tv','card');
   loadCuratedRow('bestseries-row',shuffle(_bestTVSeries),'tv').catch(()=>{});
   loadCuratedRow('kdrama-row',shuffle(_koreanSeries),'tv').catch(()=>{});
@@ -2723,7 +2754,7 @@ async function fetchSeeAllPage(page){
     india:      {mt:'movie',p:'with_origin_country=IN&sort_by=popularity.desc'},
     nollywood_movies:{mt:'movie',p:'with_origin_country=NG&sort_by=popularity.desc'},
     nollywood_drama: {mt:'tv',   p:'with_origin_country=NG&sort_by=popularity.desc'},
-    za_series:       {mt:'tv',   p:'with_origin_country=ZA&sort_by=popularity.desc'},
+    za_series:       {mt:'tv',   p:'with_origin_country=ZA&sort_by=vote_count.desc'},
   };
 
   if(_curatedMap[type]){
@@ -2969,15 +3000,26 @@ function toggleTpList(){
   requireAuth(async()=>{
     const idx=myList.findIndex(x=>x.id===curDetail.id);
     if(idx>-1){
-      myList.splice(idx,1);
+      myList.splice(idx,1);updateTpListBtn();
+      const{error}=await sb.from('zeeyus_watchlist').delete().eq('user_id',user.id).eq('media_id',String(curDetail.id)).eq('media_type',curType);
+      if(error){myList.push({...curDetail,_type:curType});updateTpListBtn();toast('Could not remove — try again');return;}
       toast('Removed from My List');
-      await sb.from('zeeyus_watchlist').delete().eq('user_id',user.id).eq('media_id',String(curDetail.id)).eq('media_type',curType).catch(()=>{});
     }else{
-      myList.push({...curDetail,_type:curType});
+      myList.push({...curDetail,_type:curType});updateTpListBtn();
+      const{error}=await sb.from('zeeyus_watchlist').upsert(
+        {user_id:user.id,media_id:String(curDetail.id),media_type:curType,media_data:{...curDetail,_type:curType}},
+        {onConflict:'user_id,media_id,media_type'}
+      );
+      if(error){
+        const i=myList.findIndex(x=>x.id===curDetail.id);
+        if(i>-1)myList.splice(i,1);
+        updateTpListBtn();
+        toast('Could not save — check connection');
+        console.error('Watchlist error:',error.message);
+        return;
+      }
       toast('Added to My List');
-      await sb.from('zeeyus_watchlist').upsert({user_id:user.id,media_id:String(curDetail.id),media_type:curType,media_data:{...curDetail,_type:curType},created_at:new Date().toISOString()},{onConflict:'user_id,media_id,media_type'}).catch(()=>{});
     }
-    updateTpListBtn();
   });
 }
 async function rateTp(r){
@@ -3095,11 +3137,8 @@ async function openPlayer(id,type,title,m,season,ep){
       const deltaMinutes=(now-lastTickTime)/60000;
       lastTickTime=now;
       const runtime=m.runtime||m.episode_run_time?.[0]||90;
-      // Cap delta to 1 minute worth — prevents runaway if tab is backgrounded
       const deltaPct=(Math.min(deltaMinutes,1.5)/runtime)*100;
       prog=Math.min(prog+deltaPct,99);
-
-      // Only remove from CW when truly done (99%+)
       if(prog>=99){_deleteCw();clearInterval(progTimer);return;}
 
       sb.from('zeeyus_continue').upsert({
@@ -3362,13 +3401,8 @@ async function changeEpPanelSeason(seasonNum){
 }
 
 // ── Autoplay toggle from desktop top bar ──
-let _epAutoPlayOn=true;
-function toggleEpPanelAutoplay(el){
-  _epAutoPlayOn=!_epAutoPlayOn;
-  el.classList.toggle('on',_epAutoPlayOn);
-  if(!_epAutoPlayOn) cancelAutoNext();
-  else scheduleAutoNext();
-}
+let _epAutoPlayOn=false;
+function toggleEpPanelAutoplay(){}
 
 // ── Remote/keyboard navigation inside episode panel ──
 document.addEventListener('keydown',e=>{
@@ -3391,7 +3425,6 @@ document.addEventListener('keydown',e=>{
   }
 });
 function playNextEp(){
-  cancelAutoNext();
   const next=epPanelEps.find(e=>e.episode_number===curPlayerEp+1);
   if(!next)return;
   curPlayerEp=next.episode_number;
@@ -3404,8 +3437,6 @@ function playNextEp(){
   document.getElementById('p-title').textContent=showTitle+` · S${curPlayerSeason} E${curPlayerEp}`;
   document.getElementById('p-next-btn').style.display=
     epPanelEps.find(e=>e.episode_number===curPlayerEp+1)?'flex':'none';
-  scheduleAutoNext();
-  // Update CW with new episode position
   if(user&&curPlayerMedia){
     sb.from('zeeyus_continue').upsert({
       user_id:user.id,media_id:String(id),media_type:'tv',
@@ -3415,46 +3446,11 @@ function playNextEp(){
   }
   setTimeout(()=>buildEpPanel(id,'tv',showTitle),400);
 }
+function scheduleAutoNext(){}
+function showAutoNext(){}
+function doAutoNext(){}
+function cancelAutoNext(){const o=document.getElementById('autonext-overlay');if(o)o.classList.remove('show');}
 
-let _autoNextTimer=null,_autoNextCountdown=null;
-let _epStartTime=null;
-function scheduleAutoNext(){
-  cancelAutoNext();
-  const curEp=epPanelEps.find(e=>e.episode_number===curPlayerEp);
-  const next=epPanelEps.find(e=>e.episode_number===curPlayerEp+1);
-  if(!next)return;
-  _epStartTime=Date.now();
-  // Current episode runtime; show overlay when 90% done or 2min before end, min 1min delay
-  const epRuntime=(curEp?.runtime||42)*60*1000;
-  const showAt=Math.max(epRuntime*0.90,epRuntime-120000,60000);
-  _autoNextTimer=setTimeout(()=>showAutoNext(next),showAt);
-}
-function showAutoNext(nextEp){
-  const overlay=document.getElementById('autonext-overlay');
-  const thumb=document.getElementById('autonext-thumb');
-  const titleEl=document.getElementById('autonext-title');
-  const secsEl=document.getElementById('autonext-secs');
-  const bar=document.getElementById('autonext-bar');
-  titleEl.textContent=`E${nextEp.episode_number}: ${nextEp.name||'Episode '+nextEp.episode_number}`;
-  if(nextEp.still_path)thumb.style.backgroundImage=`url(${IMG}w300${nextEp.still_path})`;
-  overlay.classList.add('show');
-  let secs=20;
-  secsEl.textContent=secs+'s';
-  bar.style.setProperty('--pct','100%');
-  _autoNextCountdown=setInterval(()=>{
-    secs--;
-    secsEl.textContent=secs+'s';
-    bar.style.setProperty('--pct',((secs/20)*100)+'%');
-    if(secs<=0){cancelAutoNext();playNextEp();}
-  },1000);
-}
-function doAutoNext(){cancelAutoNext();playNextEp();}
-function cancelAutoNext(){
-  clearTimeout(_autoNextTimer);clearInterval(_autoNextCountdown);
-  _autoNextTimer=null;_autoNextCountdown=null;
-  const o=document.getElementById('autonext-overlay');
-  if(o)o.classList.remove('show');
-}
 function closePlayer(){
   clearInterval(progTimer);clearTimeout(nextEpTimer);cancelAutoNext();
   if(_cwSaveFn){try{_cwSaveFn(true);}catch(_){} _cwSaveFn=null;}
@@ -3554,8 +3550,8 @@ async function doSearch(q){
   const g=document.getElementById('search-results-grid');g.innerHTML='';
   const ql=q.toLowerCase().trim();
   const results=(d.results||[])
-    .filter(m=>m.poster_path&&(m.media_type==='movie'||m.media_type==='tv'))
-    .sort((a,b)=>{
+    .filter(function(m){return m.poster_path&&(m.media_type==='movie'||m.media_type==='tv');})
+    .sort(function(a,b){
       const an=(a.title||a.name||'').toLowerCase();
       const bn=(b.title||b.name||'').toLowerCase();
       const aRank=an===ql?0:an.startsWith(ql)?1:2;
@@ -3563,9 +3559,9 @@ async function doSearch(q){
       if(aRank!==bRank)return aRank-bRank;
       return (b.popularity||0)-(a.popularity||0);
     }).slice(0,30);
-  results.forEach(m=>{
+  results.forEach(function(m){
     const el=mkCard(m,m.media_type);
-    el.onclick=()=>{closeSearch();openDetail(m,m.media_type);};
+    el.onclick=function(){closeSearch();openDetail(m,m.media_type);};
     g.appendChild(el);
   });
 }
@@ -4042,15 +4038,15 @@ if('serviceWorker' in navigator){
     <img src="assets/logo.png" class="auth-logo" alt="Zeeyus">
     <div id="auth-forms-wrap">
       <h2 class="auth-heading">Start Watching</h2>
-      <p class="auth-sub">Sign in or request access to continue.</p>
+      <p class="auth-sub">Sign in or create an account to continue.</p>
       <button class="auth-google-btn" onclick="doGoogleSignIn()">
-        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+        <svg viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
         Continue with Google
       </button>
       <div class="auth-divider">or</div>
       <div class="auth-tabs">
         <div class="auth-tab active" id="atab-in" onclick="switchAuthTab('in')">Sign In</div>
-        <div class="auth-tab" id="atab-up" onclick="switchAuthTab('up')">Request Access</div>
+        <div class="auth-tab" id="atab-up" onclick="switchAuthTab('up')">Create Account</div>
       </div>
       <div id="aform-in">
         <input class="auth-input" type="email" id="in-email" placeholder="Email" autocomplete="email">
@@ -4225,7 +4221,8 @@ if('serviceWorker' in navigator){
   <div class="dtp-body" id="dtp-body"><div class="dtp-loading">Loading...</div></div>
   <div class="dtp-footer">
     <button class="dtp-signout" onclick="doSignout()">
-      <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Sign Out
+      <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      Sign Out
     </button>
   </div>
 </div>
