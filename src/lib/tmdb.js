@@ -37,6 +37,22 @@ export function getTrending(mediaType = 'all', window = 'week') {
   return api(`/trending/${mediaType}/${window}`);
 }
 
+export async function resolveCategory(cat, pageMediaType = 'movie') {
+  const today = new Date().toISOString().slice(0, 10);
+  const month = new Date(Date.now() - 30 * 24 * 60 * 60 * 1e3).toISOString().slice(0, 10);
+  const mt = cat.mediaType || pageMediaType;
+  if (cat.kind === 'trending') {
+    const data = await getTrending(mt, cat.window);
+    return data.results || [];
+  }
+  if (cat.kind === 'provider') {
+    return trendingOnProvider(cat.provider, mt, 'US', 20);
+  }
+  const params = typeof cat.params === 'function' ? cat.params(today, month) : cat.params;
+  const data = await discover(mt, params);
+  return data.results || [];
+}
+
 export function getPopular(mediaType = 'movie') {
   return api(`/${mediaType}/popular`);
 }
