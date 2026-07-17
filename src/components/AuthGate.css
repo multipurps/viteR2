@@ -3,9 +3,39 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: radial-gradient(ellipse at 60% 20%, rgba(124,58,237,0.16) 0%, transparent 55%), var(--bg);
   padding: 20px;
+  position: relative;
+  overflow: hidden;
+  transition: background 1.2s ease;
 }
+
+.gate-poster-wall {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10px;
+  padding: 10px;
+  opacity: 0.4;
+  filter: saturate(1.1);
+  z-index: 0;
+  mask-image: radial-gradient(ellipse at 50% 45%, transparent 20%, #000 78%);
+  -webkit-mask-image: radial-gradient(ellipse at 50% 45%, transparent 20%, #000 78%);
+}
+
+.gate-poster {
+  width: 100%;
+  aspect-ratio: 2/3;
+  object-fit: cover;
+  border-radius: 10px;
+  opacity: 0.55;
+  transform: translateY(calc(var(--i) * 1px)) scale(0.96);
+  transition: opacity 1s ease, transform 1s ease;
+}
+
+.gate-poster.active { opacity: 1; transform: scale(1.03); }
+
+.gate-box { position: relative; z-index: 1; }
 
 .gate-loading {
   width: 32px;

@@ -82,19 +82,5 @@
 .sidenav:hover .sidenav-label { opacity: 1; }
 
 @media (max-width: 860px) {
-  .sidenav {
-    top: auto;
-    bottom: 12px;
-    left: 12px;
-    right: 12px;
-    width: auto;
-    height: 64px;
-    flex-direction: row;
-    padding: 0 6px;
-  }
-  .sidenav:hover { width: auto; }
-  .sidenav-mark { display: none; }
-  .sidenav-list { flex-direction: row; justify-content: space-around; padding: 0; }
-  .sidenav-item { flex-direction: column; height: 100%; gap: 3px; padding: 6px; }
-  .sidenav-label { opacity: 1; font-size: 9.5px; }
+  .sidenav { display: none; }
 }

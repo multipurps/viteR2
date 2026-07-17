@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { getDetails, IMG } from '../lib/tmdb';
-import SaveButton from '../components/SaveButton';
-import './TvDetail.css';
+import { getDetails } from '../lib/tmdb';
+import DetailLayout from '../components/DetailLayout';
 
 export default function MovieDetail() {
   const { id } = useParams();
@@ -14,27 +13,13 @@ export default function MovieDetail() {
 
   if (!movie) return <div className="tv-loading">Loading…</div>;
 
-  return (
-    <div className="tv-detail">
-      <div className="tv-bg">
-        <img src={IMG(movie.backdrop_path || movie.poster_path, 'original')} alt="" />
-        <div className="tv-bg-scrim" />
-      </div>
+  const runtime = movie.runtime ? `${Math.floor(movie.runtime / 60)}h ${movie.runtime % 60}min` : null;
 
-      <div className="tv-header">
-        <img className="tv-poster" src={IMG(movie.poster_path, 'w500')} alt={movie.title} />
-        <div className="tv-about">
-          <h1>{movie.title}</h1>
-          <div className="tv-tags">
-            <span className="tv-rating">★ {movie.vote_average?.toFixed(1)}</span>
-            <span>{movie.release_date?.slice(0, 4)}</span>
-            <span>{movie.runtime ? `${movie.runtime} min` : ''}</span>
-            <span>{movie.genres?.map((g) => g.name).join(' · ')}</span>
-          </div>
-          <p className="tv-overview">{movie.overview}</p>
-          <SaveButton mediaType="movie" mediaData={movie} />
-        </div>
-      </div>
-    </div>
+  return (
+    <DetailLayout
+      item={movie}
+      mediaType="movie"
+      tags={[runtime, movie.genres?.[0]?.name, 'Movie', movie.adult ? '18+' : null]}
+    />
   );
 }

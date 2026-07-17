@@ -53,6 +53,8 @@ a { color: inherit; text-decoration: none; }
 
 ::-webkit-scrollbar { height: 0; width: 0; }
 
+.tv-loading { padding: 100px 56px; color: var(--text-dim); }
+
 .app-shell {
   display: grid;
   grid-template-columns: var(--nav-w) 1fr;

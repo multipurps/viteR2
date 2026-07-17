@@ -1,89 +1,69 @@
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router-dom';
 import { getDetails, getSeason, IMG } from '../lib/tmdb';
-import SaveButton from '../components/SaveButton';
-import './TvDetail.css';
+import DetailLayout from '../components/DetailLayout';
+import './TvEpisodes.css';
 
 export default function TvDetail() {
   const { id } = useParams();
+  const [searchParams] = useSearchParams();
   const [show, setShow] = useState(null);
-  const [season, setSeason] = useState(1);
+  const [season, setSeason] = useState(() => Number(searchParams.get('season')) || 1);
   const [episodes, setEpisodes] = useState([]);
 
   useEffect(() => {
-    (async () => {
-      const data = await getDetails('tv', id);
-      setShow(data);
-    })();
+    (async () => setShow(await getDetails('tv', id)))();
   }, [id]);
 
   useEffect(() => {
     if (!show) return;
-    (async () => {
-      const data = await getSeason(id, season);
-      setEpisodes(data.episodes || []);
-    })();
+    (async () => setEpisodes((await getSeason(id, season)).episodes || []))();
   }, [show, season, id]);
 
   if (!show) return <div className="tv-loading">Loading…</div>;
 
   return (
-    <div className="tv-detail">
-      {/* Poster becomes the ambient background for the whole page */}
-      <div className="tv-bg">
-        <img src={IMG(show.backdrop_path || show.poster_path, 'original')} alt="" />
-        <div className="tv-bg-scrim" />
-      </div>
+    <DetailLayout
+      item={show}
+      mediaType="tv"
+      tags={[`${show.number_of_seasons} season${show.number_of_seasons === 1 ? '' : 's'}`, show.genres?.[0]?.name, 'Series', show.adult ? '18+' : null]}
+    >
+      <div className="detail2-section">
+        <div className="detail2-section-head">
+          <h2>Episodes</h2>
+        </div>
+        <div className="ep-season-picker">
+          {show.seasons?.filter((s) => s.season_number > 0).map((s) => (
+            <button
+              key={s.id}
+              className={`ep-season-btn${season === s.season_number ? ' active' : ''}`}
+              onClick={() => setSeason(s.season_number)}
+            >
+              {s.name}
+            </button>
+          ))}
+        </div>
 
-      <div className="tv-header">
-        <img className="tv-poster" src={IMG(show.poster_path, 'w500')} alt={show.name} />
-        <div className="tv-about">
-          <h1>{show.name}</h1>
-          <div className="tv-tags">
-            <span className="tv-rating">★ {show.vote_average?.toFixed(1)}</span>
-            <span>{show.first_air_date?.slice(0, 4)}</span>
-            <span>{show.genres?.map((g) => g.name).join(' · ')}</span>
-          </div>
-          <p className="tv-overview">{show.overview}</p>
-
-          <div className="tv-header-row">
-            <div className="tv-season-picker">
-              {show.seasons
-                ?.filter((s) => s.season_number > 0)
-                .map((s) => (
-                  <button
-                    key={s.id}
-                    className={`tv-season-btn${season === s.season_number ? ' active' : ''}`}
-                    onClick={() => setSeason(s.season_number)}
-                  >
-                    {s.name}
-                  </button>
-                ))}
+        <div className="ep-list">
+          {episodes.map((ep) => (
+            <div key={ep.id} className="ep-card glass">
+              <img
+                className="ep-thumb"
+                src={IMG(ep.still_path, 'w300') || IMG(show.backdrop_path, 'w300')}
+                alt={ep.name}
+              />
+              <div className="ep-info">
+                <div className="ep-top">
+                  <span className="ep-num">E{ep.episode_number}</span>
+                  <span className="ep-name">{ep.name}</span>
+                  <span className="ep-rating">★ {ep.vote_average?.toFixed(1)}</span>
+                </div>
+                <p className="ep-overview">{ep.overview || 'No synopsis available.'}</p>
+              </div>
             </div>
-            <SaveButton mediaType="tv" mediaData={show} />
-          </div>
+          ))}
         </div>
       </div>
-
-      <div className="tv-episodes">
-        {episodes.map((ep) => (
-          <div key={ep.id} className="tv-episode-card glass">
-            <img
-              className="tv-episode-thumb"
-              src={IMG(ep.still_path, 'w300') || IMG(show.backdrop_path, 'w300')}
-              alt={ep.name}
-            />
-            <div className="tv-episode-info">
-              <div className="tv-episode-top">
-                <span className="tv-episode-num">E{ep.episode_number}</span>
-                <span className="tv-episode-name">{ep.name}</span>
-                <span className="tv-episode-rating">★ {ep.vote_average?.toFixed(1)}</span>
-              </div>
-              <p className="tv-episode-overview">{ep.overview || 'No synopsis available.'}</p>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
+    </DetailLayout>
   );
 }

@@ -64,6 +64,34 @@ export function discover(mediaType, params) {
   return api(`/discover/${mediaType}`, params);
 }
 
+// Live provider list (name + logo) straight from TMDB — no logo assets
+// to store or keep updated ourselves. display_priority is TMDB's own
+// ranking of provider prominence in the region.
+let providerListCache = null;
+export async function getNetworkList(region = 'US') {
+  if (providerListCache) return providerListCache;
+  const [movieRes, tvRes] = await Promise.all([
+    api('/watch/providers/movie', `watch_region=${region}`),
+    api('/watch/providers/tv', `watch_region=${region}`),
+  ]);
+  const byId = new Map();
+  for (const p of [...(movieRes.results || []), ...(tvRes.results || [])]) {
+    if (!byId.has(p.provider_id)) byId.set(p.provider_id, p);
+  }
+  const known = new Set(Object.values(PROVIDERS).map((p) => p.id));
+  const list = [...byId.values()]
+    .filter((p) => known.has(p.provider_id))
+    .sort((a, b) => a.display_priority - b.display_priority)
+    .map((p) => ({
+      id: p.provider_id,
+      name: p.provider_name,
+      logo: IMG(p.logo_path, 'original'),
+      key: Object.entries(PROVIDERS).find(([, v]) => v.id === p.provider_id)?.[0],
+    }));
+  providerListCache = list;
+  return list;
+}
+
 export function getDetails(mediaType, id) {
   return api(`/${mediaType}/${id}`, 'append_to_response=credits,videos,recommendations');
 }

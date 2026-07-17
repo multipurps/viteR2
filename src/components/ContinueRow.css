@@ -1,0 +1,41 @@
+.continue-card { position: relative; flex: 0 0 150px; }
+
+.continue-poster {
+  display: block;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  aspect-ratio: 2/3;
+  background: var(--bg-elevated);
+}
+.continue-poster img { width: 100%; height: 100%; object-fit: cover; }
+
+.continue-btn {
+  position: absolute;
+  bottom: 14px;
+  right: 8px;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--lime);
+  color: #060608;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.4);
+}
+
+.row-progress {
+  position: absolute;
+  left: 6px;
+  right: 6px;
+  bottom: 6px;
+  height: 3px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.25);
+  overflow: hidden;
+}
+.row-progress-fill { height: 100%; background: var(--lime); }
+
+@media (max-width: 860px) {
+  .continue-card { flex-basis: 118px; }
+}
