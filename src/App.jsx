@@ -1,4 +1,6 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { AuthProvider } from './context/AuthContext';
+import AuthGate from './components/AuthGate';
 import SideNav from './components/SideNav';
 import Home from './pages/Home';
 import Movies from './pages/Movies';
@@ -12,23 +14,27 @@ import AiPicks from './pages/AiPicks';
 
 export default function App() {
   return (
-    <BrowserRouter>
-      <div className="app-shell">
-        <SideNav />
-        <main className="app-main">
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/movies" element={<Movies />} />
-            <Route path="/tv" element={<TvShows />} />
-            <Route path="/tv/:id" element={<TvDetail />} />
-            <Route path="/movie/:id" element={<MovieDetail />} />
-            <Route path="/top10" element={<Top10 />} />
-            <Route path="/watchlist" element={<Watchlist />} />
-            <Route path="/profile" element={<Profile />} />
-            <Route path="/ai" element={<AiPicks />} />
-          </Routes>
-        </main>
-      </div>
-    </BrowserRouter>
+    <AuthProvider>
+      <BrowserRouter>
+        <AuthGate>
+          <div className="app-shell">
+            <SideNav />
+            <main className="app-main">
+              <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/movies" element={<Movies />} />
+                <Route path="/tv" element={<TvShows />} />
+                <Route path="/tv/:id" element={<TvDetail />} />
+                <Route path="/movie/:id" element={<MovieDetail />} />
+                <Route path="/top10" element={<Top10 />} />
+                <Route path="/watchlist" element={<Watchlist />} />
+                <Route path="/profile" element={<Profile />} />
+                <Route path="/ai" element={<AiPicks />} />
+              </Routes>
+            </main>
+          </div>
+        </AuthGate>
+      </BrowserRouter>
+    </AuthProvider>
   );
 }

@@ -21,12 +21,28 @@ is where the Vite + React rebuild is happening.
   reference while auth/continue-watching get ported over.
 
 ## Not built yet
-- Movies / TV Shows browse pages (currently stubs)
-- Watchlist, Profile, AI Picks (currently stubs)
-- Google sign-in + owner-approval gate (Supabase client is wired in
-  `src/lib/supabase.js`; the old `admin.html` already has a login/PIN flow to
-  port over)
-- Continue-watching sync via Supabase (currently reads a local placeholder)
+- Movies / TV Shows browse pages ✅ done
+- Watchlist ✅ done (reads/writes `zeeyus_watchlist`, same table your old
+  admin panel already pointed at — it just wasn't wired up on the front end)
+- Continue-watching ✅ done, reads `zeeyus_continue` for the signed-in user
+- Google sign-in + owner-approval gate ✅ done — new sign-ins get a
+  `zeeyus_profiles` row with `approved:false`; approve/block from `/admin`
+  exactly like before
+- Profile page ✅ done, now with a real uploaded picture instead of just
+  initials
+- AI Picks — still a stub
+
+## One-time Supabase setup needed (I can't do this with just the anon key)
+Run this once in the Supabase SQL editor, for the profile-picture column:
+```sql
+alter table zeeyus_profiles add column if not exists avatar_url text;
+```
+Then in Supabase Storage, create a **public** bucket named `avatars`
+(Storage → New bucket → name `avatars` → toggle Public on). That's what
+profile picture uploads write to.
+
+Google OAuth itself should already work since your old `admin.html` had it
+configured — same Supabase project, same provider setup.
 
 ## Setup
 Copy `.env.example` to `.env.local` and fill in your TMDB key + Supabase

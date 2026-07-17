@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { getDetails, getSeason, IMG } from '../lib/tmdb';
+import SaveButton from '../components/SaveButton';
 import './TvDetail.css';
 
 export default function TvDetail() {
@@ -45,18 +46,21 @@ export default function TvDetail() {
           </div>
           <p className="tv-overview">{show.overview}</p>
 
-          <div className="tv-season-picker">
-            {show.seasons
-              ?.filter((s) => s.season_number > 0)
-              .map((s) => (
-                <button
-                  key={s.id}
-                  className={`tv-season-btn${season === s.season_number ? ' active' : ''}`}
-                  onClick={() => setSeason(s.season_number)}
-                >
-                  {s.name}
-                </button>
-              ))}
+          <div className="tv-header-row">
+            <div className="tv-season-picker">
+              {show.seasons
+                ?.filter((s) => s.season_number > 0)
+                .map((s) => (
+                  <button
+                    key={s.id}
+                    className={`tv-season-btn${season === s.season_number ? ' active' : ''}`}
+                    onClick={() => setSeason(s.season_number)}
+                  >
+                    {s.name}
+                  </button>
+                ))}
+            </div>
+            <SaveButton mediaType="tv" mediaData={show} />
           </div>
         </div>
       </div>

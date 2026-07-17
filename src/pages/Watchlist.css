@@ -1,0 +1,29 @@
+.watchlist-page { padding: 60px 56px 40px; }
+.watchlist-page h1 { font-family: var(--font-display); font-size: 2.2rem; margin-bottom: 24px; }
+.watchlist-empty { color: var(--text-dim); }
+
+.watchlist-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 16px;
+}
+
+.watchlist-card { position: relative; border-radius: var(--radius-sm); overflow: hidden; }
+.watchlist-card img { width: 100%; aspect-ratio: 2/3; object-fit: cover; }
+
+.watchlist-remove {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(0,0,0,0.6);
+  color: #fff;
+  font-size: 13px;
+  backdrop-filter: blur(6px);
+}
+
+@media (max-width: 860px) {
+  .watchlist-page { padding: 40px 20px 100px; }
+}

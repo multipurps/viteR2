@@ -2,7 +2,9 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Hero from '../components/Hero';
 import Row from '../components/Row';
-import { getTrending, getPopular, discover } from '../lib/tmdb';
+import { getTrending, discover } from '../lib/tmdb';
+import { useAuth } from '../context/AuthContext';
+import { getContinueWatching } from '../lib/supabase';
 
 const GENRE_ROWS = [
   { title: 'Action & Thriller', params: 'with_genres=28,53', type: 'movie' },
@@ -12,8 +14,10 @@ const GENRE_ROWS = [
 
 export default function Home() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [heroItems, setHeroItems] = useState([]);
   const [continueWatching, setContinueWatching] = useState([]);
+  const [progressMap, setProgressMap] = useState({});
   const [rows, setRows] = useState([]);
 
   useEffect(() => {
@@ -28,14 +32,21 @@ export default function Home() {
         }))
       );
       setRows(genreRows);
-
-      // Continue-watching: reads from localStorage for now (per-device).
-      // Once Supabase auth is wired in, this swaps to a `watch_progress`
-      // table keyed by user id so it syncs across devices.
-      const saved = JSON.parse(localStorage.getItem('zeeyus_continue') || '[]');
-      setContinueWatching(saved);
     })();
   }, []);
+
+  useEffect(() => {
+    if (!user) { setContinueWatching([]); return; }
+    getContinueWatching(user.id).then((rows) => {
+      const map = {};
+      const items = rows.map((r) => {
+        map[r.media_id] = r.progress ?? 0;
+        return { ...r.media_data, id: Number(r.media_id), media_type: r.media_type };
+      });
+      setProgressMap(map);
+      setContinueWatching(items);
+    }).catch(() => setContinueWatching([]));
+  }, [user]);
 
   return (
     <div>
@@ -46,7 +57,7 @@ export default function Home() {
       />
       <div style={{ marginTop: 40 }}>
         {continueWatching.length > 0 && (
-          <Row title="Continue Watching" items={continueWatching} />
+          <Row title="Continue Watching" items={continueWatching} progressMap={progressMap} />
         )}
         {rows.map((r) => (
           <Row key={r.title} title={r.title} items={r.items} />

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { getDetails, IMG } from '../lib/tmdb';
+import SaveButton from '../components/SaveButton';
 import './TvDetail.css';
 
 export default function MovieDetail() {
@@ -31,6 +32,7 @@ export default function MovieDetail() {
             <span>{movie.genres?.map((g) => g.name).join(' · ')}</span>
           </div>
           <p className="tv-overview">{movie.overview}</p>
+          <SaveButton mediaType="movie" mediaData={movie} />
         </div>
       </div>
     </div>

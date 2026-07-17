@@ -58,6 +58,7 @@
 }
 
 .tv-season-picker { display: flex; gap: 8px; flex-wrap: wrap; }
+.tv-header-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
 .tv-season-btn {
   padding: 8px 16px;
   border-radius: 20px;

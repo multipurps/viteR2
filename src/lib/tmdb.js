@@ -48,6 +48,9 @@ export async function resolveCategory(cat, pageMediaType = 'movie') {
   if (cat.kind === 'provider') {
     return trendingOnProvider(cat.provider, mt, 'US', 20);
   }
+  if (cat.kind === 'keyword-terms') {
+    return discoverByKeywordTerms(mt, cat.terms, cat.extraParams || 'sort_by=popularity.desc');
+  }
   const params = typeof cat.params === 'function' ? cat.params(today, month) : cat.params;
   const data = await discover(mt, params);
   return data.results || [];
@@ -71,4 +74,23 @@ export function getSeason(tvId, seasonNumber) {
 
 export function searchMulti(query) {
   return api('/search/multi', `query=${encodeURIComponent(query)}`);
+}
+
+// Resolves free-text terms ("vikings", "sword and sandal") to TMDB
+// keyword IDs at runtime, so a category like "Ancient Adventures" can
+// be defined by what it's about instead of a hand-maintained show list.
+const keywordCache = new Map();
+export async function resolveKeywordId(term) {
+  if (keywordCache.has(term)) return keywordCache.get(term);
+  const data = await api('/search/keyword', `query=${encodeURIComponent(term)}`);
+  const id = data.results?.[0]?.id ?? null;
+  keywordCache.set(term, id);
+  return id;
+}
+
+export async function discoverByKeywordTerms(mediaType, terms, extraParams = '') {
+  const ids = (await Promise.all(terms.map(resolveKeywordId))).filter(Boolean);
+  if (!ids.length) return [];
+  const data = await discover(mediaType, `with_keywords=${ids.join('|')}&${extraParams}`);
+  return data.results || [];
 }
