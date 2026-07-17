@@ -1,0 +1,100 @@
+.sidenav {
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  bottom: 16px;
+  width: calc(var(--nav-w) - 16px);
+  border-radius: var(--radius);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 22px 0;
+  z-index: 40;
+  transition: width 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+  overflow: hidden;
+}
+
+.sidenav:hover {
+  width: 210px;
+  align-items: stretch;
+}
+
+.sidenav-mark {
+  width: 34px;
+  height: 34px;
+  min-width: 34px;
+  margin: 0 auto 28px;
+  border-radius: 9px;
+  background: var(--lime);
+  color: #060608;
+  font-family: var(--font-display);
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sidenav:hover .sidenav-mark { margin-left: 22px; margin-right: auto; }
+
+.sidenav-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+  padding: 0 8px;
+}
+
+.sidenav-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  height: 46px;
+  border-radius: var(--radius-sm);
+  color: var(--text-dim);
+  padding: 0 13px;
+  white-space: nowrap;
+  transition: background 0.15s, color 0.15s;
+}
+
+.sidenav-item:hover { background: rgba(255, 255, 255, 0.06); color: var(--text); }
+
+.sidenav-item.active {
+  background: var(--lime);
+  color: #060608;
+}
+
+.sidenav-icon {
+  width: 20px;
+  height: 20px;
+  min-width: 20px;
+  display: flex;
+}
+.sidenav-icon svg { width: 100%; height: 100%; }
+
+.sidenav-label {
+  font-size: 13.5px;
+  font-weight: 600;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+
+.sidenav:hover .sidenav-label { opacity: 1; }
+
+@media (max-width: 860px) {
+  .sidenav {
+    top: auto;
+    bottom: 12px;
+    left: 12px;
+    right: 12px;
+    width: auto;
+    height: 64px;
+    flex-direction: row;
+    padding: 0 6px;
+  }
+  .sidenav:hover { width: auto; }
+  .sidenav-mark { display: none; }
+  .sidenav-list { flex-direction: row; justify-content: space-around; padding: 0; }
+  .sidenav-item { flex-direction: column; height: 100%; gap: 3px; padding: 6px; }
+  .sidenav-label { opacity: 1; font-size: 9.5px; }
+}
