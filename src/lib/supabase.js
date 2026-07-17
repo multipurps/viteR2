@@ -159,3 +159,43 @@ export async function removeFromContinue(userId, mediaId, mediaType) {
     .eq('media_type', mediaType);
   if (error) throw error;
 }
+
+// ── QR desktop pairing ──
+function randomCode() {
+  return crypto.randomUUID().replace(/-/g, '');
+}
+
+export async function createPairing() {
+  const code = randomCode();
+  const { error } = await supabase.from('zeeyus_pairing').insert({ code, status: 'pending' });
+  if (error) throw error;
+  return code;
+}
+
+export function watchPairing(code, onChange) {
+  const channel = supabase
+    .channel(`pairing-${code}`)
+    .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'zeeyus_pairing', filter: `code=eq.${code}` },
+      (payload) => onChange(payload.new))
+    .subscribe();
+  return () => supabase.removeChannel(channel);
+}
+
+export async function getPairingOnce(code) {
+  const { data } = await supabase.from('zeeyus_pairing').select('*').eq('code', code).maybeSingle();
+  return data;
+}
+
+export async function approvePairing(code) {
+  const session = await getSession();
+  if (!session) throw new Error('Not signed in');
+  const { error } = await supabase.functions.invoke('approve-pairing', {
+    body: { code },
+  });
+  if (error) throw error;
+}
+
+export async function redeemPairing(email, tokenHash) {
+  const { error } = await supabase.auth.verifyOtp({ email, token: tokenHash, type: 'magiclink' });
+  if (error) throw error;
+}

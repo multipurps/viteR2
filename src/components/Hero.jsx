@@ -23,31 +23,33 @@ export default function Hero({ items = [], onPlay, onInfo }) {
   const genreLabel = item._genreLabel || '';
 
   return (
-    <div className="hero">
-      {items.map((it, i) => (
-        <img
-          key={it.id}
-          src={IMG(it.backdrop_path, 'original')}
-          alt=""
-          className={`hero-bg${i === index ? ' on' : ''}`}
-        />
-      ))}
-      <div className="hero-scrim" />
+    <div className="hero-wrap">
+      <div className="hero">
+        {items.map((it, i) => (
+          <img
+            key={it.id}
+            src={IMG(it.backdrop_path, 'original')}
+            alt=""
+            className={`hero-bg${i === index ? ' on' : ''}`}
+          />
+        ))}
+        <div className="hero-scrim" />
 
-      <div className="hero-content">
-        <div className="hero-meta">
-          <span>{date}</span>
-          {genreLabel && <span className="hero-dot" />}
-          <span>{genreLabel}</span>
-        </div>
-        <h1 className="hero-title">{title}</h1>
-        <div className="hero-actions">
-          <button className="hero-btn hero-btn-solid" onClick={() => onPlay?.(item)}>
-            <PlayIcon /> Watch now
-          </button>
-          <button className="hero-btn glass" onClick={() => onInfo?.(item)}>
-            Trailer
-          </button>
+        <div className="hero-content">
+          <div className="hero-meta">
+            <span>{date}</span>
+            {genreLabel && <span className="hero-dot" />}
+            <span>{genreLabel}</span>
+          </div>
+          <h1 className="hero-title">{title}</h1>
+          <div className="hero-actions">
+            <button className="hero-btn hero-btn-solid" onClick={() => onPlay?.(item)}>
+              <PlayIcon /> Watch now
+            </button>
+            <button className="hero-btn glass" onClick={() => onInfo?.(item)}>
+              Trailer
+            </button>
+          </div>
         </div>
       </div>
 

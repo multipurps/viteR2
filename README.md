@@ -32,6 +32,31 @@ is where the Vite + React rebuild is happening.
   initials
 - AI Picks — still a stub
 
+## QR desktop login — setup needed
+This needs two things only you can do (I can't reach Supabase's API or
+deploy Edge Functions from my sandbox):
+
+1. Run `supabase/sql/001_pairing.sql` once in the Supabase SQL editor
+   (creates the `zeeyus_pairing` table + RLS policies).
+2. Deploy the Edge Function:
+   ```
+   supabase functions deploy approve-pairing
+   ```
+   (run from the repo root with the Supabase CLI logged in and linked
+   to your project — it needs `SUPABASE_URL` and
+   `SUPABASE_SERVICE_ROLE_KEY`, which Supabase sets automatically for
+   Edge Functions, no manual secret config needed)
+
+How it works: desktop generates a random code + QR (encoding
+`/pair/<code>`), inserts a pending row, and subscribes to it via
+Realtime. Your phone — already signed in — scans it, hits `/pair/<code>`
+(gated behind the same approval check as everything else), and taps
+Confirm. That calls the Edge Function with the phone's own session
+token, which verifies the account is approved, mints a single-use
+magic-link OTP, and writes it to the pairing row. Desktop picks that up
+and redeems it via `supabase.auth.verifyOtp`. No password ever crosses
+the wire, and the OTP is single-use.
+
 ## One-time Supabase setup needed (I can't do this with just the anon key)
 Run this once in the Supabase SQL editor, for the profile-picture column:
 ```sql

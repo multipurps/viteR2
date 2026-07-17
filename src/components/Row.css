@@ -1,9 +1,21 @@
 .row { margin: 0 0 34px; }
 
+.row-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 0 56px 14px;
+}
+
 .row-title {
   font-size: 17px;
   font-weight: 700;
-  margin: 0 56px 14px;
+}
+
+.row-seeall {
+  font-size: 13px;
+  color: var(--text-dim);
+  font-weight: 600;
 }
 
 .row-track {
@@ -42,7 +54,7 @@
 .row-progress-fill { height: 100%; background: var(--lime); }
 
 @media (max-width: 860px) {
-  .row-title { margin: 0 20px 12px; }
+  .row-head { margin: 0 20px 12px; }
   .row-track { padding: 0 20px 4px; }
   .row-card { flex-basis: 118px; }
 }

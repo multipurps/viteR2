@@ -55,6 +55,11 @@ a { color: inherit; text-decoration: none; }
 
 .tv-loading { padding: 100px 56px; color: var(--text-dim); }
 
+.home-chips-mobile { display: none; }
+@media (max-width: 860px) {
+  .home-chips-mobile { display: block; }
+}
+
 .app-shell {
   display: grid;
   grid-template-columns: var(--nav-w) 1fr;

@@ -12,6 +12,7 @@ import Top10 from './pages/Top10';
 import Networks from './pages/Networks';
 import NetworkDetail from './pages/NetworkDetail';
 import Search from './pages/Search';
+import PairConfirm from './pages/PairConfirm';
 import Watchlist from './pages/Watchlist';
 import Profile from './pages/Profile';
 import AiPicks from './pages/AiPicks';
@@ -35,6 +36,7 @@ export default function App() {
                 <Route path="/networks" element={<Networks />} />
                 <Route path="/network/:key" element={<NetworkDetail />} />
                 <Route path="/search" element={<Search />} />
+                <Route path="/pair/:code" element={<PairConfirm />} />
                 <Route path="/watchlist" element={<Watchlist />} />
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/ai" element={<AiPicks />} />

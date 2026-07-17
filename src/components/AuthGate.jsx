@@ -3,6 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import { signInWithGoogle, signOut } from '../lib/supabase';
 import { getTrending, IMG } from '../lib/tmdb';
 import { usePosterColor } from '../hooks/usePosterColor';
+import DesktopQrLogin from './DesktopQrLogin';
 import './AuthGate.css';
 
 function usePosterCarousel() {
@@ -54,6 +55,7 @@ export default function AuthGate({ children }) {
           <button className="gate-google-btn" onClick={() => signInWithGoogle()}>
             <GoogleIcon /> Continue with Google
           </button>
+          <DesktopQrLogin />
         </div>
       </div>
     );

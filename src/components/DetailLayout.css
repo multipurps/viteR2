@@ -28,6 +28,25 @@
   background: linear-gradient(180deg, rgba(0,0,0,0.15) 0%, transparent 40%, var(--bg) 96%);
 }
 
+.detail2-back, .detail2-more {
+  position: absolute;
+  top: 20px;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: rgba(0,0,0,0.45);
+  backdrop-filter: blur(10px);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+}
+.detail2-back { left: 20px; }
+.detail2-more { right: 20px; }
+
+.detail2-seeall { font-size: 12.5px; color: var(--text-dim); font-weight: 600; }
+
 .detail2-body { padding: 0 56px; max-width: 720px; margin: 0 auto; }
 
 .detail2-date { font-size: 13px; color: var(--text-dim); }

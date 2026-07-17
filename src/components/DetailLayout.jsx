@@ -1,9 +1,11 @@
+import { useNavigate } from 'react-router-dom';
 import { usePosterColor } from '../hooks/usePosterColor';
 import { IMG } from '../lib/tmdb';
 import SaveButton from './SaveButton';
 import './DetailLayout.css';
 
 export default function DetailLayout({ item, mediaType, tags, children }) {
+  const navigate = useNavigate();
   const posterUrl = IMG(item.poster_path, 'w342');
   const color = usePosterColor(posterUrl);
   const bg = color
@@ -16,6 +18,12 @@ export default function DetailLayout({ item, mediaType, tags, children }) {
       <div className="detail2-hero">
         <img className="detail2-poster" src={IMG(item.poster_path, 'w780')} alt={item.title || item.name} />
         <div className="detail2-hero-scrim" />
+        <button className="detail2-back" onClick={() => navigate(-1)} aria-label="Back">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="m15 6-6 6 6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
+        </button>
+        <button className="detail2-more" aria-label="More options">
+          <svg width="18" height="4" viewBox="0 0 24 6" fill="currentColor"><circle cx="3" cy="3" r="3" /><circle cx="12" cy="3" r="3" /><circle cx="21" cy="3" r="3" /></svg>
+        </button>
       </div>
 
       <div className="detail2-body">
@@ -40,6 +48,7 @@ export default function DetailLayout({ item, mediaType, tags, children }) {
           <div className="detail2-section">
             <div className="detail2-section-head">
               <h2>Cast</h2>
+              <span className="detail2-seeall">See all</span>
             </div>
             <div className="detail2-cast-track">
               {cast.map((c) => (
