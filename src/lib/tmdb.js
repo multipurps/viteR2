@@ -96,6 +96,19 @@ export function getDetails(mediaType, id) {
   return api(`/${mediaType}/${id}`, 'append_to_response=credits,videos,recommendations');
 }
 
+const watchProviderCache = new Map();
+export async function getPrimaryProviderKey(mediaType, id, region = 'US') {
+  const cacheKey = `${mediaType}-${id}`;
+  if (watchProviderCache.has(cacheKey)) return watchProviderCache.get(cacheKey);
+  const data = await api(`/${mediaType}/${id}/watch/providers`);
+  const flatrate = data.results?.[region]?.flatrate || [];
+  const known = new Set(Object.values(PROVIDERS).map((p) => p.id));
+  const match = flatrate.find((p) => known.has(p.provider_id));
+  const key = match ? Object.entries(PROVIDERS).find(([, v]) => v.id === match.provider_id)?.[0] : null;
+  watchProviderCache.set(cacheKey, key);
+  return key;
+}
+
 export function getSeason(tvId, seasonNumber) {
   return api(`/tv/${tvId}/season/${seasonNumber}`);
 }

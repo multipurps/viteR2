@@ -1,29 +1,89 @@
-.watchlist-page { padding: 60px 56px 40px; }
-.watchlist-page h1 { font-family: var(--font-display); font-size: 2.2rem; margin-bottom: 24px; }
-.watchlist-empty { color: var(--text-dim); }
+.fav-page { padding: 60px 56px 40px; }
+.fav-page h1 { font-family: var(--font-display); font-size: 2.2rem; margin-bottom: 22px; text-align: center; }
+.fav-empty { color: var(--text-dim); text-align: center; }
 
-.watchlist-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  gap: 16px;
+.fav-chips {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 30px;
 }
 
-.watchlist-card { position: relative; border-radius: var(--radius-sm); overflow: hidden; }
-.watchlist-card img { width: 100%; aspect-ratio: 2/3; object-fit: cover; }
+.fav-chip {
+  padding: 10px 20px;
+  border-radius: 20px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid var(--glass-border);
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--text-dim);
+}
+.fav-chip.active { background: #fff; color: #060608; border-color: #fff; }
 
-.watchlist-remove {
+.fav-chip-logo { padding: 6px 18px; display: flex; align-items: center; }
+.fav-chip-logo img { height: 20px; width: auto; object-fit: contain; }
+
+.fav-carousel {
+  display: flex;
+  gap: 20px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  padding: 0 calc(50% - 170px) 20px;
+}
+
+.fav-card {
+  position: relative;
+  flex: 0 0 340px;
+  aspect-ratio: 3/4;
+  border-radius: 26px;
+  overflow: hidden;
+  scroll-snap-align: center;
+  cursor: pointer;
+}
+
+.fav-card img { width: 100%; height: 100%; object-fit: cover; }
+
+.fav-card-scrim {
   position: absolute;
-  top: 8px;
-  right: 8px;
-  width: 28px;
-  height: 28px;
+  inset: 0;
+  background: linear-gradient(0deg, rgba(0,0,0,0.85) 0%, transparent 45%);
+  pointer-events: none;
+}
+
+.fav-remove {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
-  background: rgba(0,0,0,0.6);
+  background: rgba(0,0,0,0.55);
+  backdrop-filter: blur(6px);
   color: #fff;
   font-size: 13px;
-  backdrop-filter: blur(6px);
 }
 
+.fav-card-info {
+  position: absolute;
+  left: 20px;
+  right: 20px;
+  bottom: 20px;
+}
+.fav-card-info h3 { font-size: 1.3rem; font-weight: 800; margin-bottom: 8px; }
+
+.fav-card-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: rgba(255,255,255,0.8);
+}
+.fav-dot { width: 3px; height: 3px; border-radius: 50%; background: rgba(255,255,255,0.5); }
+.fav-rating { color: var(--lime); font-weight: 700; }
+
 @media (max-width: 860px) {
-  .watchlist-page { padding: 40px 20px 100px; }
+  .fav-page { padding: 40px 0 110px; }
+  .fav-carousel { padding: 0 calc(50% - 140px) 20px; }
+  .fav-card { flex-basis: 280px; }
 }
