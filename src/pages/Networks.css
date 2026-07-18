@@ -1,0 +1,24 @@
+.networks-page { padding: 60px 56px; }
+.networks-page h1 { font-family: var(--font-display); font-size: 2.2rem; margin-bottom: 26px; }
+
+.networks-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  max-width: 640px;
+}
+
+.networks-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 20px;
+  border-radius: var(--radius);
+}
+
+.networks-card img { width: 44px; height: 44px; object-fit: contain; border-radius: 10px; background: rgba(255,255,255,0.06); padding: 6px; }
+.networks-card span { font-weight: 700; font-size: 14.5px; }
+
+@media (max-width: 860px) {
+  .networks-page { padding: 40px 20px 100px; }
+}

@@ -1,0 +1,97 @@
+.gate-screen {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  position: relative;
+  overflow: hidden;
+  transition: background 1.2s ease;
+}
+
+.gate-poster-wall {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10px;
+  padding: 10px;
+  opacity: 0.4;
+  filter: saturate(1.1);
+  z-index: 0;
+  mask-image: radial-gradient(ellipse at 50% 45%, transparent 20%, #000 78%);
+  -webkit-mask-image: radial-gradient(ellipse at 50% 45%, transparent 20%, #000 78%);
+}
+
+.gate-poster {
+  width: 100%;
+  aspect-ratio: 2/3;
+  object-fit: cover;
+  border-radius: 10px;
+  opacity: 0.55;
+  transform: translateY(calc(var(--i) * 1px)) scale(0.96);
+  transition: opacity 1s ease, transform 1s ease;
+}
+
+.gate-poster.active { opacity: 1; transform: scale(1.03); }
+
+.gate-box { position: relative; z-index: 1; }
+
+.gate-loading {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 3px solid var(--glass-border);
+  border-top-color: var(--lime);
+  animation: gate-spin 0.8s linear infinite;
+}
+@keyframes gate-spin { to { transform: rotate(360deg); } }
+
+.gate-box {
+  width: 100%;
+  max-width: 380px;
+  border-radius: 22px;
+  padding: 40px 32px;
+  text-align: center;
+}
+
+.gate-mark {
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  background: var(--lime);
+  color: #060608;
+  font-family: var(--font-display);
+  font-size: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20px;
+}
+
+.gate-box h1 { font-size: 22px; margin-bottom: 8px; }
+.gate-box p { color: var(--text-dim); font-size: 13.5px; line-height: 1.5; margin-bottom: 26px; }
+
+.gate-google-btn {
+  width: 100%;
+  height: 48px;
+  border-radius: 12px;
+  background: #fff;
+  color: #1a1a1a;
+  font-weight: 700;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.gate-actions { display: flex; gap: 10px; justify-content: center; }
+.gate-refresh, .gate-signout {
+  padding: 10px 18px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+}
+.gate-refresh { background: var(--lime); color: #060608; }
+.gate-signout { background: rgba(255,255,255,0.08); color: var(--text-dim); }
