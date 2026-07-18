@@ -104,6 +104,11 @@
    margins, and the pagination dots sitting below the card rather than
    overlaid on it — a distinctly different treatment from the desktop
    full-bleed hero, not just a smaller version of it. */
+@media (min-width: 1400px) {
+  .hero-content { padding: 0 72px; }
+  .hero-dots { right: 72px; }
+}
+
 @media (max-width: 860px) {
   .hero-wrap { padding: 12px 16px 0; }
 
