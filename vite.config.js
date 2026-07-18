@@ -1,9 +1,8 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
-// Served at https://multipurps.github.io/Zeeyus/ — a project subpath,
-// not the domain root, so asset paths need this base set explicitly.
+// Hosted on Vercel at the domain root — no subpath, unlike the earlier
+// GitHub Pages attempt (which needed base: '/Zeeyus/').
 export default defineConfig({
-  base: '/Zeeyus/',
   plugins: [react()],
 })
