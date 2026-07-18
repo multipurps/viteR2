@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { usePosterColor } from '../hooks/usePosterColor';
 import { IMG } from '../lib/tmdb';
@@ -12,6 +13,13 @@ export default function DetailLayout({ item, mediaType, tags, children }) {
     ? `linear-gradient(180deg, rgba(${color.r},${color.g},${color.b},0.9) 0%, var(--bg) 78%)`
     : undefined;
   const cast = (item.credits?.cast || []).slice(0, 8);
+  const [trailerOpen, setTrailerOpen] = useState(false);
+
+  const videos = item.videos?.results || [];
+  const trailer =
+    videos.find((v) => v.site === 'YouTube' && v.type === 'Trailer' && v.official) ||
+    videos.find((v) => v.site === 'YouTube' && v.type === 'Trailer') ||
+    videos.find((v) => v.site === 'YouTube');
 
   return (
     <div className="detail2" style={{ background: bg }}>
@@ -24,6 +32,11 @@ export default function DetailLayout({ item, mediaType, tags, children }) {
         <button className="detail2-more" aria-label="More options">
           <svg width="18" height="4" viewBox="0 0 24 6" fill="currentColor"><circle cx="3" cy="3" r="3" /><circle cx="12" cy="3" r="3" /><circle cx="21" cy="3" r="3" /></svg>
         </button>
+        {trailer && (
+          <button className="detail2-play" onClick={() => setTrailerOpen(true)} aria-label="Play trailer">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor"><path d="M6 4l15 8-15 8V4Z" /></svg>
+          </button>
+        )}
       </div>
 
       <div className="detail2-body">
@@ -43,6 +56,13 @@ export default function DetailLayout({ item, mediaType, tags, children }) {
           <span className="detail2-votes">{formatCount(item.vote_count)} votes</span>
           <SaveButton mediaType={mediaType} mediaData={item} />
         </div>
+
+        {trailer && (
+          <button className="detail2-trailer-btn" onClick={() => setTrailerOpen(true)}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M6 4l15 8-15 8V4Z" /></svg>
+            Play trailer
+          </button>
+        )}
 
         {cast.length > 0 && (
           <div className="detail2-section">
@@ -72,6 +92,20 @@ export default function DetailLayout({ item, mediaType, tags, children }) {
 
         {children}
       </div>
+
+      {trailerOpen && trailer && (
+        <div className="detail2-modal" onClick={() => setTrailerOpen(false)}>
+          <div className="detail2-modal-inner" onClick={(e) => e.stopPropagation()}>
+            <iframe
+              src={`https://www.youtube.com/embed/${trailer.key}?autoplay=1`}
+              title="Trailer"
+              allow="autoplay; encrypted-media; picture-in-picture"
+              allowFullScreen
+            />
+            <button className="detail2-modal-close" onClick={() => setTrailerOpen(false)}>✕</button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

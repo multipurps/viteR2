@@ -1,0 +1,20 @@
+{
+  "name": "Zeeyus",
+  "short_name": "Zeeyus",
+  "description": "Your personal movie & TV browser",
+  "id": "/",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#060608",
+  "theme_color": "#060608",
+  "lang": "en",
+  "dir": "ltr",
+  "categories": ["entertainment", "video"],
+  "icons": [
+    { "src": "/assets/icon.png", "sizes": "1024x1024", "type": "image/png", "purpose": "any" },
+    { "src": "/assets/icon.png", "sizes": "1024x1024", "type": "image/png", "purpose": "maskable" },
+    { "src": "/assets/icon.png", "sizes": "192x192", "type": "image/png", "purpose": "any" }
+  ]
+}
