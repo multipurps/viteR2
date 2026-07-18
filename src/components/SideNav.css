@@ -60,8 +60,8 @@
 .sidenav-item:hover { background: rgba(255, 255, 255, 0.06); color: var(--text); }
 
 .sidenav-item.active {
-  background: var(--lime);
-  color: #060608;
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
 }
 
 .sidenav-icon {

@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { getNetworkList } from '../lib/tmdb';
 import './NetworkRow.css';
 
-export default function NetworkRow() {
+export default function NetworkRow({ title = 'Film Networks' }) {
   const [networks, setNetworks] = useState([]);
   const navigate = useNavigate();
 
@@ -16,7 +16,7 @@ export default function NetworkRow() {
   return (
     <section className="netrow">
       <div className="netrow-head">
-        <h2>Film Networks</h2>
+        <h2>{title}</h2>
         <button onClick={() => navigate('/networks')}>See all</button>
       </div>
       <div className="netrow-track">

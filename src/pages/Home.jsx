@@ -1,71 +1,35 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import Hero from '../components/Hero';
-import Row from '../components/Row';
-import ContinueRow from '../components/ContinueRow';
+import PromoHero from '../components/PromoHero';
+import FeaturedRow from '../components/FeaturedRow';
 import NetworkRow from '../components/NetworkRow';
-import GenreChips from '../components/GenreChips';
-import TopBar from '../components/TopBar';
-import { getTrending, discover } from '../lib/tmdb';
+import ContinueRow from '../components/ContinueRow';
+import { getTrending } from '../lib/tmdb';
 import { useAuth } from '../context/AuthContext';
 import { getContinueWatching } from '../lib/supabase';
 
-const GENRE_ROWS = [
-  { title: 'Action & Thriller', params: 'with_genres=28,53', type: 'movie' },
-  { title: 'Comedy', params: 'with_genres=35', type: 'movie' },
-  { title: 'Sci-Fi & Fantasy', params: 'with_genres=878,14', type: 'movie' },
-];
-
 export default function Home() {
-  const navigate = useNavigate();
   const { user } = useAuth();
-  const [activeGenre, setActiveGenre] = useState(null);
   const [heroItems, setHeroItems] = useState([]);
-  const [newItems, setNewItems] = useState([]);
+  const [featuredItems, setFeaturedItems] = useState([]);
   const [continueWatching, setContinueWatching] = useState([]);
-  const [rows, setRows] = useState([]);
 
-  // Hero pulls from a blend of popular + trending + new-release, not a
-  // fixed list — so it stays current as new titles come out. When a
-  // genre chip is active, all three sources get filtered by it too.
+  // Blend of trending movies + trending TV, no hardcoded picks — same
+  // pool feeds both the rotating hero and the Featured row.
   useEffect(() => {
     (async () => {
-      const genreParam = activeGenre ? `&with_genres=${activeGenre}` : '';
-      const cutoff = new Date(Date.now() - 60 * 24 * 60 * 60 * 1e3).toISOString().slice(0, 10);
-
-      const [trending, popular, fresh] = await Promise.all([
+      const [trendingMovies, trendingTv] = await Promise.all([
         getTrending('movie', 'week'),
-        discover('movie', `sort_by=popularity.desc${genreParam}`),
-        discover('movie', `primary_release_date.gte=${cutoff}&sort_by=popularity.desc${genreParam}`),
+        getTrending('tv', 'week'),
       ]);
+      const pool = [
+        ...(trendingMovies.results || []).map((m) => ({ ...m, media_type: 'movie' })),
+        ...(trendingTv.results || []).map((t) => ({ ...t, media_type: 'tv' })),
+      ].filter((m) => m.backdrop_path);
 
-      const pool = [...(trending.results || []), ...(popular.results || []), ...(fresh.results || [])];
-      const filteredPool = activeGenre
-        ? pool.filter((m) => m.genre_ids?.includes(activeGenre))
-        : pool;
-      const seen = new Set();
-      const deduped = filteredPool.filter((m) => {
-        if (!m.backdrop_path || seen.has(m.id)) return false;
-        seen.add(m.id);
-        return true;
-      });
-      setHeroItems(deduped.slice(0, 8));
-      setNewItems((fresh.results || []).filter((m) => m.poster_path));
+      setHeroItems(pool.slice(0, 6));
+      setFeaturedItems(pool.slice(6, 14));
     })();
-  }, [activeGenre]);
-
-  useEffect(() => {
-    if (activeGenre) { setRows([]); return; }
-    (async () => {
-      const genreRows = await Promise.all(
-        GENRE_ROWS.map(async (g) => ({
-          title: g.title,
-          items: (await discover(g.type, g.params)).results || [],
-        }))
-      );
-      setRows(genreRows);
-    })();
-  }, [activeGenre]);
+  }, []);
 
   useEffect(() => {
     if (!user) { setContinueWatching([]); return; }
@@ -84,24 +48,11 @@ export default function Home() {
 
   return (
     <div>
-      <TopBar />
-      <div className="home-chips-mobile">
-        <GenreChips active={activeGenre} onChange={setActiveGenre} />
-      </div>
-
-      <Hero
-        items={heroItems}
-        onPlay={(item) => navigate(`/movie/${item.id}`)}
-        onInfo={(item) => navigate(`/movie/${item.id}`)}
-      />
-
-      <div style={{ marginTop: 40 }}>
-        <NetworkRow />
+      <PromoHero items={heroItems} />
+      <div style={{ marginTop: 8 }}>
+        <FeaturedRow items={featuredItems} />
+        <NetworkRow title="By Networks" />
         {continueWatching.length > 0 && <ContinueRow items={continueWatching} />}
-        <Row title="New" items={newItems} seeAllTo="/movies" />
-        {rows.map((r) => (
-          <Row key={r.title} title={r.title} items={r.items} seeAllTo="/movies" />
-        ))}
       </div>
     </div>
   );

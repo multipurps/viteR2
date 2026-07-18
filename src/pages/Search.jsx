@@ -1,14 +1,49 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { searchMulti, IMG } from '../lib/tmdb';
+import Hero from '../components/Hero';
+import Row from '../components/Row';
+import GenreChips from '../components/GenreChips';
+import { searchMulti, getTrending, discover, IMG } from '../lib/tmdb';
 import './Search.css';
 
 export default function Search() {
+  const navigate = useNavigate();
   const [query, setQuery] = useState('');
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
 
+  const [activeGenre, setActiveGenre] = useState(null);
+  const [heroItems, setHeroItems] = useState([]);
+  const [newItems, setNewItems] = useState([]);
+  const [movieItems, setMovieItems] = useState([]);
+
+  // Browse feed (default state, before typing) — same blended
+  // popular+trending+new-release approach as everywhere else.
+  useEffect(() => {
+    if (query.trim()) return;
+    (async () => {
+      const genreParam = activeGenre ? `&with_genres=${activeGenre}` : '';
+      const cutoff = new Date(Date.now() - 60 * 24 * 60 * 60 * 1e3).toISOString().slice(0, 10);
+      const [trending, popular, fresh] = await Promise.all([
+        getTrending('movie', 'week'),
+        discover('movie', `sort_by=popularity.desc${genreParam}`),
+        discover('movie', `primary_release_date.gte=${cutoff}&sort_by=popularity.desc${genreParam}`),
+      ]);
+      const pool = [...(trending.results || []), ...(popular.results || []), ...(fresh.results || [])];
+      const filtered = activeGenre ? pool.filter((m) => m.genre_ids?.includes(activeGenre)) : pool;
+      const seen = new Set();
+      const deduped = filtered.filter((m) => {
+        if (!m.backdrop_path || seen.has(m.id)) return false;
+        seen.add(m.id);
+        return true;
+      });
+      setHeroItems(deduped.slice(0, 8));
+      setNewItems((fresh.results || []).filter((m) => m.poster_path));
+      setMovieItems((popular.results || []).filter((m) => m.poster_path));
+    })();
+  }, [activeGenre, query]);
+
+  // Real search — takes over once you actually type something.
   useEffect(() => {
     if (!query.trim()) { setResults([]); return; }
     setLoading(true);
@@ -20,12 +55,13 @@ export default function Search() {
     return () => clearTimeout(timer);
   }, [query]);
 
+  const browsing = !query.trim();
+
   return (
     <div className="search-page">
       <div className="search-bar glass">
         <SearchIcon />
         <input
-          autoFocus
           placeholder="Movies, series, shows…"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
@@ -33,21 +69,37 @@ export default function Search() {
         <button className="search-filter" aria-label="Filters"><FilterIcon /></button>
       </div>
 
-      {loading && <p className="search-status">Searching…</p>}
-      {!loading && query && results.length === 0 && <p className="search-status">Nothing found for “{query}”.</p>}
-
-      <div className="search-grid">
-        {results.map((item) => (
-          <button
-            key={`${item.media_type}-${item.id}`}
-            className="search-card"
-            onClick={() => navigate(`/${item.media_type}/${item.id}`)}
-          >
-            <img src={IMG(item.poster_path, 'w342')} alt={item.title || item.name} loading="lazy" />
-            <span>{item.title || item.name}</span>
-          </button>
-        ))}
-      </div>
+      {browsing ? (
+        <>
+          <GenreChips active={activeGenre} onChange={setActiveGenre} />
+          <Hero
+            items={heroItems}
+            onPlay={(item) => navigate(`/movie/${item.id}`)}
+            onInfo={(item) => navigate(`/movie/${item.id}`)}
+          />
+          <div style={{ marginTop: 30 }}>
+            <Row title="New" items={newItems} seeAllTo="/movies" />
+            <Row title="Movies" items={movieItems} seeAllTo="/movies" />
+          </div>
+        </>
+      ) : (
+        <>
+          {loading && <p className="search-status">Searching…</p>}
+          {!loading && results.length === 0 && <p className="search-status">Nothing found for “{query}”.</p>}
+          <div className="search-grid">
+            {results.map((item) => (
+              <button
+                key={`${item.media_type}-${item.id}`}
+                className="search-card"
+                onClick={() => navigate(`/${item.media_type}/${item.id}`)}
+              >
+                <img src={IMG(item.poster_path, 'w342')} alt={item.title || item.name} loading="lazy" />
+                <span>{item.title || item.name}</span>
+              </button>
+            ))}
+          </div>
+        </>
+      )}
     </div>
   );
 }
