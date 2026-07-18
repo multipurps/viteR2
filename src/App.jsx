@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { HashRouter, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import AuthGate from './components/AuthGate';
 import SideNav from './components/SideNav';
@@ -21,7 +21,7 @@ import AiPicks from './pages/AiPicks';
 export default function App() {
   return (
     <AuthProvider>
-      <BrowserRouter>
+      <HashRouter>
         <AuthGate>
           <div className="app-shell">
             <SideNav />
@@ -46,7 +46,7 @@ export default function App() {
             </main>
           </div>
         </AuthGate>
-      </BrowserRouter>
+      </HashRouter>
     </AuthProvider>
   );
 }

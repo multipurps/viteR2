@@ -15,7 +15,7 @@ export default function DesktopQrLogin() {
     (async () => {
       try {
         const code = await createPairing();
-        const url = `${window.location.origin}/pair/${code}`;
+        const url = `${window.location.origin}${window.location.pathname}#/pair/${code}`;
         if (canvasRef.current) await QRCode.toCanvas(canvasRef.current, url, { width: 220, margin: 1 });
         if (cancelled) return;
         setStatus('ready');
