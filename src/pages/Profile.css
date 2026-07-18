@@ -56,3 +56,10 @@
   font-size: 13px;
   font-weight: 700;
 }
+
+.profile-admin-link {
+  margin-top: 14px;
+  font-size: 12px;
+  color: var(--text-faint);
+  text-decoration: underline;
+}

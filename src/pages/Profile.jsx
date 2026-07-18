@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import { useRef, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { signOut, uploadAvatar } from '../lib/supabase';
@@ -63,6 +64,7 @@ export default function Profile() {
         {error && <p className="profile-error">{error}</p>}
 
         <button className="profile-signout" onClick={() => signOut()}>Sign out</button>
+        <Link to="/admin" className="profile-admin-link">Admin — Approvals</Link>
       </div>
     </div>
   );
