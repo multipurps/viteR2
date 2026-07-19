@@ -17,10 +17,10 @@ export default function MobileNav() {
             key={to}
             to={to}
             end={to === '/'}
+            aria-label={label}
             className={({ isActive }) => `mobilenav-item${isActive ? ' active' : ''}`}
           >
             <Icon />
-            <span>{label}</span>
           </NavLink>
         ))}
       </div>

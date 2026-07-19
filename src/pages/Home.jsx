@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import PromoHero from '../components/PromoHero';
-import FeaturedRow from '../components/FeaturedRow';
+import GenreRow from '../components/GenreRow';
 import NetworkRow from '../components/NetworkRow';
 import ContinueRow from '../components/ContinueRow';
 import { getTrending } from '../lib/tmdb';
@@ -10,11 +10,8 @@ import { getContinueWatching } from '../lib/supabase';
 export default function Home() {
   const { user } = useAuth();
   const [heroItems, setHeroItems] = useState([]);
-  const [featuredItems, setFeaturedItems] = useState([]);
   const [continueWatching, setContinueWatching] = useState([]);
 
-  // Blend of trending movies + trending TV, no hardcoded picks — same
-  // pool feeds both the rotating hero and the Featured row.
   useEffect(() => {
     (async () => {
       const [trendingMovies, trendingTv] = await Promise.all([
@@ -25,9 +22,7 @@ export default function Home() {
         ...(trendingMovies.results || []).map((m) => ({ ...m, media_type: 'movie' })),
         ...(trendingTv.results || []).map((t) => ({ ...t, media_type: 'tv' })),
       ].filter((m) => m.backdrop_path);
-
       setHeroItems(pool.slice(0, 6));
-      setFeaturedItems(pool.slice(6, 14));
     })();
   }, []);
 
@@ -50,7 +45,7 @@ export default function Home() {
     <div>
       <PromoHero items={heroItems} />
       <div style={{ marginTop: 8 }}>
-        <FeaturedRow items={featuredItems} />
+        <GenreRow />
         <NetworkRow title="By Networks" />
         {continueWatching.length > 0 && <ContinueRow items={continueWatching} />}
       </div>

@@ -27,3 +27,7 @@ create policy "anon can read pairing by code" on zeeyus_pairing
 
 -- No update/delete policy for anon — only the Edge Function (service
 -- role, which bypasses RLS) can mark a row approved and attach a token.
+
+-- REQUIRED: without this, the desktop's live subscription never fires
+-- (this was missing before — likely why QR login didn't work at all).
+alter publication supabase_realtime add table zeeyus_pairing;

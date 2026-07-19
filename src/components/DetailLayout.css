@@ -154,6 +154,15 @@
 .detail2-cast-placeholder { display: block; }
 .detail2-cast-card span { font-size: 11.5px; color: var(--text-dim); }
 
+.detail2-similar-card {
+  flex: 0 0 110px;
+  aspect-ratio: 2/3;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  background: var(--bg-elevated);
+}
+.detail2-similar-card img { width: 100%; height: 100%; object-fit: cover; }
+
 .detail2-overview { color: var(--text-dim); line-height: 1.6; font-size: 14.5px; }
 
 @media (max-width: 860px) {

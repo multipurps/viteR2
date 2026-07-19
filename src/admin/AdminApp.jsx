@@ -1,16 +1,22 @@
 import { useEffect, useState } from 'react';
-import { useAuth } from '../context/AuthContext';
-import { supabase } from '../lib/supabase';
+import { supabase, signInWithGoogle, signOut, getSession, onAuthStateChange } from '../lib/supabase';
 import './Admin.css';
 
-const OWNER_EMAIL = import.meta.env.VITE_OWNER_EMAIL; // optional lock-down, see README
+const OWNER_EMAIL = import.meta.env.VITE_OWNER_EMAIL; // set this to lock the page to just you
 
-export default function Admin() {
-  const { user } = useAuth();
+export default function AdminApp() {
+  const [session, setSession] = useState(undefined); // undefined = loading
   const [profiles, setProfiles] = useState(null);
   const [error, setError] = useState('');
 
-  const isOwner = !OWNER_EMAIL || user?.email === OWNER_EMAIL;
+  useEffect(() => {
+    getSession().then(setSession);
+    const { data: sub } = onAuthStateChange(setSession);
+    return () => sub.subscription.unsubscribe();
+  }, []);
+
+  const user = session?.user;
+  const isOwner = user && (!OWNER_EMAIL || user.email === OWNER_EMAIL);
 
   useEffect(() => {
     if (!isOwner) return;
@@ -32,17 +38,34 @@ export default function Admin() {
     if (error) { setError(error.message); load(); }
   }
 
+  if (session === undefined) {
+    return <div className="admin-page"><p className="admin-loading">Loading…</p></div>;
+  }
+
+  if (!user) {
+    return (
+      <div className="admin-page admin-gate">
+        <h1>Zeeyus Admin</h1>
+        <button className="admin-google-btn" onClick={() => signInWithGoogle()}>Sign in with Google</button>
+      </div>
+    );
+  }
+
   if (!isOwner) {
     return (
-      <div className="admin-page">
+      <div className="admin-page admin-gate">
         <p className="admin-denied">This page is owner-only.</p>
+        <button className="admin-signout" onClick={() => signOut()}>Sign out</button>
       </div>
     );
   }
 
   return (
     <div className="admin-page">
-      <h1>Admin — Approvals</h1>
+      <div className="admin-header">
+        <h1>Admin — Approvals</h1>
+        <button className="admin-signout" onClick={() => signOut()}>Sign out</button>
+      </div>
       {error && <p className="admin-error">{error}</p>}
       {profiles === null && <p className="admin-loading">Loading…</p>}
 

@@ -13,6 +13,7 @@ export default function DetailLayout({ item, mediaType, tags, children }) {
     ? `linear-gradient(180deg, rgba(${color.r},${color.g},${color.b},0.9) 0%, var(--bg) 78%)`
     : undefined;
   const cast = (item.credits?.cast || []).slice(0, 8);
+  const similar = (item.recommendations?.results || []).filter((s) => s.poster_path).slice(0, 12);
   const [trailerOpen, setTrailerOpen] = useState(false);
 
   const videos = item.videos?.results || [];
@@ -89,6 +90,23 @@ export default function DetailLayout({ item, mediaType, tags, children }) {
           <h2>Synopsis</h2>
           <p className="detail2-overview">{item.overview}</p>
         </div>
+
+        {similar.length > 0 && (
+          <div className="detail2-section">
+            <h2>Similar to this</h2>
+            <div className="detail2-cast-track">
+              {similar.map((s) => (
+                <button
+                  key={s.id}
+                  className="detail2-similar-card"
+                  onClick={() => navigate(`/${mediaType}/${s.id}`)}
+                >
+                  <img src={IMG(s.poster_path, 'w342')} alt={s.title || s.name} loading="lazy" />
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
 
         {children}
       </div>

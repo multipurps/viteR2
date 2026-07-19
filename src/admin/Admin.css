@@ -3,6 +3,28 @@
 .admin-loading, .admin-denied { color: var(--text-dim); }
 .admin-error { color: var(--red); margin-bottom: 16px; }
 
+.admin-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
+.admin-header h1 { margin-bottom: 0; }
+
+.admin-gate {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 18px;
+}
+.admin-google-btn, .admin-signout {
+  padding: 12px 26px;
+  border-radius: 22px;
+  background: #fff;
+  color: #060608;
+  font-weight: 700;
+  font-size: 14px;
+}
+.admin-signout { background: rgba(255,255,255,0.08); color: var(--text-dim); }
+
 .admin-list { display: flex; flex-direction: column; gap: 12px; }
 
 .admin-row {

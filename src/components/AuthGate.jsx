@@ -6,52 +6,57 @@ import { usePosterColor } from '../hooks/usePosterColor';
 import DesktopQrLogin from './DesktopQrLogin';
 import './AuthGate.css';
 
-function usePosterCarousel() {
-  const [posters, setPosters] = useState([]);
+function useTitleCarousel() {
+  const [titles, setTitles] = useState([]);
   const [index, setIndex] = useState(0);
 
   useEffect(() => {
     getTrending('movie', 'day').then((data) => {
-      setPosters((data.results || []).filter((p) => p.poster_path).slice(0, 10));
+      setTitles((data.results || []).filter((p) => p.backdrop_path).slice(0, 10));
     });
   }, []);
 
   useEffect(() => {
-    if (posters.length < 2) return;
-    const t = setInterval(() => setIndex((i) => (i + 1) % posters.length), 4500);
+    if (titles.length < 2) return;
+    const t = setInterval(() => setIndex((i) => (i + 1) % titles.length), 4000);
     return () => clearInterval(t);
-  }, [posters.length]);
+  }, [titles.length]);
 
-  return { posters, active: posters[index] };
+  return titles[index];
 }
 
 export default function AuthGate({ children }) {
   const { loading, status, user, refreshProfile } = useAuth();
-  const { posters, active } = usePosterCarousel();
+  const [step, setStep] = useState('splash'); // splash | signin
+  const active = useTitleCarousel();
   const color = usePosterColor(active ? IMG(active.poster_path, 'w342') : null);
-  const glow = color ? `rgba(${color.r},${color.g},${color.b},0.5)` : 'rgba(124,58,237,0.4)';
+  const glow = color ? `rgba(${color.r},${color.g},${color.b},0.55)` : 'rgba(124,58,237,0.4)';
 
   if (loading) return <div className="gate-screen"><div className="gate-loading" /></div>;
 
   if (status === 'signed-out') {
-    return (
-      <div className="gate-screen" style={{ background: `radial-gradient(ellipse at 50% 12%, ${glow} 0%, transparent 55%), var(--bg)` }}>
-        <div className="gate-poster-wall">
-          {posters.map((p, i) => (
-            <img
-              key={p.id}
-              src={IMG(p.poster_path, 'w342')}
-              alt=""
-              className={`gate-poster${p.id === active?.id ? ' active' : ''}`}
-              style={{ '--i': i }}
-            />
-          ))}
+    if (step === 'splash') {
+      return (
+        <div className="splash-screen">
+          {active && (
+            <img key={active.id} src={IMG(active.backdrop_path, 'original')} alt="" className="splash-bg" />
+          )}
+          <div className="splash-scrim" />
+          <div className="splash-content">
+            <div className="splash-mark">Z</div>
+            {active && <h1 className="splash-title">{active.title || active.name}</h1>}
+            <button className="splash-getstarted" onClick={() => setStep('signin')}>Get Started</button>
+          </div>
         </div>
+      );
+    }
 
-        <div className="gate-box glass-strong">
+    return (
+      <div className="gate-screen" style={{ background: `radial-gradient(ellipse at 50% 20%, ${glow} 0%, transparent 60%), var(--bg)` }}>
+        {active && <img src={IMG(active.backdrop_path, 'original')} alt="" className="gate-bg" />}
+        <div className="gate-bg-scrim" />
+        <div className="gate-bare">
           <div className="gate-mark">Z</div>
-          <h1>Zeeyus</h1>
-          <p>Sign in to continue.</p>
           <button className="gate-google-btn" onClick={() => signInWithGoogle()}>
             <GoogleIcon /> Continue with Google
           </button>

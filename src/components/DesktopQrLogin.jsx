@@ -1,7 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 import QRCode from 'qrcode';
-import { createPairing, watchPairing, redeemPairing } from '../lib/supabase';
+import { createPairing, watchPairing, getPairingOnce, redeemPairing } from '../lib/supabase';
 import './DesktopQrLogin.css';
+
+const POLL_MS = 3000;
 
 export default function DesktopQrLogin() {
   const canvasRef = useRef(null);
@@ -10,7 +12,21 @@ export default function DesktopQrLogin() {
 
   useEffect(() => {
     let stopWatching;
+    let pollTimer;
     let cancelled = false;
+    let handled = false;
+
+    async function handleApproval(row) {
+      if (handled || cancelled || !(row.status === 'approved' && row.token_hash)) return;
+      handled = true;
+      setStatus('approved');
+      try {
+        await redeemPairing(row.email, row.token_hash);
+      } catch (e) {
+        setError(e.message);
+        setStatus('error');
+      }
+    }
 
     (async () => {
       try {
@@ -20,25 +36,21 @@ export default function DesktopQrLogin() {
         if (cancelled) return;
         setStatus('ready');
 
-        stopWatching = watchPairing(code, async (row) => {
-          if (row.status === 'approved' && row.token_hash) {
-            setStatus('approved');
-            try {
-              await redeemPairing(row.email, row.token_hash);
-              // onAuthStateChange in AuthContext picks up the new session automatically
-            } catch (e) {
-              setError(e.message);
-              setStatus('error');
-            }
-          }
-        });
+        // Realtime is the fast path, but don't depend on it alone —
+        // poll as a fallback in case Realtime isn't enabled on this table.
+        stopWatching = watchPairing(code, handleApproval);
+        pollTimer = setInterval(async () => {
+          if (handled) return;
+          const row = await getPairingOnce(code).catch(() => null);
+          if (row) handleApproval(row);
+        }, POLL_MS);
       } catch (e) {
         setError(e.message);
         setStatus('error');
       }
     })();
 
-    return () => { cancelled = true; stopWatching?.(); };
+    return () => { cancelled = true; stopWatching?.(); clearInterval(pollTimer); };
   }, []);
 
   return (

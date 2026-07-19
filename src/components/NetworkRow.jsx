@@ -21,7 +21,7 @@ export default function NetworkRow({ title = 'Film Networks' }) {
       </div>
       <div className="netrow-track">
         {networks.map((n) => (
-          <button key={n.id} className="netrow-card glass" onClick={() => navigate(`/network/${n.key}`)}>
+          <button key={n.id} className="netrow-card" onClick={() => navigate(`/network/${n.key}`)}>
             <img src={n.logo} alt={n.name} />
           </button>
         ))}

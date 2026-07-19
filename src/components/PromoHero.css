@@ -18,8 +18,16 @@
   height: 100%;
   object-fit: cover;
   object-position: top center;
-  mix-blend-mode: luminosity;
+}
+
+.promo-hero::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: inherit;
+  mix-blend-mode: normal;
   opacity: 0.55;
+  pointer-events: none;
 }
 
 .promo-hero-content {
@@ -27,6 +35,15 @@
   z-index: 1;
   padding: 32px;
   max-width: 420px;
+}
+
+.promo-hero-content::before {
+  content: '';
+  position: absolute;
+  inset: -20px -20px 0;
+  bottom: -32px;
+  background: linear-gradient(0deg, rgba(0,0,0,0.55) 0%, transparent 100%);
+  z-index: -1;
 }
 
 .promo-hero-eyebrow {

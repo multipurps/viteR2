@@ -9,33 +9,97 @@
   transition: background 1.2s ease;
 }
 
-.gate-poster-wall {
+/* ── Step 1: splash, one title at a time, then Get Started ── */
+.splash-screen {
+  min-height: 100vh;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: flex-end;
+}
+
+.splash-bg {
   position: absolute;
   inset: 0;
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 10px;
-  padding: 10px;
-  opacity: 0.4;
-  filter: saturate(1.1);
-  z-index: 0;
-  mask-image: radial-gradient(ellipse at 50% 45%, transparent 20%, #000 78%);
-  -webkit-mask-image: radial-gradient(ellipse at 50% 45%, transparent 20%, #000 78%);
-}
-
-.gate-poster {
   width: 100%;
-  aspect-ratio: 2/3;
+  height: 100%;
   object-fit: cover;
-  border-radius: 10px;
-  opacity: 0.55;
-  transform: translateY(calc(var(--i) * 1px)) scale(0.96);
-  transition: opacity 1s ease, transform 1s ease;
+  object-position: top center;
+  animation: splash-fade 1.2s ease;
+}
+@keyframes splash-fade { from { opacity: 0; } to { opacity: 1; } }
+
+.splash-scrim {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(0deg, var(--bg) 5%, rgba(6,6,8,0.2) 55%, rgba(6,6,8,0.6) 100%);
 }
 
-.gate-poster.active { opacity: 1; transform: scale(1.03); }
+.splash-content {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  padding: 0 28px 60px;
+  text-align: center;
+}
 
-.gate-box { position: relative; z-index: 1; }
+.splash-mark {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  background: var(--lime);
+  color: #060608;
+  font-family: var(--font-display);
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 40px;
+}
+
+.splash-title {
+  font-family: var(--font-display);
+  font-size: clamp(1.8rem, 6vw, 2.6rem);
+  margin-bottom: 32px;
+  transition: opacity 0.4s ease;
+}
+
+.splash-getstarted {
+  width: 100%;
+  max-width: 340px;
+  height: 52px;
+  border-radius: 26px;
+  background: var(--lime);
+  color: #060608;
+  font-weight: 800;
+  font-size: 15px;
+}
+
+/* ── Step 2: bare Google sign-in, no card ── */
+.gate-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.35;
+}
+.gate-bg-scrim {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 50% 40%, transparent 0%, var(--bg) 85%);
+}
+
+.gate-bare {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  width: 100%;
+  max-width: 320px;
+}
 
 .gate-loading {
   width: 32px;
@@ -53,6 +117,8 @@
   border-radius: 22px;
   padding: 40px 32px;
   text-align: center;
+  position: relative;
+  z-index: 1;
 }
 
 .gate-mark {

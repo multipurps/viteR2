@@ -38,8 +38,16 @@ export default function Search() {
         return true;
       });
       setHeroItems(deduped.slice(0, 8));
-      setNewItems((fresh.results || []).filter((m) => m.poster_path));
-      setMovieItems((popular.results || []).filter((m) => m.poster_path));
+
+      const newList = (fresh.results || []).filter((m) => m.poster_path);
+      const newIds = new Set(newList.map((m) => m.id));
+      // "Movies" is top-rated (not just popular), and excludes anything
+      // already shown in "New" — genuinely different lists now.
+      const topRated = await discover('movie', `sort_by=vote_average.desc&vote_count.gte=500${genreParam}`);
+      const movieList = (topRated.results || []).filter((m) => m.poster_path && !newIds.has(m.id));
+
+      setNewItems(newList);
+      setMovieItems(movieList);
     })();
   }, [activeGenre, query]);
 
