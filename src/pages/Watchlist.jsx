@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { getWatchlist, removeFromWatchlist } from '../lib/supabase';
-import { IMG, getNetworkList, getPrimaryProviderKey } from '../lib/tmdb';
+import { IMG, getNetworkList, getPrimaryProviderId, PROVIDERS } from '../lib/tmdb';
 import './Watchlist.css';
 
 export default function Watchlist() {
@@ -12,8 +12,12 @@ export default function Watchlist() {
   const [active, setActive] = useState('all');
   const navigate = useNavigate();
 
+  const knownIds = new Set(Object.values(PROVIDERS).map((p) => p.id));
+
   useEffect(() => {
-    getNetworkList().then(setNetworks);
+    // Favourites chips stay to the curated major platforms (matching the
+    // reference design) rather than the full ~150-provider Networks list.
+    getNetworkList().then((list) => setNetworks(list.filter((n) => knownIds.has(n.id))));
   }, []);
 
   useEffect(() => {
@@ -22,7 +26,7 @@ export default function Watchlist() {
       const withProvider = await Promise.all(
         rows.map(async (r) => ({
           ...r,
-          _providerKey: await getPrimaryProviderKey(r.media_type, r.media_id).catch(() => null),
+          _providerId: await getPrimaryProviderId(r.media_type, r.media_id).catch(() => null),
         }))
       );
       setItems(withProvider);
@@ -38,9 +42,9 @@ export default function Watchlist() {
     }
   }
 
-  const availableNetworkKeys = new Set((items || []).map((i) => i._providerKey).filter(Boolean));
-  const visibleNetworks = networks.filter((n) => availableNetworkKeys.has(n.key));
-  const filtered = (items || []).filter((i) => active === 'all' || i._providerKey === active);
+  const availableProviderIds = new Set((items || []).map((i) => i._providerId).filter(Boolean));
+  const visibleNetworks = networks.filter((n) => availableProviderIds.has(n.id));
+  const filtered = (items || []).filter((i) => active === 'all' || i._providerId === active);
 
   return (
     <div className="fav-page">
@@ -51,9 +55,9 @@ export default function Watchlist() {
           <button className={`fav-chip${active === 'all' ? ' active' : ''}`} onClick={() => setActive('all')}>All</button>
           {visibleNetworks.map((n) => (
             <button
-              key={n.key}
-              className={`fav-chip fav-chip-logo${active === n.key ? ' active' : ''}`}
-              onClick={() => setActive(n.key)}
+              key={n.id}
+              className={`fav-chip fav-chip-logo${active === n.id ? ' active' : ''}`}
+              onClick={() => setActive(n.id)}
             >
               <img src={n.logo} alt={n.name} />
             </button>

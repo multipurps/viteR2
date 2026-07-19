@@ -31,7 +31,7 @@
 
 .detail2-back, .detail2-more {
   position: absolute;
-  top: 20px;
+  top: calc(20px + var(--safe-top));
   width: 38px;
   height: 38px;
   border-radius: 50%;

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import Hero from '../components/Hero';
 import Row from '../components/Row';
 import GenreChips from '../components/GenreChips';
@@ -8,12 +8,17 @@ import './Search.css';
 
 export default function Search() {
   const navigate = useNavigate();
+  const [urlParams] = useSearchParams();
   const [query, setQuery] = useState('');
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  const [activeGenre, setActiveGenre] = useState(null);
+  const [activeGenre, setActiveGenre] = useState(() => {
+    const g = urlParams.get('genre');
+    return g ? Number(g) : null;
+  });
   const [heroItems, setHeroItems] = useState([]);
+  const [trendingItems, setTrendingItems] = useState([]);
   const [newItems, setNewItems] = useState([]);
   const [movieItems, setMovieItems] = useState([]);
 
@@ -39,13 +44,17 @@ export default function Search() {
       });
       setHeroItems(deduped.slice(0, 8));
 
-      const newList = (fresh.results || []).filter((m) => m.poster_path);
+      const trendingList = (trending.results || []).filter((m) => m.poster_path && m.genre_ids?.some((g) => !activeGenre || g === activeGenre));
+      const trendingIds = new Set(trendingList.map((m) => m.id));
+
+      const newList = (fresh.results || []).filter((m) => m.poster_path && !trendingIds.has(m.id));
       const newIds = new Set(newList.map((m) => m.id));
       // "Movies" is top-rated (not just popular), and excludes anything
-      // already shown in "New" — genuinely different lists now.
+      // already shown in "Trending"/"New" — genuinely different lists now.
       const topRated = await discover('movie', `sort_by=vote_average.desc&vote_count.gte=500${genreParam}`);
-      const movieList = (topRated.results || []).filter((m) => m.poster_path && !newIds.has(m.id));
+      const movieList = (topRated.results || []).filter((m) => m.poster_path && !newIds.has(m.id) && !trendingIds.has(m.id));
 
+      setTrendingItems(trendingList);
       setNewItems(newList);
       setMovieItems(movieList);
     })();
@@ -86,6 +95,7 @@ export default function Search() {
             onInfo={(item) => navigate(`/movie/${item.id}`)}
           />
           <div style={{ marginTop: 30 }}>
+            <Row title="Trending" items={trendingItems} seeAllTo="/movies" />
             <Row title="New" items={newItems} seeAllTo="/movies" />
             <Row title="Movies" items={movieItems} seeAllTo="/movies" />
           </div>

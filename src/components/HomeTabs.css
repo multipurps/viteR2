@@ -1,0 +1,31 @@
+.hometabs { margin-top: 8px; }
+
+.hometabs-switch {
+  display: inline-flex;
+  gap: 2px;
+  margin: 0 56px 24px;
+  border-radius: 999px;
+  padding: 4px;
+}
+
+.hometabs-switch button {
+  padding: 8px 20px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-dim);
+  transition: color 0.2s;
+}
+
+.hometabs-switch button.active {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.12);
+}
+
+@media (max-width: 860px) {
+  .hometabs-switch { margin: 0 16px 20px; }
+}
+
+@media (min-width: 1400px) {
+  .hometabs-switch { margin: 0 72px 24px; }
+}

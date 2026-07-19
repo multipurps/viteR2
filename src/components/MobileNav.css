@@ -8,7 +8,7 @@
     position: fixed;
     left: 50%;
     transform: translateX(-50%);
-    bottom: 18px;
+    bottom: calc(18px + var(--safe-bottom));
     width: auto;
     border-radius: 999px;
     padding: 4px;

@@ -1,7 +1,6 @@
 import { useNavigate } from 'react-router-dom';
-import { discover } from '../lib/tmdb';
 import { useEffect, useRef, useState } from 'react';
-import { IMG } from '../lib/tmdb';
+import { discover, IMG } from '../lib/tmdb';
 import './GenreRow.css';
 
 const GENRES = [
@@ -17,28 +16,49 @@ const GENRES = [
 
 export default function GenreRow() {
   const navigate = useNavigate();
+  const [posterSets, setPosterSets] = useState({}); // { genreId: [posters] }
+
+  // Fetch all genres together so we can dedupe across them — otherwise
+  // the same handful of overall-popular blockbusters (tagged with many
+  // genres) win the #1 slot in nearly every tile.
+  useEffect(() => {
+    (async () => {
+      const results = await Promise.all(
+        GENRES.map((g) => discover('movie', `with_genres=${g.genre}&sort_by=popularity.desc`))
+      );
+      const used = new Set();
+      const sets = {};
+      GENRES.forEach((g, i) => {
+        const pool = (results[i]?.results || []).filter((m) => m.poster_path);
+        const unique = pool.filter((m) => !used.has(m.id));
+        const chosen = (unique.length >= 4 ? unique : pool).slice(0, 5);
+        chosen.forEach((m) => used.add(m.id));
+        sets[g.genre] = chosen;
+      });
+      setPosterSets(sets);
+    })();
+  }, []);
+
   return (
     <section className="genrow">
       <h2 className="genrow-title">Genres</h2>
       <div className="genrow-track">
         {GENRES.map((g) => (
-          <GenreTile key={g.genre} genre={g} onClick={() => navigate('/movies')} />
+          <GenreTile
+            key={g.genre}
+            genre={g}
+            posters={posterSets[g.genre] || []}
+            onClick={() => navigate(`/search?genre=${g.genre}`)}
+          />
         ))}
       </div>
     </section>
   );
 }
 
-function GenreTile({ genre, onClick }) {
-  const [posters, setPosters] = useState([]);
+function GenreTile({ genre, posters, onClick }) {
   const [index, setIndex] = useState(0);
   const timer = useRef(null);
-
-  useEffect(() => {
-    discover('movie', `with_genres=${genre.genre}&sort_by=popularity.desc`).then((data) => {
-      setPosters((data.results || []).filter((m) => m.poster_path).slice(0, 5));
-    });
-  }, [genre.genre]);
 
   useEffect(() => {
     if (posters.length < 2) return;

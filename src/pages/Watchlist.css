@@ -1,4 +1,4 @@
-.fav-page { padding: 60px 56px 40px; }
+.fav-page { padding: calc(60px + var(--safe-top)) 56px 40px; }
 .fav-page h1 { font-family: var(--font-display); font-size: 2.2rem; margin-bottom: 22px; text-align: center; }
 .fav-empty { color: var(--text-dim); text-align: center; }
 
@@ -26,16 +26,17 @@
 
 .fav-carousel {
   display: flex;
-  gap: 20px;
+  gap: 14px;
   overflow-x: auto;
   scroll-snap-type: x mandatory;
-  padding: 0 calc(50% - 170px) 20px;
+  padding: 0 16px 20px;
 }
 
 .fav-card {
   position: relative;
-  flex: 0 0 340px;
-  aspect-ratio: 3/4;
+  flex: 0 0 calc(100vw - 32px);
+  max-width: 460px;
+  aspect-ratio: 2/3;
   border-radius: 26px;
   overflow: hidden;
   scroll-snap-align: center;
@@ -84,6 +85,6 @@
 
 @media (max-width: 860px) {
   .fav-page { padding: 40px 0 110px; }
-  .fav-carousel { padding: 0 calc(50% - 140px) 20px; }
-  .fav-card { flex-basis: 280px; }
+  .fav-carousel { padding: 0 16px 20px; }
+  .fav-card { flex-basis: calc(100vw - 32px); }
 }

@@ -34,7 +34,7 @@ export default function App() {
                 <Route path="/movie/:id" element={<MovieDetail />} />
                 <Route path="/top10" element={<Top10 />} />
                 <Route path="/networks" element={<Networks />} />
-                <Route path="/network/:key" element={<NetworkDetail />} />
+                <Route path="/network/:id" element={<NetworkDetail />} />
                 <Route path="/search" element={<Search />} />
                 <Route path="/pair/:code" element={<PairConfirm />} />
                 <Route path="/watchlist" element={<Watchlist />} />

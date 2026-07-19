@@ -1,4 +1,4 @@
-.top10 { padding: 60px 56px; max-width: 900px; }
+.top10 { padding: calc(60px + var(--safe-top)) 56px; max-width: 900px; }
 
 .top10-head {
   display: flex;

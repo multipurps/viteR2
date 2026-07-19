@@ -16,7 +16,7 @@ export default function Networks() {
       <h1>Networks</h1>
       <div className="networks-grid">
         {networks?.map((n) => (
-          <button key={n.id} className="networks-card glass" onClick={() => navigate(`/network/${n.key}`)}>
+          <button key={n.id} className="networks-card glass" onClick={() => navigate(`/network/${n.id}`)}>
             <img src={n.logo} alt={n.name} />
             <span>{n.name}</span>
           </button>

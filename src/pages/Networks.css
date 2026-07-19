@@ -1,4 +1,4 @@
-.networks-page { padding: 60px 56px; }
+.networks-page { padding: calc(60px + var(--safe-top)) 56px; }
 .networks-page h1 { font-family: var(--font-display); font-size: 2.2rem; margin-bottom: 26px; }
 
 .networks-grid {

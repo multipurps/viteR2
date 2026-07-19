@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import Hero from '../components/Hero';
-import { discover, IMG, PROVIDERS } from '../lib/tmdb';
+import { discover, getNetworkList, IMG } from '../lib/tmdb';
 import './NetworkDetail.css';
 
 const GENRE_CHIPS_MOVIE = [
@@ -29,9 +29,10 @@ const GENRE_CHIPS_TV = [
 ];
 
 export default function NetworkDetail() {
-  const { key } = useParams();
+  const { id } = useParams();
+  const providerId = Number(id);
   const navigate = useNavigate();
-  const provider = PROVIDERS[key];
+  const [provider, setProvider] = useState(undefined); // undefined = loading, null = not found
   const [mediaType, setMediaType] = useState('movie');
   const [genre, setGenre] = useState(null);
   const [heroItems, setHeroItems] = useState([]);
@@ -40,9 +41,15 @@ export default function NetworkDetail() {
   const chips = mediaType === 'movie' ? GENRE_CHIPS_MOVIE : GENRE_CHIPS_TV;
 
   useEffect(() => {
+    getNetworkList().then((list) => {
+      setProvider(list.find((p) => p.id === providerId) || null);
+    });
+  }, [providerId]);
+
+  useEffect(() => {
     if (!provider) return;
     (async () => {
-      const data = await discover(mediaType, `watch_region=US&with_watch_providers=${provider.id}&sort_by=popularity.desc`);
+      const data = await discover(mediaType, `watch_region=${provider.region}&with_watch_providers=${provider.id}&sort_by=popularity.desc`);
       setHeroItems((data.results || []).filter((i) => i.backdrop_path).slice(0, 6));
     })();
   }, [provider, mediaType]);
@@ -52,7 +59,7 @@ export default function NetworkDetail() {
     (async () => {
       const cutoff = new Date(Date.now() - 90 * 24 * 60 * 60 * 1e3).toISOString().slice(0, 10);
       const dateField = mediaType === 'movie' ? 'primary_release_date' : 'first_air_date';
-      const data = await discover(mediaType, `watch_region=US&with_watch_providers=${provider.id}&${dateField}.gte=${cutoff}&sort_by=popularity.desc`);
+      const data = await discover(mediaType, `watch_region=${provider.region}&with_watch_providers=${provider.id}&${dateField}.gte=${cutoff}&sort_by=popularity.desc`);
       setNewItems(data.results || []);
     })();
   }, [provider, mediaType]);
@@ -61,12 +68,15 @@ export default function NetworkDetail() {
     if (!provider) return;
     (async () => {
       const genreParam = genre ? `&with_genres=${genre}` : '';
-      const data = await discover(mediaType, `watch_region=US&with_watch_providers=${provider.id}&sort_by=popularity.desc${genreParam}`);
+      const data = await discover(mediaType, `watch_region=${provider.region}&with_watch_providers=${provider.id}&sort_by=popularity.desc${genreParam}`);
       setGridItems(data.results || []);
     })();
   }, [provider, mediaType, genre]);
 
-  if (!provider) {
+  if (provider === undefined) {
+    return <div className="tv-loading">Loading…</div>;
+  }
+  if (provider === null) {
     return <div className="network-missing">Unknown network. <button onClick={() => navigate('/networks')}>See all networks</button></div>;
   }
 

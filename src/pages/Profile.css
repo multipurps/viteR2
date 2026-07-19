@@ -1,4 +1,4 @@
-.profile-page { padding: 60px 56px; max-width: 480px; }
+.profile-page { padding: calc(60px + var(--safe-top)) 56px; max-width: 480px; }
 .profile-page h1 { font-family: var(--font-display); font-size: 2rem; margin-bottom: 26px; }
 
 .profile-card {

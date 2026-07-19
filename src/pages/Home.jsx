@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import PromoHero from '../components/PromoHero';
+import HomeTabs from '../components/HomeTabs';
 import GenreRow from '../components/GenreRow';
 import NetworkRow from '../components/NetworkRow';
 import ContinueRow from '../components/ContinueRow';
@@ -44,6 +45,7 @@ export default function Home() {
   return (
     <div>
       <PromoHero items={heroItems} />
+      <HomeTabs />
       <div style={{ marginTop: 8 }}>
         <GenreRow />
         <NetworkRow title="By Networks" />

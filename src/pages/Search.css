@@ -1,4 +1,4 @@
-.search-page { padding: 24px 0 40px; }
+.search-page { padding: calc(24px + var(--safe-top)) 0 40px; }
 
 .search-bar {
   display: flex;
@@ -38,7 +38,7 @@
 .search-card span { font-size: 13px; font-weight: 600; display: block; }
 
 @media (max-width: 860px) {
-  .search-page { padding: 16px 0 100px; }
+  .search-page { padding: calc(16px + var(--safe-top)) 0 100px; }
   .search-bar { margin: 0 16px 16px; }
   .search-status, .search-grid { margin: 0 16px; }
 }

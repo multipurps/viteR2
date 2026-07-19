@@ -65,28 +65,40 @@ export function discover(mediaType, params) {
 }
 
 // Live provider list (name + logo) straight from TMDB — no logo assets
-// to store or keep updated ourselves. display_priority is TMDB's own
-// ranking of provider prominence in the region.
+// or provider IDs to hand-maintain. Watch-provider data is region-scoped
+// (IROKOtv only shows up under NG, JioHotstar only under IN, etc.), so a
+// single US query would only ever surface a handful of US majors — this
+// merges across the regions that actually cover the platforms requested.
+const NETWORK_REGIONS = ['US', 'GB', 'NG', 'ZA', 'IN', 'KR', 'CN', 'JP'];
 let providerListCache = null;
-export async function getNetworkList(region = 'US') {
+export async function getNetworkList() {
   if (providerListCache) return providerListCache;
-  const [movieRes, tvRes] = await Promise.all([
-    api('/watch/providers/movie', `watch_region=${region}`),
-    api('/watch/providers/tv', `watch_region=${region}`),
+  const calls = NETWORK_REGIONS.flatMap((region) => [
+    { region, promise: api('/watch/providers/movie', `watch_region=${region}`) },
+    { region, promise: api('/watch/providers/tv', `watch_region=${region}`) },
   ]);
+  const settled = await Promise.all(
+    calls.map((c) => c.promise.then((res) => ({ region: c.region, res })).catch(() => ({ region: c.region, res: { results: [] } })))
+  );
   const byId = new Map();
-  for (const p of [...(movieRes.results || []), ...(tvRes.results || [])]) {
-    if (!byId.has(p.provider_id)) byId.set(p.provider_id, p);
+  for (const { region, res } of settled) {
+    for (const p of res.results || []) {
+      if (!byId.has(p.provider_id)) {
+        byId.set(p.provider_id, { ...p, regions: new Set([region]) });
+      } else {
+        byId.get(p.provider_id).regions.add(region);
+      }
+    }
   }
-  const known = new Set(Object.values(PROVIDERS).map((p) => p.id));
   const list = [...byId.values()]
-    .filter((p) => known.has(p.provider_id))
-    .sort((a, b) => a.display_priority - b.display_priority)
+    .sort((a, b) => (a.display_priority ?? 999) - (b.display_priority ?? 999))
     .map((p) => ({
       id: p.provider_id,
       name: p.provider_name,
       logo: IMG(p.logo_path, 'original'),
-      key: Object.entries(PROVIDERS).find(([, v]) => v.id === p.provider_id)?.[0],
+      // Prefer US for the discover query if available (better catalog
+      // data on TMDB), otherwise fall back to wherever it was found.
+      region: p.regions.has('US') ? 'US' : [...p.regions][0],
     }));
   providerListCache = list;
   return list;
@@ -97,16 +109,16 @@ export function getDetails(mediaType, id) {
 }
 
 const watchProviderCache = new Map();
-export async function getPrimaryProviderKey(mediaType, id, region = 'US') {
+export async function getPrimaryProviderId(mediaType, id, region = 'US') {
   const cacheKey = `${mediaType}-${id}`;
   if (watchProviderCache.has(cacheKey)) return watchProviderCache.get(cacheKey);
   const data = await api(`/${mediaType}/${id}/watch/providers`);
   const flatrate = data.results?.[region]?.flatrate || [];
   const known = new Set(Object.values(PROVIDERS).map((p) => p.id));
   const match = flatrate.find((p) => known.has(p.provider_id));
-  const key = match ? Object.entries(PROVIDERS).find(([, v]) => v.id === match.provider_id)?.[0] : null;
-  watchProviderCache.set(cacheKey, key);
-  return key;
+  const providerId = match ? match.provider_id : null;
+  watchProviderCache.set(cacheKey, providerId);
+  return providerId;
 }
 
 export function getSeason(tvId, seasonNumber) {
