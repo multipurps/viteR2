@@ -160,9 +160,12 @@ export async function removeFromContinue(userId, mediaId, mediaType) {
   if (error) throw error;
 }
 
-// ── QR desktop pairing ──
-function randomCode() {
-  return crypto.randomUUID().replace(/-/g, '');
+// ── QR / TV-code desktop pairing ──
+const CODE_CHARS = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // no 0/O/1/I — easy to read off a TV
+function randomCode(len = 6) {
+  let out = '';
+  for (let i = 0; i < len; i++) out += CODE_CHARS[Math.floor(Math.random() * CODE_CHARS.length)];
+  return out;
 }
 
 export async function createPairing() {

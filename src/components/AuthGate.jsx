@@ -27,7 +27,10 @@ function useTitleCarousel() {
 
 export default function AuthGate({ children }) {
   const { loading, status, user, refreshProfile } = useAuth();
-  const [step, setStep] = useState('splash'); // splash | signin
+  // Desktop/TV: skip the tap-to-advance splash — a remote makes that
+  // step annoying, and the QR/TV-code needs to be visible immediately.
+  const isWide = typeof window !== 'undefined' && window.innerWidth >= 861;
+  const [step, setStep] = useState(isWide ? 'signin' : 'splash'); // splash | signin
   const active = useTitleCarousel();
   const color = usePosterColor(active ? IMG(active.poster_path, 'w342') : null);
   const glow = color ? `rgba(${color.r},${color.g},${color.b},0.55)` : 'rgba(124,58,237,0.4)';

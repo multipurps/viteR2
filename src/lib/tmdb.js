@@ -90,7 +90,14 @@ export async function getNetworkList() {
       }
     }
   }
+  // TMDB tracks a lot of add-on-bundle/cross-listing entries alongside
+  // real platforms ("AMC+ Roku Premium Channel", "HBO Max on U-Next").
+  // Filtered by structural pattern, not a specific-name list, so this
+  // doesn't need manual upkeep as new noise appears.
+  const NOISE_PATTERN = /(amazon channel|roku premium channel|\bon [A-Z][\w-]+$)/i;
+
   const list = [...byId.values()]
+    .filter((p) => !NOISE_PATTERN.test(p.provider_name))
     .sort((a, b) => (a.display_priority ?? 999) - (b.display_priority ?? 999))
     .map((p) => ({
       id: p.provider_id,

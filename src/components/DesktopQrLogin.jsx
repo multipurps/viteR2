@@ -9,6 +9,7 @@ export default function DesktopQrLogin() {
   const canvasRef = useRef(null);
   const [status, setStatus] = useState('loading'); // loading | ready | approved | error
   const [error, setError] = useState('');
+  const [code, setCode] = useState('');
 
   useEffect(() => {
     let stopWatching;
@@ -30,18 +31,19 @@ export default function DesktopQrLogin() {
 
     (async () => {
       try {
-        const code = await createPairing();
-        const url = `${window.location.origin}${window.location.pathname}#/pair/${code}`;
-        if (canvasRef.current) await QRCode.toCanvas(canvasRef.current, url, { width: 220, margin: 1 });
+        const pairCode = await createPairing();
+        setCode(pairCode);
+        const url = `${window.location.origin}${window.location.pathname}#/pair/${pairCode}`;
+        if (canvasRef.current) await QRCode.toCanvas(canvasRef.current, url, { width: 200, margin: 1 });
         if (cancelled) return;
         setStatus('ready');
 
         // Realtime is the fast path, but don't depend on it alone —
         // poll as a fallback in case Realtime isn't enabled on this table.
-        stopWatching = watchPairing(code, handleApproval);
+        stopWatching = watchPairing(pairCode, handleApproval);
         pollTimer = setInterval(async () => {
           if (handled) return;
-          const row = await getPairingOnce(code).catch(() => null);
+          const row = await getPairingOnce(pairCode).catch(() => null);
           if (row) handleApproval(row);
         }, POLL_MS);
       } catch (e) {
@@ -59,10 +61,11 @@ export default function DesktopQrLogin() {
         <canvas ref={canvasRef} />
         {status === 'approved' && <div className="qr-approved-overlay">Signed in — one sec…</div>}
       </div>
+      {code && status !== 'approved' && <div className="qr-code-text">{code}</div>}
       <p className="qr-hint">
         {status === 'error'
           ? error
-          : 'Scan with a phone that\'s already signed in to Zeeyus'}
+          : 'Scan the QR, or on your phone go to Profile → "Sign in a TV" and enter the code above'}
       </p>
     </div>
   );

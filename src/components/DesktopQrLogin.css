@@ -37,3 +37,11 @@
 }
 
 .qr-hint { margin-top: 12px; font-size: 11.5px; color: var(--text-faint); max-width: 220px; text-align: center; }
+
+.qr-code-text {
+  margin-top: 14px;
+  font-family: var(--font-display);
+  font-size: 26px;
+  letter-spacing: 0.2em;
+  color: #fff;
+}

@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { signOut, uploadAvatar } from '../lib/supabase';
+import EnterTvCode from '../components/EnterTvCode';
 import './Profile.css';
 
 export default function Profile() {
@@ -64,6 +65,8 @@ export default function Profile() {
 
         <button className="profile-signout" onClick={() => signOut()}>Sign out</button>
       </div>
+
+      <EnterTvCode />
     </div>
   );
 }
