@@ -41,7 +41,7 @@ export default function GenreRow() {
 
   return (
     <section className="genrow">
-      <h2 className="genrow-title">Genres</h2>
+      <h2 className="genrow-title">Featured</h2>
       <div className="genrow-track">
         {GENRES.map((g) => (
           <GenreTile

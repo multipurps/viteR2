@@ -1,0 +1,54 @@
+.hometop10 { margin: 40px 0; }
+.hometop10-title { font-size: 19px; font-weight: 800; margin: 0 56px 20px; }
+
+.hometop10-block { margin-bottom: 30px; }
+.hometop10-block h3 { font-size: 15px; font-weight: 700; margin: 0 56px 12px; color: var(--text-dim); }
+
+.hometop10-track {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 0 56px 6px;
+}
+
+.hometop10-card {
+  position: relative;
+  flex: 0 0 120px;
+  display: flex;
+  align-items: flex-end;
+}
+
+.hometop10-card img {
+  width: 100px;
+  aspect-ratio: 2/3;
+  object-fit: cover;
+  border-radius: var(--radius-sm);
+  margin-left: 26px;
+}
+
+.hometop10-rank {
+  position: absolute;
+  left: 0;
+  bottom: -6px;
+  font-family: var(--font-display);
+  font-size: 3.2rem;
+  line-height: 1;
+  color: transparent;
+  -webkit-text-stroke: 1.5px rgba(255,255,255,0.55);
+  z-index: 0;
+}
+
+@media (max-width: 860px) {
+  .hometop10-title { margin: 0 20px 16px; }
+  .hometop10-block h3 { margin: 0 20px 10px; }
+  .hometop10-track { padding: 0 20px 6px; }
+  .hometop10-card { flex-basis: 104px; }
+  .hometop10-card img { width: 84px; margin-left: 22px; }
+  .hometop10-rank { font-size: 2.6rem; }
+}
+
+@media (min-width: 1400px) {
+  .hometop10-title { margin: 0 72px 20px; }
+  .hometop10-block h3 { margin: 0 72px 12px; }
+  .hometop10-track { padding: 0 72px 6px; gap: 12px; }
+}

@@ -4,6 +4,7 @@ import HomeTabs from '../components/HomeTabs';
 import GenreRow from '../components/GenreRow';
 import NetworkRow from '../components/NetworkRow';
 import ContinueRow from '../components/ContinueRow';
+import HomeTop10s from '../components/HomeTop10s';
 import { getTrending } from '../lib/tmdb';
 import { useAuth } from '../context/AuthContext';
 import { getContinueWatching } from '../lib/supabase';
@@ -48,8 +49,9 @@ export default function Home() {
       <HomeTabs />
       <div style={{ marginTop: 8 }}>
         <GenreRow />
-        <NetworkRow title="By Networks" />
+        <NetworkRow title="Film Networks" curatedOnly />
         {continueWatching.length > 0 && <ContinueRow items={continueWatching} />}
+        <HomeTop10s />
       </div>
     </div>
   );
