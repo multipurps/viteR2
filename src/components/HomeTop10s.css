@@ -2,7 +2,19 @@
 .hometop10-title { font-size: 19px; font-weight: 800; margin: 0 56px 20px; }
 
 .hometop10-block { margin-bottom: 30px; }
-.hometop10-block h3 { font-size: 15px; font-weight: 700; margin: 0 56px 12px; color: var(--text-dim); }
+.hometop10-block-head { display: flex; align-items: center; gap: 10px; margin: 0 56px 12px; }
+.hometop10-block-head h3 { margin: 0; }
+.hometop10-badge {
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--text-faint);
+  padding: 3px 9px;
+  border-radius: 8px;
+  background: rgba(255,255,255,0.06);
+}
+.hometop10-badge.real { color: var(--lime); background: rgba(212,242,68,0.12); }
 
 .hometop10-track {
   display: flex;
@@ -40,7 +52,7 @@
 
 @media (max-width: 860px) {
   .hometop10-title { margin: 0 20px 16px; }
-  .hometop10-block h3 { margin: 0 20px 10px; }
+  .hometop10-block-head { margin: 0 20px 10px; }
   .hometop10-track { padding: 0 20px 6px; }
   .hometop10-card { flex-basis: 104px; }
   .hometop10-card img { width: 84px; margin-left: 22px; }
@@ -49,6 +61,6 @@
 
 @media (min-width: 1400px) {
   .hometop10-title { margin: 0 72px 20px; }
-  .hometop10-block h3 { margin: 0 72px 12px; }
+  .hometop10-block-head { margin: 0 72px 12px; }
   .hometop10-track { padding: 0 72px 6px; gap: 12px; }
 }

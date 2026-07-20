@@ -59,6 +59,7 @@ export default function GenreRow({ centered = false }) {
 function GenreTile({ genre, posters, onClick }) {
   const [index, setIndex] = useState(0);
   const timer = useRef(null);
+  const active = posters[index];
 
   useEffect(() => {
     if (posters.length < 2) return;
@@ -72,7 +73,10 @@ function GenreTile({ genre, posters, onClick }) {
         <img key={p.id} src={IMG(p.poster_path, 'w342')} alt="" className={`genrow-tile-bg${i === index ? ' on' : ''}`} />
       ))}
       <div className="genrow-tile-scrim" />
-      <span className="genrow-tile-label">{genre.label}</span>
+      <div className="genrow-tile-text">
+        <span className="genrow-tile-label">{genre.label}</span>
+        {active && <span className="genrow-tile-filmtitle">{active.title || active.name}</span>}
+      </div>
     </button>
   );
 }

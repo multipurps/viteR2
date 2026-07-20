@@ -32,6 +32,22 @@ is where the Vite + React rebuild is happening.
   initials
 - AI Picks — still a stub
 
+## Real Netflix Top 10 — one more Edge Function to deploy
+Netflix is the only platform with a genuine official Top 10 (everyone else
+— Disney+, Prime, HBO Max, Apple TV+, Hulu — has no public official chart,
+period). Wired up via a proxy since a browser can't fetch netflix.com
+directly (CORS):
+```
+supabase functions deploy netflix-top10
+```
+Without this deployed, the Netflix row silently falls back to the same
+TMDB-popularity estimate as the other platforms — labeled honestly either
+way (badge says "Real weekly ranking" vs "Estimated · TMDB popularity").
+Heads up: this one parses Netflix's public HTML page (they don't offer a
+real API), so it's more fragile than the TMDB integration — if it stops
+returning results, Netflix likely changed their page markup and the
+regex in `supabase/functions/netflix-top10/index.ts` needs updating.
+
 ## QR desktop login — setup needed
 This needs two things only you can do (I can't reach Supabase's API or
 deploy Edge Functions from my sandbox):

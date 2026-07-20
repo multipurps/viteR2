@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import Row from './Row';
+import RevealOnScroll from './RevealOnScroll';
 import { resolveCategory } from '../lib/tmdb';
 import { slugify } from '../lib/categories';
 
@@ -30,13 +31,14 @@ export default function CategoryRows({ mediaType, categories }) {
   return (
     <div>
       {rows.map((r) => (
-        <Row
-          key={r.title}
-          title={r.title}
-          items={r.items}
-          type={mediaType}
-          seeAllTo={`/category/${mediaType}/${slugify(r.title)}`}
-        />
+        <RevealOnScroll key={r.title}>
+          <Row
+            title={r.title}
+            items={r.items}
+            type={mediaType}
+            seeAllTo={`/category/${mediaType}/${slugify(r.title)}`}
+          />
+        </RevealOnScroll>
       ))}
     </div>
   );

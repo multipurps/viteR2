@@ -111,6 +111,11 @@
   max-width: 320px;
 }
 
+.gate-email-wrap { display: none; width: 100%; margin-top: -8px; }
+@media (min-width: 861px) {
+  .gate-email-wrap { display: block; }
+}
+
 .gate-loading {
   width: 32px;
   height: 32px;

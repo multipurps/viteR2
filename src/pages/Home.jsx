@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import PromoHero from '../components/PromoHero';
 import Hero from '../components/Hero';
 import HomeTabs from '../components/HomeTabs';
@@ -8,6 +8,7 @@ import NetworkRow from '../components/NetworkRow';
 import ContinueRow from '../components/ContinueRow';
 import HomeTop10s from '../components/HomeTop10s';
 import CategoryRows from '../components/CategoryRows';
+import RevealOnScroll from '../components/RevealOnScroll';
 import { getTrending } from '../lib/tmdb';
 import { MOVIE_CATEGORIES, TV_CATEGORIES } from '../lib/categories';
 import { useAuth } from '../context/AuthContext';
@@ -16,7 +17,11 @@ import { getContinueWatching } from '../lib/supabase';
 export default function Home() {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const [tab, setTab] = useState('home');
+  const [searchParams, setSearchParams] = useSearchParams();
+  const tab = searchParams.get('tab') || 'home';
+  const setTab = (next) => {
+    setSearchParams(next === 'home' ? {} : { tab: next });
+  };
 
   const [homeHeroItems, setHomeHeroItems] = useState([]);
   const [tabHeroItems, setTabHeroItems] = useState([]);
@@ -80,9 +85,11 @@ export default function Home() {
       {tab === 'home' && (
         <div style={{ marginTop: 8 }}>
           <GenreRow centered />
-          <NetworkRow title="Film Networks" curatedOnly />
-          {continueWatching.length > 0 && <ContinueRow items={continueWatching} />}
-          <HomeTop10s />
+          <RevealOnScroll><NetworkRow title="Film Networks" curatedOnly /></RevealOnScroll>
+          {continueWatching.length > 0 && (
+            <RevealOnScroll><ContinueRow items={continueWatching} /></RevealOnScroll>
+          )}
+          <RevealOnScroll><HomeTop10s /></RevealOnScroll>
         </div>
       )}
 

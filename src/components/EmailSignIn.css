@@ -1,0 +1,32 @@
+.email-signin {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+  margin-top: 14px;
+}
+
+.email-signin input {
+  flex: 1;
+  height: 44px;
+  border-radius: 12px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid var(--glass-border);
+  color: #fff;
+  padding: 0 14px;
+  font-size: 13.5px;
+}
+.email-signin input::placeholder { color: var(--text-faint); }
+
+.email-signin button {
+  padding: 0 18px;
+  border-radius: 12px;
+  background: rgba(255,255,255,0.1);
+  color: #fff;
+  font-weight: 700;
+  font-size: 12.5px;
+  white-space: nowrap;
+}
+.email-signin button:disabled { opacity: 0.6; }
+
+.email-signin-sent { margin-top: 14px; font-size: 13px; color: var(--lime); text-align: center; }
+.email-signin-error { width: 100%; color: var(--red); font-size: 11.5px; margin-top: 6px; }

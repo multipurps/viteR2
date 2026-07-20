@@ -12,6 +12,10 @@ export function signInWithGoogle() {
   return supabase.auth.signInWithOAuth({ provider: 'google' });
 }
 
+export function signInWithEmail(email) {
+  return supabase.auth.signInWithOtp({ email, options: { shouldCreateUser: true } });
+}
+
 export function signOut() {
   return supabase.auth.signOut();
 }
@@ -187,6 +191,15 @@ export function watchPairing(code, onChange) {
 export async function getPairingOnce(code) {
   const { data } = await supabase.from('zeeyus_pairing').select('*').eq('code', code).maybeSingle();
   return data;
+}
+
+// Real Netflix Top 10 (titles only) via the netflix-top10 Edge Function —
+// falls back to null on any failure so callers can gracefully use the
+// TMDB-popularity estimate instead.
+export async function getNetflixTop10(type = 'tv') {
+  const { data, error } = await supabase.functions.invoke('netflix-top10', { body: { type } });
+  if (error) throw error;
+  return data?.titles || [];
 }
 
 export async function approvePairing(code) {

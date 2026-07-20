@@ -4,6 +4,7 @@ import { signInWithGoogle, signOut } from '../lib/supabase';
 import { getTrending, getPrimaryProviderId, PROVIDERS, IMG } from '../lib/tmdb';
 import { usePosterColor } from '../hooks/usePosterColor';
 import DesktopQrLogin from './DesktopQrLogin';
+import EmailSignIn from './EmailSignIn';
 import './AuthGate.css';
 
 const PROVIDER_LABEL_BY_ID = Object.fromEntries(
@@ -84,6 +85,9 @@ export default function AuthGate({ children }) {
           <button className="gate-google-btn" onClick={() => signInWithGoogle()}>
             <GoogleIcon /> Continue with Google
           </button>
+          <div className="gate-email-wrap">
+            <EmailSignIn />
+          </div>
           <DesktopQrLogin />
         </div>
       </div>

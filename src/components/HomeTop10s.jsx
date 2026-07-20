@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { discover, getNetworkList, PROVIDERS, IMG } from '../lib/tmdb';
+import { discover, getNetworkList, searchMulti, PROVIDERS, IMG } from '../lib/tmdb';
+import { getNetflixTop10 } from '../lib/supabase';
 import './HomeTop10s.css';
 
 // Providers we already know the TMDB id for.
@@ -17,6 +18,21 @@ async function resolveShowmaxId() {
   return list.find((n) => n.name?.toLowerCase() === 'showmax')?.id ?? null;
 }
 
+// Matches real Netflix title strings back to TMDB entries so we still
+// get poster art + ids, while keeping Netflix's own real ranking order.
+async function resolveRealNetflixSection(mediaType) {
+  const titles = await getNetflixTop10(mediaType === 'tv' ? 'tv' : 'movies');
+  if (!titles?.length) return null;
+  const matches = await Promise.all(
+    titles.map(async (title) => {
+      const data = await searchMulti(title).catch(() => null);
+      const hit = data?.results?.find((r) => (r.media_type === mediaType) && r.poster_path);
+      return hit || null;
+    })
+  );
+  return matches.filter(Boolean);
+}
+
 export default function HomeTop10s() {
   const [sections, setSections] = useState([]);
 
@@ -30,15 +46,38 @@ export default function HomeTop10s() {
 
       const results = await Promise.all(
         platformConfigs.map(async (p) => {
-          const [movies, tv] = await Promise.all([
-            discover('movie', `watch_region=${p.region}&with_watch_providers=${p.providerId}&sort_by=popularity.desc`),
-            discover('tv', `watch_region=${p.region}&with_watch_providers=${p.providerId}&sort_by=popularity.desc`),
-          ]);
-          return {
-            label: p.label,
-            movies: (movies.results || []).filter((m) => m.poster_path).slice(0, 10),
-            tv: (tv.results || []).filter((m) => m.poster_path).slice(0, 10),
-          };
+          const isNetflix = p.label === 'Netflix';
+          let movies = null;
+          let tv = null;
+          let real = false;
+
+          if (isNetflix) {
+            try {
+              const [realMovies, realTv] = await Promise.all([
+                resolveRealNetflixSection('movie'),
+                resolveRealNetflixSection('tv'),
+              ]);
+              if (realMovies?.length || realTv?.length) {
+                movies = realMovies || [];
+                tv = realTv || [];
+                real = true;
+              }
+            } catch {
+              // Edge Function not deployed yet, or fetch failed — fall
+              // through to the estimate below instead of showing nothing.
+            }
+          }
+
+          if (movies === null) {
+            const [m, t] = await Promise.all([
+              discover('movie', `watch_region=${p.region}&with_watch_providers=${p.providerId}&sort_by=popularity.desc`),
+              discover('tv', `watch_region=${p.region}&with_watch_providers=${p.providerId}&sort_by=popularity.desc`),
+            ]);
+            movies = (m.results || []).filter((x) => x.poster_path).slice(0, 10);
+            tv = (t.results || []).filter((x) => x.poster_path).slice(0, 10);
+          }
+
+          return { label: p.label, movies, tv, real };
         })
       );
 
@@ -49,6 +88,7 @@ export default function HomeTop10s() {
         label: 'Nollywood',
         movies: (nollywood.results || []).filter((m) => m.poster_path).slice(0, 10),
         tv: [],
+        real: false,
       });
 
       setSections(results.filter((s) => s.movies.length || s.tv.length));
@@ -62,7 +102,12 @@ export default function HomeTop10s() {
       <h2 className="hometop10-title">Top 10 by Network</h2>
       {sections.map((s) => (
         <div key={s.label} className="hometop10-block">
-          <h3>{s.label}</h3>
+          <div className="hometop10-block-head">
+            <h3>{s.label}</h3>
+            <span className={`hometop10-badge${s.real ? ' real' : ''}`}>
+              {s.real ? 'Real weekly ranking' : 'Estimated · TMDB popularity'}
+            </span>
+          </div>
           {s.movies.length > 0 && <RankedRow items={s.movies} type="movie" />}
           {s.tv.length > 0 && <RankedRow items={s.tv} type="tv" />}
         </div>
@@ -79,7 +124,7 @@ function RankedRow({ items, type }) {
         <button
           key={item.id}
           className="hometop10-card"
-          onClick={() => navigate(`/${type}/${item.id}`)}
+          onClick={() => navigate(`/${item.media_type || type}/${item.id}`)}
         >
           <span className="hometop10-rank">{i + 1}</span>
           <img src={IMG(item.poster_path, 'w342')} alt={item.title || item.name} loading="lazy" />
