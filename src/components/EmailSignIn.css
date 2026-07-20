@@ -1,12 +1,31 @@
+.email-signin-wrap { width: 100%; margin-top: 14px; }
+
+.email-signin-tabs {
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  border-radius: 12px;
+  background: rgba(255,255,255,0.05);
+  margin-bottom: 10px;
+}
+.email-signin-tab {
+  flex: 1;
+  padding: 8px 0;
+  border-radius: 9px;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--text-faint);
+}
+.email-signin-tab.active { background: rgba(255,255,255,0.1); color: #fff; }
+
 .email-signin {
   display: flex;
+  flex-direction: column;
   gap: 8px;
   width: 100%;
-  margin-top: 14px;
 }
 
 .email-signin input {
-  flex: 1;
   height: 44px;
   border-radius: 12px;
   background: rgba(255,255,255,0.06);
@@ -14,11 +33,12 @@
   color: #fff;
   padding: 0 14px;
   font-size: 13.5px;
+  width: 100%;
 }
 .email-signin input::placeholder { color: var(--text-faint); }
 
 .email-signin button {
-  padding: 0 18px;
+  height: 44px;
   border-radius: 12px;
   background: rgba(255,255,255,0.1);
   color: #fff;
@@ -29,4 +49,4 @@
 .email-signin button:disabled { opacity: 0.6; }
 
 .email-signin-sent { margin-top: 14px; font-size: 13px; color: var(--lime); text-align: center; }
-.email-signin-error { width: 100%; color: var(--red); font-size: 11.5px; margin-top: 6px; }
+.email-signin-error { width: 100%; color: var(--red); font-size: 11.5px; margin-top: 8px; text-align: center; }

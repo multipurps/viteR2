@@ -5,7 +5,7 @@ import { IMG } from '../lib/tmdb';
 import SaveButton from './SaveButton';
 import './DetailLayout.css';
 
-export default function DetailLayout({ item, mediaType, tags, children }) {
+export default function DetailLayout({ item, mediaType, tags, onPlay, children }) {
   const navigate = useNavigate();
   const posterUrl = IMG(item.poster_path, 'w342');
   const color = usePosterColor(posterUrl);
@@ -33,8 +33,12 @@ export default function DetailLayout({ item, mediaType, tags, children }) {
         <button className="detail2-more" aria-label="More options">
           <svg width="18" height="4" viewBox="0 0 24 6" fill="currentColor"><circle cx="3" cy="3" r="3" /><circle cx="12" cy="3" r="3" /><circle cx="21" cy="3" r="3" /></svg>
         </button>
-        {trailer && (
-          <button className="detail2-play" onClick={() => setTrailerOpen(true)} aria-label="Play trailer">
+        {(onPlay || trailer) && (
+          <button
+            className="detail2-play"
+            onClick={() => (onPlay ? onPlay() : setTrailerOpen(true))}
+            aria-label={onPlay ? 'Play' : 'Play trailer'}
+          >
             <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor"><path d="M6 4l15 8-15 8V4Z" /></svg>
           </button>
         )}

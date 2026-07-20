@@ -18,7 +18,10 @@
   border-radius: var(--radius-sm);
   padding: 12px;
   align-items: center;
+  width: 100%;
+  text-align: left;
 }
+.ep-card:hover { background: rgba(255,255,255,0.06); }
 
 .ep-thumb { width: 160px; aspect-ratio: 16/9; object-fit: cover; border-radius: 10px; flex-shrink: 0; }
 

@@ -16,6 +16,16 @@ export function signInWithEmail(email) {
   return supabase.auth.signInWithOtp({ email, options: { shouldCreateUser: true } });
 }
 
+// Email + password — works on devices (TVs, etc.) where the Google OAuth
+// redirect and magic-link flows can't complete on the same session.
+export function signInWithPassword(email, password) {
+  return supabase.auth.signInWithPassword({ email, password });
+}
+
+export function signUpWithPassword(email, password) {
+  return supabase.auth.signUp({ email, password });
+}
+
 export function signOut() {
   return supabase.auth.signOut();
 }
