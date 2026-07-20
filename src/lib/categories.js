@@ -3,6 +3,15 @@
 // list of titles, so they won't go stale or need upkeep as new
 // movies/shows release.
 
+export function slugify(title) {
+  return title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+}
+
+export function findCategoryBySlug(mediaType, slug) {
+  const list = mediaType === 'tv' ? TV_CATEGORIES : MOVIE_CATEGORIES;
+  return list.find((c) => slugify(c.title) === slug) || null;
+}
+
 export const MOVIE_CATEGORIES = [
   { title: 'Trending This Week', kind: 'trending', mediaType: 'movie', window: 'week' },
   { title: 'New Releases', kind: 'discover', params: (today, month) =>

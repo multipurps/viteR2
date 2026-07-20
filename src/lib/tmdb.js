@@ -23,37 +23,43 @@ export const PROVIDERS = {
   disney: { id: 337, label: 'Disney+' },
 };
 
-export async function trendingOnProvider(providerKey, mediaType = 'movie', region = 'US', count = 10) {
+export async function trendingOnProvider(providerKey, mediaType = 'movie', region = 'US', count = 10, page = 1) {
   const provider = PROVIDERS[providerKey];
   if (!provider) throw new Error(`Unknown provider: ${providerKey}`);
   const data = await api(
     `/discover/${mediaType}`,
-    `watch_region=${region}&with_watch_providers=${provider.id}&sort_by=popularity.desc&page=1`
+    `watch_region=${region}&with_watch_providers=${provider.id}&sort_by=popularity.desc&page=${page}`
   );
-  return (data.results || []).slice(0, count);
+  const results = count ? (data.results || []).slice(0, count) : (data.results || []);
+  return { results, totalPages: data.total_pages || 1 };
 }
 
-export function getTrending(mediaType = 'all', window = 'week') {
-  return api(`/trending/${mediaType}/${window}`);
+export function getTrending(mediaType = 'all', window = 'week', page = 1) {
+  return api(`/trending/${mediaType}/${window}`, `page=${page}`);
 }
 
-export async function resolveCategory(cat, pageMediaType = 'movie') {
+// Returns { results, totalPages }. `count` limits how many to return for
+// compact home-row display (pass null/0 for the full page, used by the
+// "See all" load-more views).
+export async function resolveCategory(cat, pageMediaType = 'movie', page = 1, count = null) {
   const today = new Date().toISOString().slice(0, 10);
   const month = new Date(Date.now() - 30 * 24 * 60 * 60 * 1e3).toISOString().slice(0, 10);
   const mt = cat.mediaType || pageMediaType;
   if (cat.kind === 'trending') {
-    const data = await getTrending(mt, cat.window);
-    return data.results || [];
+    const data = await getTrending(mt, cat.window, page);
+    const results = count ? (data.results || []).slice(0, count) : (data.results || []);
+    return { results, totalPages: data.total_pages || 1 };
   }
   if (cat.kind === 'provider') {
-    return trendingOnProvider(cat.provider, mt, 'US', 20);
+    return trendingOnProvider(cat.provider, mt, 'US', count, page);
   }
   if (cat.kind === 'keyword-terms') {
-    return discoverByKeywordTerms(mt, cat.terms, cat.extraParams || 'sort_by=popularity.desc');
+    return discoverByKeywordTerms(mt, cat.terms, cat.extraParams || 'sort_by=popularity.desc', page, count);
   }
   const params = typeof cat.params === 'function' ? cat.params(today, month) : cat.params;
-  const data = await discover(mt, params);
-  return data.results || [];
+  const data = await discover(mt, `${params}&page=${page}`);
+  const results = count ? (data.results || []).slice(0, count) : (data.results || []);
+  return { results, totalPages: data.total_pages || 1 };
 }
 
 export function getPopular(mediaType = 'movie') {
@@ -148,9 +154,10 @@ export async function resolveKeywordId(term) {
   return id;
 }
 
-export async function discoverByKeywordTerms(mediaType, terms, extraParams = '') {
+export async function discoverByKeywordTerms(mediaType, terms, extraParams = '', page = 1, count = null) {
   const ids = (await Promise.all(terms.map(resolveKeywordId))).filter(Boolean);
-  if (!ids.length) return [];
-  const data = await discover(mediaType, `with_keywords=${ids.join('|')}&${extraParams}`);
-  return data.results || [];
+  if (!ids.length) return { results: [], totalPages: 1 };
+  const data = await discover(mediaType, `with_keywords=${ids.join('|')}&${extraParams}&page=${page}`);
+  const results = count ? (data.results || []).slice(0, count) : (data.results || []);
+  return { results, totalPages: data.total_pages || 1 };
 }

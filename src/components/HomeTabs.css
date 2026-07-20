@@ -1,9 +1,7 @@
-.hometabs { margin-top: 8px; }
-
 .hometabs-switch {
   display: inline-flex;
   gap: 2px;
-  margin: 0 56px 24px;
+  margin: 8px 56px 24px;
   border-radius: 999px;
   padding: 4px;
 }
@@ -23,9 +21,9 @@
 }
 
 @media (max-width: 860px) {
-  .hometabs-switch { margin: 0 16px 20px; }
+  .hometabs-switch { margin: 8px 16px 20px; }
 }
 
 @media (min-width: 1400px) {
-  .hometabs-switch { margin: 0 72px 24px; }
+  .hometabs-switch { margin: 8px 72px 24px; }
 }

@@ -1,28 +1,48 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { signInWithGoogle, signOut } from '../lib/supabase';
-import { getTrending, IMG } from '../lib/tmdb';
+import { getTrending, getPrimaryProviderId, PROVIDERS, IMG } from '../lib/tmdb';
 import { usePosterColor } from '../hooks/usePosterColor';
 import DesktopQrLogin from './DesktopQrLogin';
 import './AuthGate.css';
 
+const PROVIDER_LABEL_BY_ID = Object.fromEntries(
+  Object.values(PROVIDERS).map((p) => [p.id, p.label])
+);
+
 function useTitleCarousel() {
   const [titles, setTitles] = useState([]);
+  const [networks, setNetworks] = useState({}); // { movieId: 'Netflix' }
   const [index, setIndex] = useState(0);
 
   useEffect(() => {
-    getTrending('movie', 'day').then((data) => {
-      setTitles((data.results || []).filter((p) => p.backdrop_path).slice(0, 10));
+    getTrending('movie', 'day').then(async (data) => {
+      const list = (data.results || []).filter((p) => p.backdrop_path).slice(0, 10);
+      setTitles(list);
+
+      // Preload every backdrop up front so rotating to the next one
+      // never shows a blank/loading flash.
+      list.forEach((t) => { const img = new Image(); img.src = IMG(t.backdrop_path, 'original'); });
+
+      // Resolve which network each title streams on, for display.
+      const entries = await Promise.all(
+        list.map(async (t) => {
+          const providerId = await getPrimaryProviderId('movie', t.id).catch(() => null);
+          return [t.id, providerId ? PROVIDER_LABEL_BY_ID[providerId] : null];
+        })
+      );
+      setNetworks(Object.fromEntries(entries));
     });
   }, []);
 
   useEffect(() => {
     if (titles.length < 2) return;
-    const t = setInterval(() => setIndex((i) => (i + 1) % titles.length), 4000);
+    const t = setInterval(() => setIndex((i) => (i + 1) % titles.length), 10000);
     return () => clearInterval(t);
   }, [titles.length]);
 
-  return titles[index];
+  const active = titles[index];
+  return { active, network: active ? networks[active.id] : null };
 }
 
 export default function AuthGate({ children }) {
@@ -31,7 +51,7 @@ export default function AuthGate({ children }) {
   // step annoying, and the QR/TV-code needs to be visible immediately.
   const isWide = typeof window !== 'undefined' && window.innerWidth >= 861;
   const [step, setStep] = useState(isWide ? 'signin' : 'splash'); // splash | signin
-  const active = useTitleCarousel();
+  const { active, network } = useTitleCarousel();
   const color = usePosterColor(active ? IMG(active.poster_path, 'w342') : null);
   const glow = color ? `rgba(${color.r},${color.g},${color.b},0.55)` : 'rgba(124,58,237,0.4)';
 
@@ -48,6 +68,7 @@ export default function AuthGate({ children }) {
           <div className="splash-content">
             <div className="splash-mark">Z</div>
             {active && <h1 className="splash-title">{active.title || active.name}</h1>}
+            {network && <span className="splash-network">{network}</span>}
             <button className="splash-getstarted" onClick={() => setStep('signin')}>Get Started</button>
           </div>
         </div>

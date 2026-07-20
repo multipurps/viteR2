@@ -11,8 +11,8 @@ export default function BrowsePage({ mediaType, categories, heroSource }) {
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      const heroResults = await resolveCategory(heroSource, mediaType);
-      if (!cancelled) setHeroItems(heroResults.filter((i) => i.backdrop_path).slice(0, 6));
+      const { results } = await resolveCategory(heroSource, mediaType, 1, 20);
+      if (!cancelled) setHeroItems(results.filter((i) => i.backdrop_path).slice(0, 6));
     })();
     return () => { cancelled = true; };
   }, [mediaType, heroSource]);

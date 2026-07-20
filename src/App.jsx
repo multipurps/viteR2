@@ -13,6 +13,7 @@ import Networks from './pages/Networks';
 import NetworkDetail from './pages/NetworkDetail';
 import Search from './pages/Search';
 import PairConfirm from './pages/PairConfirm';
+import CategoryFull from './pages/CategoryFull';
 import Watchlist from './pages/Watchlist';
 import Profile from './pages/Profile';
 import AiPicks from './pages/AiPicks';
@@ -37,6 +38,7 @@ export default function App() {
                 <Route path="/network/:id" element={<NetworkDetail />} />
                 <Route path="/search" element={<Search />} />
                 <Route path="/pair/:code" element={<PairConfirm />} />
+                <Route path="/category/:mediaType/:slug" element={<CategoryFull />} />
                 <Route path="/watchlist" element={<Watchlist />} />
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/ai" element={<AiPicks />} />

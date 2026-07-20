@@ -12,7 +12,7 @@ export default function Top10() {
 
   useEffect(() => {
     (async () => {
-      const results = await trendingOnProvider(active, mediaType, 'US', 10);
+      const { results } = await trendingOnProvider(active, mediaType, 'US', 10);
       setItems(results);
     })();
   }, [active, mediaType]);

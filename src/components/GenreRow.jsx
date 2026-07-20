@@ -14,7 +14,7 @@ const GENRES = [
   { label: 'Documentary', genre: 99 },
 ];
 
-export default function GenreRow() {
+export default function GenreRow({ centered = false }) {
   const navigate = useNavigate();
   const [posterSets, setPosterSets] = useState({}); // { genreId: [posters] }
 
@@ -40,7 +40,7 @@ export default function GenreRow() {
   }, []);
 
   return (
-    <section className="genrow">
+    <section className={`genrow${centered ? ' genrow-centered' : ''}`}>
       <h2 className="genrow-title">Featured</h2>
       <div className="genrow-track">
         {GENRES.map((g) => (

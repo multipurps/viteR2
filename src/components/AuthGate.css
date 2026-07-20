@@ -60,8 +60,18 @@
 .splash-title {
   font-family: var(--font-display);
   font-size: clamp(1.8rem, 6vw, 2.6rem);
-  margin-bottom: 32px;
+  margin-bottom: 10px;
   transition: opacity 0.4s ease;
+}
+
+.splash-network {
+  display: block;
+  font-size: 12.5px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--lime);
+  margin-bottom: 32px;
 }
 
 .splash-getstarted {

@@ -1,6 +1,9 @@
 .genrow { margin: 34px 0; }
 .genrow-title { font-size: 17px; font-weight: 700; margin: 0 56px 14px; }
 
+.genrow-centered .genrow-title { text-align: center; }
+.genrow-centered .genrow-track { justify-content: center; }
+
 .genrow-track {
   display: flex;
   gap: 12px;
