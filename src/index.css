@@ -28,6 +28,20 @@ html { scroll-behavior: smooth; }
   html { scroll-behavior: auto; }
 }
 
+/* No visible scrollbars anywhere — the page's own vertical scroll and
+   every horizontal row/carousel (Row, NetworkRow, cast list, episode
+   list, etc). Scrolling itself still works fully, this only hides the
+   OS/browser scrollbar track. */
+* {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* old Edge/IE */
+}
+*::-webkit-scrollbar {
+  display: none; /* Chrome/Safari/newer Edge */
+  width: 0;
+  height: 0;
+}
+
 body {
   background: var(--bg);
   color: var(--text);

@@ -75,6 +75,7 @@ export default function Home() {
       ) : (
         <Hero
           items={tabHeroItems}
+          mediaType={tab}
           onPlay={(item) => navigate(`/${item.media_type}/${item.id}`)}
           onInfo={(item) => navigate(`/${item.media_type}/${item.id}`)}
         />
@@ -83,9 +84,9 @@ export default function Home() {
       <HomeTabs tab={tab} onChange={setTab} />
 
       {tab === 'home' && (
-        <div style={{ marginTop: 8 }}>
+        <div style={{ marginTop: 0 }}>
           <GenreRow centered />
-          <RevealOnScroll><NetworkRow title="Film Networks" curatedOnly /></RevealOnScroll>
+          <RevealOnScroll><NetworkRow title="Film Networks" limit={20} /></RevealOnScroll>
           {continueWatching.length > 0 && (
             <RevealOnScroll><ContinueRow items={continueWatching} /></RevealOnScroll>
           )}

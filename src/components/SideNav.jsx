@@ -14,7 +14,7 @@ const ITEMS = [
 
 export default function SideNav() {
   return (
-    <nav className="sidenav glass-strong">
+    <nav className="sidenav">
       <div className="sidenav-mark">Z</div>
       <ul className="sidenav-list">
         {ITEMS.map(({ to, label, icon: Icon }) => (

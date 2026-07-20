@@ -42,3 +42,40 @@
   .search-bar { margin: 0 16px 16px; }
   .search-status, .search-grid { margin: 0 16px; }
 }
+
+.search-filter {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: var(--text-dim);
+  transition: background 0.15s, color 0.15s;
+}
+.search-filter:hover { background: rgba(255,255,255,0.08); }
+
+.search-filter-panel {
+  margin: 12px 56px 0;
+  border-radius: 16px;
+  padding: 16px 18px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 22px;
+}
+.search-filter-group span { display: block; font-size: 12px; color: var(--text-dim); font-weight: 600; margin-bottom: 8px; }
+.search-filter-chips { display: flex; gap: 8px; flex-wrap: wrap; }
+.search-filter-chips button {
+  padding: 7px 14px;
+  border-radius: 16px;
+  background: rgba(255,255,255,0.06);
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-dim);
+}
+.search-filter-chips button.active { background: var(--lime); color: #060608; }
+
+@media (max-width: 860px) {
+  .search-filter-panel { margin: 12px 20px 0; }
+}

@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import Hero from '../components/Hero';
 import Row from '../components/Row';
 import GenreChips from '../components/GenreChips';
+import { FilterIcon } from '../components/HeroSearchLink';
 import { searchMulti, getTrending, discover, IMG } from '../lib/tmdb';
 import './Search.css';
 
@@ -12,6 +13,9 @@ export default function Search() {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [filterOpen, setFilterOpen] = useState(() => urlParams.get('filters') === '1');
+  const [typeFilter, setTypeFilter] = useState('all'); // all | movie | tv
+  const [sortBy, setSortBy] = useState('popularity'); // popularity | rating | newest
 
   const [activeGenre, setActiveGenre] = useState(() => {
     const g = urlParams.get('genre');
@@ -74,6 +78,17 @@ export default function Search() {
 
   const browsing = !query.trim();
 
+  const filteredResults = results
+    .filter((r) => typeFilter === 'all' || r.media_type === typeFilter)
+    .slice()
+    .sort((a, b) => {
+      if (sortBy === 'rating') return (b.vote_average || 0) - (a.vote_average || 0);
+      if (sortBy === 'newest') {
+        return (b.release_date || b.first_air_date || '').localeCompare(a.release_date || a.first_air_date || '');
+      }
+      return (b.popularity || 0) - (a.popularity || 0);
+    });
+
   return (
     <div className="search-page">
       <div className="search-bar glass">
@@ -83,14 +98,50 @@ export default function Search() {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
         />
-        <button className="search-filter" aria-label="Filters"><FilterIcon /></button>
+        <button className="search-filter" aria-label="Filters" onClick={() => setFilterOpen((v) => !v)}>
+          <FilterIcon size={16} />
+        </button>
       </div>
+
+      {filterOpen && (
+        <div className="search-filter-panel glass">
+          <div className="search-filter-group">
+            <span>Type</span>
+            <div className="search-filter-chips">
+              {[['all', 'All'], ['movie', 'Movies'], ['tv', 'TV Shows']].map(([key, label]) => (
+                <button
+                  key={key}
+                  className={typeFilter === key ? 'active' : ''}
+                  onClick={() => setTypeFilter(key)}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div className="search-filter-group">
+            <span>Sort by</span>
+            <div className="search-filter-chips">
+              {[['popularity', 'Popularity'], ['rating', 'Rating'], ['newest', 'Newest']].map(([key, label]) => (
+                <button
+                  key={key}
+                  className={sortBy === key ? 'active' : ''}
+                  onClick={() => setSortBy(key)}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
 
       {browsing ? (
         <>
           <GenreChips active={activeGenre} onChange={setActiveGenre} />
           <Hero
             items={heroItems}
+            mediaType="movie"
             onPlay={(item) => navigate(`/movie/${item.id}`)}
             onInfo={(item) => navigate(`/movie/${item.id}`)}
           />
@@ -103,9 +154,9 @@ export default function Search() {
       ) : (
         <>
           {loading && <p className="search-status">Searching…</p>}
-          {!loading && results.length === 0 && <p className="search-status">Nothing found for “{query}”.</p>}
+          {!loading && filteredResults.length === 0 && <p className="search-status">Nothing found for “{query}”.</p>}
           <div className="search-grid">
-            {results.map((item) => (
+            {filteredResults.map((item) => (
               <button
                 key={`${item.media_type}-${item.id}`}
                 className="search-card"
@@ -123,4 +174,3 @@ export default function Search() {
 }
 
 function SearchIcon() { return <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" strokeWidth="1.8" /><path d="m21 21-4.3-4.3" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" /></svg>; }
-function FilterIcon() { return <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M4 6h16M7 12h10M10 18h4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" /></svg>; }

@@ -1,20 +1,36 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { usePosterColor } from '../hooks/usePosterColor';
 import { IMG } from '../lib/tmdb';
+import PageBackdrop from './PageBackdrop';
 import SaveButton from './SaveButton';
 import './DetailLayout.css';
 
-export default function DetailLayout({ item, mediaType, tags, onPlay, children }) {
+export default function DetailLayout({ item, mediaType, tags, onPlay, episodesSlot, children }) {
   const navigate = useNavigate();
-  const posterUrl = IMG(item.poster_path, 'w342');
-  const color = usePosterColor(posterUrl);
-  const bg = color
-    ? `linear-gradient(180deg, rgba(${color.r},${color.g},${color.b},0.9) 0%, var(--bg) 78%)`
-    : undefined;
   const cast = (item.credits?.cast || []).slice(0, 8);
   const similar = (item.recommendations?.results || []).filter((s) => s.poster_path).slice(0, 12);
   const [trailerOpen, setTrailerOpen] = useState(false);
+  const [moreOpen, setMoreOpen] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  async function handleShare() {
+    const shareData = { title: item.title || item.name, url: window.location.href };
+    if (navigator.share) {
+      try { await navigator.share(shareData); } catch { /* user cancelled */ }
+    } else {
+      await handleCopyLink();
+    }
+    setMoreOpen(false);
+  }
+
+  async function handleCopyLink() {
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1800);
+    } catch { /* clipboard unavailable */ }
+    setMoreOpen(false);
+  }
 
   const videos = item.videos?.results || [];
   const trailer =
@@ -23,16 +39,23 @@ export default function DetailLayout({ item, mediaType, tags, onPlay, children }
     videos.find((v) => v.site === 'YouTube');
 
   return (
-    <div className="detail2" style={{ background: bg }}>
-      <div className="detail2-hero">
-        <img className="detail2-poster" src={IMG(item.poster_path, 'w780')} alt={item.title || item.name} />
-        <div className="detail2-hero-scrim" />
-        <button className="detail2-back" onClick={() => navigate(-1)} aria-label="Back">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="m15 6-6 6 6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
-        </button>
-        <button className="detail2-more" aria-label="More options">
-          <svg width="18" height="4" viewBox="0 0 24 6" fill="currentColor"><circle cx="3" cy="3" r="3" /><circle cx="12" cy="3" r="3" /><circle cx="21" cy="3" r="3" /></svg>
-        </button>
+    <div className="detail2">
+      <PageBackdrop images={[IMG(item.poster_path, 'w780')]} />
+
+      <button className="detail2-back" onClick={() => navigate(-1)} aria-label="Back">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="m15 6-6 6 6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
+      </button>
+      <button className="detail2-more" onClick={() => setMoreOpen((v) => !v)} aria-label="More options">
+        <svg width="18" height="4" viewBox="0 0 24 6" fill="currentColor"><circle cx="3" cy="3" r="3" /><circle cx="12" cy="3" r="3" /><circle cx="21" cy="3" r="3" /></svg>
+      </button>
+      {moreOpen && (
+        <div className="detail2-more-menu glass" onMouseLeave={() => setMoreOpen(false)}>
+          <button onClick={handleShare}>Share</button>
+          <button onClick={handleCopyLink}>{copied ? 'Link copied' : 'Copy link'}</button>
+        </div>
+      )}
+
+      <div className="detail2-hero-spacer">
         {(onPlay || trailer) && (
           <button
             className="detail2-play"
@@ -68,6 +91,8 @@ export default function DetailLayout({ item, mediaType, tags, onPlay, children }
             Play trailer
           </button>
         )}
+
+        {episodesSlot}
 
         {cast.length > 0 && (
           <div className="detail2-section">

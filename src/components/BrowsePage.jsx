@@ -21,6 +21,7 @@ export default function BrowsePage({ mediaType, categories, heroSource }) {
     <div>
       <Hero
         items={heroItems}
+        mediaType={mediaType}
         onPlay={(item) => navigate(`/${mediaType}/${item.id}`)}
         onInfo={(item) => navigate(`/${mediaType}/${item.id}`)}
       />

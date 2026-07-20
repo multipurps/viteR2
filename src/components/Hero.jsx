@@ -1,10 +1,13 @@
 import { useEffect, useRef, useState } from 'react';
 import { IMG } from '../lib/tmdb';
+import PageBackdrop from './PageBackdrop';
+import HeroSearchLink from './HeroSearchLink';
+import HeroActions from './HeroActions';
 import './Hero.css';
 
 const ROTATE_MS = 7000;
 
-export default function Hero({ items = [], onPlay, onInfo }) {
+export default function Hero({ items = [], onPlay, onInfo, mediaType }) {
   const [index, setIndex] = useState(0);
   const timer = useRef(null);
 
@@ -16,54 +19,54 @@ export default function Hero({ items = [], onPlay, onInfo }) {
     return () => clearInterval(timer.current);
   }, [items.length]);
 
-  if (!items.length) return <div className="hero hero-empty" />;
   const item = items[index];
-  const title = item.title || item.name;
-  const date = (item.release_date || item.first_air_date || '').slice(0, 7).replace('-', ', ');
-  const genreLabel = item._genreLabel || '';
+  const images = items.map((it) => IMG(it.backdrop_path, 'original'));
+  const mt = item ? (item.media_type || mediaType || (item.first_air_date ? 'tv' : 'movie')) : mediaType;
 
   return (
-    <div className="hero-wrap">
-      <div className="hero">
-        {items.map((it, i) => (
-          <img
-            key={it.id}
-            src={IMG(it.backdrop_path, 'original')}
-            alt=""
-            className={`hero-bg${i === index ? ' on' : ''}`}
-          />
-        ))}
-        <div className="hero-scrim" />
+    <>
+      <PageBackdrop images={images} activeIndex={index} />
+      <HeroSearchLink />
 
-        <div className="hero-content">
-          <div className="hero-meta">
-            <span>{date}</span>
-            {genreLabel && <span className="hero-dot" />}
-            <span>{genreLabel}</span>
-          </div>
-          <h1 className="hero-title">{title}</h1>
-          <div className="hero-actions">
-            <button className="hero-btn hero-btn-solid" onClick={() => onPlay?.(item)}>
-              <PlayIcon /> Watch now
-            </button>
-            <button className="hero-btn glass" onClick={() => onInfo?.(item)}>
-              Trailer
-            </button>
-          </div>
+      {/* .hero-content always renders at full height, loaded or not — the
+          page's layout height must never depend on the fetch resolving,
+          or everything below jumps down the instant items arrive. */}
+      <div className="hero-content">
+        {item && (
+          <>
+            <div className="hero-meta">
+              <span>{(item.release_date || item.first_air_date || '').slice(0, 7).replace('-', ', ')}</span>
+              {item._genreLabel && <span className="hero-dot" />}
+              <span>{item._genreLabel || ''}</span>
+            </div>
+            <h1 className="hero-title">{item.title || item.name}</h1>
+            <div className="hero-actions">
+              <button className="hero-btn hero-btn-solid" onClick={() => onPlay?.(item)}>
+                <PlayIcon /> Watch now
+              </button>
+              <button className="hero-btn glass" onClick={() => onInfo?.(item)}>
+                Trailer
+              </button>
+            </div>
+          </>
+        )}
+      </div>
+
+      {item && <HeroActions mediaType={mt} mediaData={item} />}
+
+      {items.length > 1 && (
+        <div className="hero-dots">
+          {items.map((_, i) => (
+            <button
+              key={i}
+              className={`hero-progress${i === index ? ' active' : ''}`}
+              onClick={() => setIndex(i)}
+              aria-label={`Show ${i + 1}`}
+            />
+          ))}
         </div>
-      </div>
-
-      <div className="hero-dots">
-        {items.map((_, i) => (
-          <button
-            key={i}
-            className={`hero-progress${i === index ? ' active' : ''}`}
-            onClick={() => setIndex(i)}
-            aria-label={`Show ${i + 1}`}
-          />
-        ))}
-      </div>
-    </div>
+      )}
+    </>
   );
 }
 

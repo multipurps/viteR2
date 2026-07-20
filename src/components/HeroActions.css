@@ -1,0 +1,38 @@
+.hero-actions-cluster {
+  position: fixed;
+  z-index: 45;
+  right: 56px;
+  bottom: 104px;
+  display: flex;
+  gap: 10px;
+}
+
+.hero-action-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,0.45);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.16);
+  color: #fff;
+  transition: background 0.15s, color 0.15s, border-color 0.15s, transform 0.15s;
+}
+
+.hero-action-btn svg { width: 19px; height: 19px; }
+.hero-action-btn:hover { transform: translateY(-1px); }
+.hero-action-btn.active { background: var(--lime); color: #060608; border-color: var(--lime); }
+.hero-action-btn:disabled { opacity: 0.5; cursor: default; transform: none; }
+
+@media (min-width: 1400px) {
+  .hero-actions-cluster { right: 72px; }
+}
+
+@media (max-width: 860px) {
+  .hero-actions-cluster { right: 16px; bottom: 96px; gap: 8px; }
+  .hero-action-btn { width: 40px; height: 40px; }
+  .hero-action-btn svg { width: 17px; height: 17px; }
+}
