@@ -25,30 +25,33 @@ export default function PromoHero({ items = [] }) {
   return (
     <>
       <PageBackdrop images={images} activeIndex={index} />
-      <HeroSearchLink />
 
-      {/* Always mounted at full height, loaded or not — see Hero.jsx for
-          why this matters (avoids the whole page jumping once data
-          arrives). */}
-      <div className="promo-hero-content">
-        {item && (
-          <>
-            <span className="promo-hero-eyebrow">
-              {item.media_type === 'tv' ? 'New Season' : 'New Release'}
-            </span>
-            <h2 className="promo-hero-title">{item.title || item.name}</h2>
-            <p className="promo-hero-desc">{item.overview}</p>
-            <button
-              className="promo-hero-btn"
-              onClick={() => navigate(`/${item.media_type === 'tv' ? 'tv' : 'movie'}/${item.id}`)}
-            >
-              Watch
-            </button>
-          </>
-        )}
+      {/* This wrap is normal-flow (not fixed) — the backdrop image behind
+          it stays put while scrolling, but the search pill / title /
+          action cluster all scroll away with the rest of the page, same
+          as everything below the hero. Only shown here (Home) — Hero.jsx
+          (Movies/TV/Search) doesn't render a search link at all. */}
+      <div className="promo-hero-wrap">
+        <HeroSearchLink />
+        <div className="promo-hero-content">
+          {item && (
+            <>
+              <span className="promo-hero-eyebrow">
+                {item.media_type === 'tv' ? 'New Season' : 'New Release'}
+              </span>
+              <h2 className="promo-hero-title">{item.title || item.name}</h2>
+              <p className="promo-hero-desc">{item.overview}</p>
+              <button
+                className="promo-hero-btn"
+                onClick={() => navigate(`/${item.media_type === 'tv' ? 'tv' : 'movie'}/${item.id}`)}
+              >
+                Watch
+              </button>
+            </>
+          )}
+        </div>
+        {item && <HeroActions mediaType={item.media_type === 'tv' ? 'tv' : 'movie'} mediaData={item} />}
       </div>
-
-      {item && <HeroActions mediaType={item.media_type === 'tv' ? 'tv' : 'movie'} mediaData={item} />}
     </>
   );
 }

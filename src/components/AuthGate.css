@@ -44,16 +44,6 @@
 }
 
 .splash-mark {
-  width: 48px;
-  height: 48px;
-  border-radius: 14px;
-  background: var(--lime);
-  color: #060608;
-  font-family: var(--font-display);
-  font-size: 20px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   margin: 0 auto 40px;
 }
 
@@ -134,18 +124,34 @@
 }
 
 .gate-mark {
-  width: 56px;
-  height: 56px;
-  border-radius: 16px;
-  background: var(--lime);
-  color: #060608;
-  font-family: var(--font-display);
-  font-size: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   margin: 0 auto 20px;
 }
+
+.video-splash {
+  align-items: center;
+  justify-content: center;
+  background: var(--bg);
+}
+
+.splash-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.splash-skip {
+  position: absolute;
+  bottom: 40px;
+  right: 40px;
+  z-index: 1;
+  padding: 10px 22px;
+  border-radius: 20px;
+  background: rgba(255,255,255,0.10);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+}
+.splash-skip:hover { background: rgba(255,255,255,0.18); }
 
 .gate-box h1 { font-size: 22px; margin-bottom: 8px; }
 .gate-box p { color: var(--text-dim); font-size: 13.5px; line-height: 1.5; margin-bottom: 26px; }

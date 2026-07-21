@@ -4,7 +4,7 @@ import PromoHero from '../components/PromoHero';
 import Hero from '../components/Hero';
 import HomeTabs from '../components/HomeTabs';
 import GenreRow from '../components/GenreRow';
-import NetworkRow from '../components/NetworkRow';
+import NetworkRow, { POPULAR_NETWORKS } from '../components/NetworkRow';
 import ContinueRow from '../components/ContinueRow';
 import HomeTop10s from '../components/HomeTop10s';
 import CategoryRows from '../components/CategoryRows';
@@ -86,7 +86,7 @@ export default function Home() {
       {tab === 'home' && (
         <div style={{ marginTop: 0 }}>
           <GenreRow centered />
-          <RevealOnScroll><NetworkRow title="Film Networks" limit={20} /></RevealOnScroll>
+          <RevealOnScroll><NetworkRow title="Film Networks" curatedNames={POPULAR_NETWORKS} /></RevealOnScroll>
           {continueWatching.length > 0 && (
             <RevealOnScroll><ContinueRow items={continueWatching} /></RevealOnScroll>
           )}

@@ -1,4 +1,5 @@
 import { NavLink } from 'react-router-dom';
+import Logo from './Logo';
 import './SideNav.css';
 
 const ITEMS = [
@@ -15,7 +16,7 @@ const ITEMS = [
 export default function SideNav() {
   return (
     <nav className="sidenav">
-      <div className="sidenav-mark">Z</div>
+      <Logo size={34} className="sidenav-mark" />
       <ul className="sidenav-list">
         {ITEMS.map(({ to, label, icon: Icon }) => (
           <li key={to}>

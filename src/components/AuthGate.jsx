@@ -5,6 +5,7 @@ import { getTrending, getPrimaryProviderId, PROVIDERS, IMG } from '../lib/tmdb';
 import { usePosterColor } from '../hooks/usePosterColor';
 import DesktopQrLogin from './DesktopQrLogin';
 import EmailSignIn from './EmailSignIn';
+import Logo from './Logo';
 import './AuthGate.css';
 
 const PROVIDER_LABEL_BY_ID = Object.fromEntries(
@@ -48,10 +49,11 @@ function useTitleCarousel() {
 
 export default function AuthGate({ children }) {
   const { loading, status, user, refreshProfile } = useAuth();
-  // Desktop/TV: skip the tap-to-advance splash — a remote makes that
-  // step annoying, and the QR/TV-code needs to be visible immediately.
+  // Desktop/TV: skip the tap-to-advance image splash — a remote makes
+  // that step annoying — and play the video splash instead, which
+  // auto-advances on its own with no interaction required.
   const isWide = typeof window !== 'undefined' && window.innerWidth >= 861;
-  const [step, setStep] = useState(isWide ? 'signin' : 'splash'); // splash | signin
+  const [step, setStep] = useState(isWide ? 'video-splash' : 'splash'); // video-splash | splash | signin
   const { active, network } = useTitleCarousel();
   const color = usePosterColor(active ? IMG(active.poster_path, 'w342') : null);
   const glow = color ? `rgba(${color.r},${color.g},${color.b},0.55)` : 'rgba(124,58,237,0.4)';
@@ -59,6 +61,22 @@ export default function AuthGate({ children }) {
   if (loading) return <div className="gate-screen"><div className="gate-loading" /></div>;
 
   if (status === 'signed-out') {
+    if (step === 'video-splash') {
+      return (
+        <div className="splash-screen video-splash">
+          <video
+            className="splash-video"
+            src="/splash.mp4"
+            autoPlay
+            muted
+            playsInline
+            onEnded={() => setStep('signin')}
+          />
+          <button className="splash-skip" onClick={() => setStep('signin')}>Skip</button>
+        </div>
+      );
+    }
+
     if (step === 'splash') {
       return (
         <div className="splash-screen">
@@ -67,7 +85,7 @@ export default function AuthGate({ children }) {
           )}
           <div className="splash-scrim" />
           <div className="splash-content">
-            <div className="splash-mark">Z</div>
+            <Logo size={48} className="splash-mark" />
             {active && <h1 className="splash-title">{active.title || active.name}</h1>}
             {network && <span className="splash-network">{network}</span>}
             <button className="splash-getstarted" onClick={() => setStep('signin')}>Get Started</button>
@@ -81,7 +99,7 @@ export default function AuthGate({ children }) {
         {active && <img src={IMG(active.backdrop_path, 'original')} alt="" className="gate-bg" />}
         <div className="gate-bg-scrim" />
         <div className="gate-bare">
-          <div className="gate-mark">Z</div>
+          <Logo size={56} className="gate-mark" />
           <button className="gate-google-btn" onClick={() => signInWithGoogle()}>
             <GoogleIcon /> Continue with Google
           </button>
@@ -98,7 +116,7 @@ export default function AuthGate({ children }) {
     return (
       <div className="gate-screen">
         <div className="gate-box glass-strong">
-          <div className="gate-mark">Z</div>
+          <Logo size={56} className="gate-mark" />
           <h1>Awaiting approval</h1>
           <p>Signed in as {user.email}. This account needs approval before it can watch anything.</p>
           <div className="gate-actions">
@@ -114,7 +132,7 @@ export default function AuthGate({ children }) {
     return (
       <div className="gate-screen">
         <div className="gate-box glass-strong">
-          <div className="gate-mark">Z</div>
+          <Logo size={56} className="gate-mark" />
           <h1>Access blocked</h1>
           <p>This account doesn't have access.</p>
           <button className="gate-signout" onClick={() => signOut()}>Sign out</button>

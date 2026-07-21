@@ -2,6 +2,7 @@ import { useRef, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { signOut, uploadAvatar } from '../lib/supabase';
 import EnterTvCode from '../components/EnterTvCode';
+import FilmProfile from '../components/FilmProfile';
 import './Profile.css';
 
 export default function Profile() {
@@ -71,6 +72,8 @@ export default function Profile() {
       </div>
 
       <EnterTvCode />
+
+      <FilmProfile userId={user?.id} />
     </div>
   );
 }

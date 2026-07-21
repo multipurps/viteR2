@@ -1,7 +1,12 @@
-.promo-hero-content {
+.promo-hero-wrap {
   position: relative;
-  z-index: 1;
   min-height: 84vh;
+}
+
+.promo-hero-content {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
@@ -53,6 +58,9 @@
   .promo-hero-content { padding: 0 72px 64px; }
 }
 
+/* Desktop gets the full-bleed cinematic treatment; mobile fits its own
+   screen instead of forcing a huge scroll before reaching content. */
 @media (max-width: 860px) {
-  .promo-hero-content { min-height: 76vh; padding: 0 20px 96px; }
+  .promo-hero-wrap { min-height: 58vh; }
+  .promo-hero-content { padding: 0 20px 28px; }
 }
