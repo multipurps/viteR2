@@ -35,6 +35,8 @@ async function resolveRealNetflixSection(mediaType) {
 
 export default function HomeTop10s() {
   const [sections, setSections] = useState([]);
+  // Which list (movie/tv) is showing per network, keyed by label.
+  const [activeType, setActiveType] = useState({});
 
   useEffect(() => {
     (async () => {
@@ -91,7 +93,12 @@ export default function HomeTop10s() {
         real: false,
       });
 
-      setSections(results.filter((s) => s.movies.length || s.tv.length));
+      const withData = results.filter((s) => s.movies.length || s.tv.length);
+      setSections(withData);
+      // Default each network to whichever list has titles — movies first.
+      setActiveType(
+        Object.fromEntries(withData.map((s) => [s.label, s.movies.length ? 'movie' : 'tv']))
+      );
     })();
   }, []);
 
@@ -100,18 +107,39 @@ export default function HomeTop10s() {
   return (
     <section className="hometop10">
       <h2 className="hometop10-title">Top 10 by Network</h2>
-      {sections.map((s) => (
-        <div key={s.label} className="hometop10-block">
-          <div className="hometop10-block-head">
-            <h3>{s.label}</h3>
-            <span className={`hometop10-badge${s.real ? ' real' : ''}`}>
-              {s.real ? 'Real weekly ranking' : 'Estimated · TMDB popularity'}
-            </span>
+      {sections.map((s) => {
+        const hasBoth = s.movies.length > 0 && s.tv.length > 0;
+        const type = activeType[s.label] || (s.movies.length ? 'movie' : 'tv');
+        const items = type === 'movie' ? s.movies : s.tv;
+
+        return (
+          <div key={s.label} className="hometop10-block">
+            <div className="hometop10-block-head">
+              <h3>{s.label} Top 10</h3>
+              <span className={`hometop10-badge${s.real ? ' real' : ''}`}>
+                {s.real ? 'Real weekly ranking' : 'Estimated · TMDB popularity'}
+              </span>
+              {hasBoth && (
+                <div className="hometop10-switch">
+                  <button
+                    className={type === 'movie' ? 'active' : ''}
+                    onClick={() => setActiveType((cur) => ({ ...cur, [s.label]: 'movie' }))}
+                  >
+                    Movies
+                  </button>
+                  <button
+                    className={type === 'tv' ? 'active' : ''}
+                    onClick={() => setActiveType((cur) => ({ ...cur, [s.label]: 'tv' }))}
+                  >
+                    Shows
+                  </button>
+                </div>
+              )}
+            </div>
+            <RankedRow items={items} type={type} />
           </div>
-          {s.movies.length > 0 && <RankedRow items={s.movies} type="movie" />}
-          {s.tv.length > 0 && <RankedRow items={s.tv} type="tv" />}
-        </div>
-      ))}
+        );
+      })}
     </section>
   );
 }
