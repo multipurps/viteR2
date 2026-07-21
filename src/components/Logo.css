@@ -1,6 +1,5 @@
 .app-logo {
   display: block;
-  object-fit: cover;
-  border-radius: 22%;
+  object-fit: contain;
   flex-shrink: 0;
 }
