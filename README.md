@@ -93,3 +93,36 @@ project URL/anon key. `.env.local` is gitignored.
 npm install
 npm run dev
 ```
+
+## Recommendation engine (Story DNA) setup
+
+Three things need to happen once, outside of what a git push can do:
+
+1. Run `supabase/sql/003_recommendations.sql` in the Supabase SQL editor
+   (creates `zeeyus_interactions`, `zeeyus_story_dna`, `zeeyus_taste_profile`).
+
+2. Set these as Edge Function secrets (Supabase dashboard → Edge Functions →
+   Secrets, or via CLI):
+   ```
+   supabase secrets set GROQ_API_KEY=your_groq_key
+   supabase secrets set TMDB_API_KEY=your_tmdb_v3_key
+   ```
+   (`SUPABASE_URL` / `SUPABASE_SERVICE_ROLE_KEY` are provided automatically —
+   no need to set those.)
+
+3. Deploy the two new functions:
+   ```
+   supabase functions deploy story-dna
+   supabase functions deploy recommend
+   ```
+
+Until all three are done, `/ai` will just show the "rate a few titles" empty
+state — the client code fails gracefully rather than erroring.
+
+How it works, briefly: rating a title (Love/Like/Dislike/Not for me) writes to
+`zeeyus_interactions`. `recommend` builds a taste profile from whatever's been
+rated (weighted — Love counts far more than a completed-but-unrated watch),
+scores a fresh candidate pool against it with zero AI calls, and only spends
+one Groq call per request on the final top-4 picks + explanations. Story DNA
+per title is generated once and cached forever in `zeeyus_story_dna` — that's
+the actual cost control, not the request-time logic.

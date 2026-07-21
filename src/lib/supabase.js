@@ -225,3 +225,43 @@ export async function redeemPairing(email, tokenHash) {
   const { error } = await supabase.auth.verifyOtp({ email, token: tokenHash, type: 'magiclink' });
   if (error) throw error;
 }
+
+// ── Recommendations (Story DNA engine) ──
+
+export async function rateTitle(userId, mediaType, tmdbId, rating, reasons = []) {
+  const { error } = await supabase.from('zeeyus_interactions').upsert(
+    { user_id: userId, media_type: mediaType, tmdb_id: tmdbId, rating, reasons, updated_at: new Date().toISOString() },
+    { onConflict: 'user_id,tmdb_id,media_type' }
+  );
+  if (error) throw error;
+}
+
+export async function getUserRating(userId, tmdbId, mediaType) {
+  const { data } = await supabase
+    .from('zeeyus_interactions')
+    .select('rating, reasons')
+    .eq('user_id', userId)
+    .eq('tmdb_id', tmdbId)
+    .eq('media_type', mediaType)
+    .maybeSingle();
+  return data || null;
+}
+
+// Suggested "what did you love about this" chips come from the same
+// cached DNA the recommend pipeline uses — first call for a title
+// costs one Groq request, every call after is free (cache hit).
+export async function getStoryDna(tmdbId, mediaType) {
+  const { data, error } = await supabase.functions.invoke('story-dna', {
+    body: { tmdb_id: tmdbId, media_type: mediaType },
+  });
+  if (error) throw error;
+  return data?.dna || null;
+}
+
+// Calls the recommend Edge Function. Returns { new_user: true } for
+// users with no ratings yet, or { new_user: false, sections: {...} }.
+export async function getRecommendations() {
+  const { data, error } = await supabase.functions.invoke('recommend', { body: {} });
+  if (error) throw error;
+  return data;
+}

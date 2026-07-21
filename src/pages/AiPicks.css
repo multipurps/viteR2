@@ -1,0 +1,46 @@
+.aipicks, .aipicks-empty {
+  padding: 40px 56px 80px;
+  max-width: 720px;
+}
+
+.aipicks h1, .aipicks-empty h1 {
+  font-family: var(--font-display);
+  font-size: 2.2rem;
+  margin-bottom: 8px;
+}
+
+.aipicks-sub { color: var(--text-dim); font-size: 13.5px; margin-bottom: 32px; }
+.aipicks-empty p { color: var(--text-dim); font-size: 14px; line-height: 1.6; margin-top: 12px; max-width: 460px; }
+
+.aipicks-card {
+  display: flex;
+  gap: 16px;
+  width: 100%;
+  text-align: left;
+  padding: 16px;
+  border-radius: 16px;
+  background: rgba(255,255,255,0.04);
+  margin-bottom: 16px;
+}
+.aipicks-card img { width: 80px; aspect-ratio: 2/3; border-radius: 10px; object-fit: cover; flex-shrink: 0; }
+.aipicks-card-body { display: flex; flex-direction: column; justify-content: center; }
+.aipicks-card-label {
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--lime);
+  margin-bottom: 6px;
+}
+.aipicks-card-body h2 { font-size: 17px; margin-bottom: 6px; }
+.aipicks-card-body p { color: var(--text-dim); font-size: 13px; line-height: 1.5; }
+
+.aipicks-block { margin-top: 32px; }
+.aipicks-block h3 { font-size: 15px; font-weight: 700; margin-bottom: 14px; }
+.aipicks-track { display: flex; gap: 12px; overflow-x: auto; }
+.aipicks-gem { flex: 0 0 120px; aspect-ratio: 2/3; border-radius: 10px; overflow: hidden; }
+.aipicks-gem img { width: 100%; height: 100%; object-fit: cover; }
+
+@media (max-width: 860px) {
+  .aipicks, .aipicks-empty { padding: 90px 20px 100px; }
+}

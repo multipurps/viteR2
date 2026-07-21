@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { IMG } from '../lib/tmdb';
 import PageBackdrop from './PageBackdrop';
 import SaveButton from './SaveButton';
+import RatingWidget from './RatingWidget';
 import './DetailLayout.css';
 
 export default function DetailLayout({ item, mediaType, tags, onPlay, episodesSlot, children }) {
@@ -91,6 +92,8 @@ export default function DetailLayout({ item, mediaType, tags, onPlay, episodesSl
             Play trailer
           </button>
         )}
+
+        <RatingWidget mediaType={mediaType} mediaData={item} />
 
         {episodesSlot}
 
