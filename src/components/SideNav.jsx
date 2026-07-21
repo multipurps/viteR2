@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom';
-import Logo from './Logo';
+import { useAuth } from '../context/AuthContext';
 import './SideNav.css';
 
 const ITEMS = [
@@ -14,9 +14,14 @@ const ITEMS = [
 ];
 
 export default function SideNav() {
+  const { user, profile } = useAuth();
+  const initial = (user?.email || '?')[0].toUpperCase();
+
   return (
     <nav className="sidenav">
-      <Logo size={34} className="sidenav-mark" />
+      <NavLink to="/profile" className="sidenav-avatar" aria-label="Profile">
+        {profile?.avatar_url ? <img src={profile.avatar_url} alt="" /> : <span>{initial}</span>}
+      </NavLink>
       <ul className="sidenav-list">
         {ITEMS.map(({ to, label, icon: Icon }) => (
           <li key={to}>
