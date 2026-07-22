@@ -272,6 +272,19 @@ export async function getRatedTitles(userId) {
   return data || [];
 }
 
+// Ratings made before the media_data snapshot column existed have it
+// null — this backfills one row at a time as the Rated page discovers
+// them, so they only ever need fetching from TMDB once.
+export async function backfillInteractionSnapshot(userId, tmdbId, mediaType, mediaData) {
+  const { error } = await supabase
+    .from('zeeyus_interactions')
+    .update({ media_data: mediaData })
+    .eq('user_id', userId)
+    .eq('tmdb_id', tmdbId)
+    .eq('media_type', mediaType);
+  if (error) throw error;
+}
+
 // Suggested "what did you love about this" chips come from the same
 // cached DNA the recommend pipeline uses — first call for a title
 // costs one Groq request, every call after is free (cache hit).

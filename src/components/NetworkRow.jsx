@@ -11,7 +11,7 @@ import './NetworkRow.css';
 // Video" vs "Amazon Prime Video" — so a wrong hardcoded id silently
 // points at the wrong one).
 export const POPULAR_NETWORKS = [
-  'Netflix', 'Prime Video', 'Disney+', 'Max', 'Hulu', 'Apple TV+',
+  'Netflix', 'Prime Video', 'Disney+', 'Max', 'Apple TV+', 'Hulu',
   'Paramount+', 'Peacock', 'Crunchyroll', 'MUBI', 'Shudder', 'AMC+',
   'STARZ', 'BritBox', 'Discovery+', 'BBC iPlayer', 'ITVX', 'Rakuten TV',
   'Tubi', 'Pluto TV',

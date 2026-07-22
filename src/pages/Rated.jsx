@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { getRatedTitles } from '../lib/supabase';
-import { IMG } from '../lib/tmdb';
+import { getRatedTitles, backfillInteractionSnapshot } from '../lib/supabase';
+import { getDetails, IMG } from '../lib/tmdb';
 import './Rated.css';
 
 const FILTERS = [
@@ -27,7 +27,26 @@ export default function Rated() {
 
   useEffect(() => {
     if (!user) return;
-    getRatedTitles(user.id).then(setItems).catch(() => setItems([]));
+    getRatedTitles(user.id).then(async (rows) => {
+      setItems(rows);
+
+      // Rated before media_data existed — fetch once from TMDB, show
+      // it immediately, and persist so this only happens once per title.
+      const missing = rows.filter((r) => !r.media_data);
+      for (const row of missing) {
+        try {
+          const details = await getDetails(row.media_type, row.tmdb_id);
+          setItems((prev) => prev.map((p) => (
+            p.tmdb_id === row.tmdb_id && p.media_type === row.media_type
+              ? { ...p, media_data: details }
+              : p
+          )));
+          backfillInteractionSnapshot(user.id, row.tmdb_id, row.media_type, details).catch(() => {});
+        } catch {
+          // Title may have been removed from TMDB — leave it out of view rather than showing a broken card.
+        }
+      }
+    }).catch(() => setItems([]));
   }, [user]);
 
   const filtered = (items || []).filter((i) => active === 'all' || i.rating === active);

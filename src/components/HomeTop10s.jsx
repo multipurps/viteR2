@@ -73,8 +73,8 @@ export default function HomeTop10s() {
 
           if (movies === null) {
             const [m, t] = await Promise.all([
-              discover('movie', `watch_region=${p.region}&with_watch_providers=${p.providerId}&sort_by=popularity.desc`),
-              discover('tv', `watch_region=${p.region}&with_watch_providers=${p.providerId}&sort_by=popularity.desc`),
+              discover('movie', `watch_region=${p.region}&with_watch_providers=${p.providerId}&with_watch_monetization_types=flatrate&sort_by=popularity.desc`),
+              discover('tv', `watch_region=${p.region}&with_watch_providers=${p.providerId}&with_watch_monetization_types=flatrate&sort_by=popularity.desc`),
             ]);
             movies = (m.results || []).filter((x) => x.poster_path).slice(0, 10);
             tv = (t.results || []).filter((x) => x.poster_path).slice(0, 10);

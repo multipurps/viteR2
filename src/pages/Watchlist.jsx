@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { getWatchlist, removeFromWatchlist } from '../lib/supabase';
 import { IMG, getNetworkList, getPrimaryProviderId, PROVIDERS } from '../lib/tmdb';
+import ScrollRow from '../components/ScrollRow';
 import './Watchlist.css';
 
 export default function Watchlist() {
@@ -73,7 +74,7 @@ export default function Watchlist() {
         <p className="fav-empty">Nothing saved from this network.</p>
       )}
 
-      <div className="fav-carousel">
+      <ScrollRow className="fav-carousel">
         {filtered.map((item) => {
           const media = item.media_data || {};
           const title = media.title || media.name;
@@ -100,7 +101,7 @@ export default function Watchlist() {
             </div>
           );
         })}
-      </div>
+      </ScrollRow>
     </div>
   );
 }

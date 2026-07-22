@@ -28,7 +28,7 @@ export async function trendingOnProvider(providerKey, mediaType = 'movie', regio
   if (!provider) throw new Error(`Unknown provider: ${providerKey}`);
   const data = await api(
     `/discover/${mediaType}`,
-    `watch_region=${region}&with_watch_providers=${provider.id}&sort_by=popularity.desc&page=${page}`
+    `watch_region=${region}&with_watch_providers=${provider.id}&with_watch_monetization_types=flatrate&sort_by=popularity.desc&page=${page}`
   );
   const results = count ? (data.results || []).slice(0, count) : (data.results || []);
   return { results, totalPages: data.total_pages || 1 };

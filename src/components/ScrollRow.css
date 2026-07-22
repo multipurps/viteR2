@@ -35,3 +35,11 @@
   .scrollrow-arrow-left { left: -10px; }
   .scrollrow-arrow-right { right: -10px; }
 }
+
+/* Touch devices (real swipe capability) don't need the buttons — this
+   checks actual pointer/hover capability, not screen width, since a
+   width check would misfire on any device (TV included) that reports
+   an unusual viewport size. */
+@media (hover: none) and (pointer: coarse) {
+  .scrollrow-arrow { display: none !important; }
+}

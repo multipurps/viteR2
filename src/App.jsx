@@ -11,6 +11,7 @@ import MovieDetail from './pages/MovieDetail';
 import Top10 from './pages/Top10';
 import Networks from './pages/Networks';
 import NetworkDetail from './pages/NetworkDetail';
+import NetworkCategoryFull from './pages/NetworkCategoryFull';
 import Search from './pages/Search';
 import PairConfirm from './pages/PairConfirm';
 import CategoryFull from './pages/CategoryFull';
@@ -37,6 +38,7 @@ export default function App() {
                 <Route path="/top10" element={<Top10 />} />
                 <Route path="/networks" element={<Networks />} />
                 <Route path="/network/:id" element={<NetworkDetail />} />
+                <Route path="/network/:id/category" element={<NetworkCategoryFull />} />
                 <Route path="/search" element={<Search />} />
                 <Route path="/pair/:code" element={<PairConfirm />} />
                 <Route path="/category/:mediaType/:slug" element={<CategoryFull />} />

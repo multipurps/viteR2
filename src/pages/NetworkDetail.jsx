@@ -56,7 +56,7 @@ export default function NetworkDetail() {
   useEffect(() => {
     if (!provider) return;
     (async () => {
-      const data = await discover(mediaType, `watch_region=${provider.region}&with_watch_providers=${provider.id}&sort_by=popularity.desc`);
+      const data = await discover(mediaType, `watch_region=${provider.region}&with_watch_providers=${provider.id}&with_watch_monetization_types=flatrate&sort_by=popularity.desc`);
       setHeroItems((data.results || []).filter((i) => i.backdrop_path).slice(0, 6));
     })();
   }, [provider, mediaType]);
@@ -66,7 +66,7 @@ export default function NetworkDetail() {
     (async () => {
       const cutoff = new Date(Date.now() - 90 * 24 * 60 * 60 * 1e3).toISOString().slice(0, 10);
       const dateField = mediaType === 'movie' ? 'primary_release_date' : 'first_air_date';
-      const data = await discover(mediaType, `watch_region=${provider.region}&with_watch_providers=${provider.id}&${dateField}.gte=${cutoff}&sort_by=popularity.desc`);
+      const data = await discover(mediaType, `watch_region=${provider.region}&with_watch_providers=${provider.id}&with_watch_monetization_types=flatrate&${dateField}.gte=${cutoff}&sort_by=popularity.desc`);
       setNewItems(data.results || []);
     })();
   }, [provider, mediaType]);
@@ -89,7 +89,7 @@ export default function NetworkDetail() {
           // fall through to the estimate below
         }
       }
-      const data = await discover(mediaType, `watch_region=${provider.region}&with_watch_providers=${provider.id}&sort_by=popularity.desc`);
+      const data = await discover(mediaType, `watch_region=${provider.region}&with_watch_providers=${provider.id}&with_watch_monetization_types=flatrate&sort_by=popularity.desc`);
       if (!cancelled) {
         setTop10({ items: (data.results || []).filter((i) => i.poster_path).slice(0, 10), real: false });
       }
@@ -106,14 +106,14 @@ export default function NetworkDetail() {
 
     genreList.forEach((g) => {
       const filterParam = g.keywordId ? `with_keywords=${g.keywordId}` : `with_genres=${g.genre}`;
-      discover(mediaType, `watch_region=${provider.region}&with_watch_providers=${provider.id}&${filterParam}&sort_by=popularity.desc`)
+      discover(mediaType, `watch_region=${provider.region}&with_watch_providers=${provider.id}&with_watch_monetization_types=flatrate&${filterParam}&sort_by=popularity.desc`)
         .then((data) => {
           if (cancelled) return;
           const items = (data.results || []).filter((i) => i.poster_path);
           if (!items.length) return;
           setGenreRows((prev) => {
             const next = prev.filter((r) => r.label !== g.label);
-            next.push({ label: g.label, items });
+            next.push({ label: g.label, items, genre: g.genre, keywordId: g.keywordId });
             const order = genreList.map((x) => x.label);
             return next.sort((a, b) => order.indexOf(a.label) - order.indexOf(b.label));
           });
@@ -160,7 +160,13 @@ export default function NetworkDetail() {
         )}
 
         {genreRows.map((r) => (
-          <Row key={r.label} title={r.label} items={r.items} type={mediaType} />
+          <Row
+            key={r.label}
+            title={r.label}
+            items={r.items}
+            type={mediaType}
+            seeAllTo={`/network/${provider.id}/category?type=${mediaType}&label=${encodeURIComponent(r.label)}&${r.keywordId ? `keyword=${r.keywordId}` : `genre=${r.genre}`}`}
+          />
         ))}
       </div>
     </div>
