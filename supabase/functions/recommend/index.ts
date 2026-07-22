@@ -60,7 +60,7 @@ Deno.serve(async (req) => {
     // ── 1. Load the user's signal ────────────────────────────────
     const { data: interactions } = await supabase
       .from('zeeyus_interactions')
-      .select('tmdb_id, media_type, rating, watched_pct')
+      .select('tmdb_id, media_type, rating, watched_pct, updated_at')
       .eq('user_id', userId);
 
     if (!interactions || interactions.length === 0) {
@@ -135,6 +135,48 @@ Deno.serve(async (req) => {
     // ── 7. One LLM call: pick + explain the flagship categories ────
     const llmSections = await pickFlagshipCategories(profile, scored, groqKey);
 
+    // ── 8. Just for Tonight — re-ranked using only the last 7 days of
+    // signal instead of the full lifetime profile, so it can reflect a
+    // recent mood shift instead of always echoing the other picks.
+    const recentCutoff = Date.now() - 7 * 24 * 60 * 60 * 1000;
+    const recentInteractions = interactions.filter(
+      (i: any) => i.updated_at && new Date(i.updated_at).getTime() > recentCutoff
+    );
+    const recentProfile = recentInteractions.length ? buildTasteProfile(recentInteractions, dnaMap) : null;
+
+    const usedKeys = new Set<string>([
+      ...Object.values(llmSections).map((s: any) => (s?.item ? excludeKey(s.item.id, s.item.media_type) : null)),
+      becauseYouLoved ? excludeKey(becauseYouLoved.pick.id, becauseYouLoved.pick.media_type) : null,
+      ...hiddenGems.map((g) => excludeKey(g.id, g.media_type)),
+    ].filter(Boolean) as string[]);
+
+    const justForTonight = scored
+      .filter((c) => !usedKeys.has(excludeKey(c.id, c.media_type)))
+      .map((c) => ({ c, score: scoreCandidate(recentProfile || profile, c.dna) }))
+      .sort((a, b) => b.score - a.score)[0];
+
+    // ── 9. Coming Soon For You — upcoming releases, same scoring, its
+    // own small candidate pool (backfill capped lower — most upcoming
+    // titles are thin on metadata pre-release, not worth spending as
+    // much on).
+    const comingSoonCandidates = await buildUpcomingPool(tmdbKey, excluded);
+    const comingSoonDna = await loadOrBackfillDna(
+      supabase,
+      comingSoonCandidates.map((c) => ({ tmdb_id: c.id, media_type: c.media_type })),
+      tmdbKey,
+      groqKey,
+      5
+    );
+    const comingSoon = comingSoonCandidates
+      .map((c) => {
+        const dna = comingSoonDna.get(excludeKey(c.id, c.media_type));
+        if (!dna) return null;
+        return { ...c, score: scoreCandidate(profile, dna) };
+      })
+      .filter((c): c is NonNullable<typeof c> => c !== null)
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 6);
+
     return jsonResponse({
       new_user: false,
       sections: {
@@ -143,6 +185,8 @@ Deno.serve(async (req) => {
         ...(becauseYouLoved
           ? { because_you_loved: { source: becauseYouLoved.source, item: toClientItem(becauseYouLoved.pick) } }
           : {}),
+        ...(justForTonight ? { just_for_tonight: { item: toClientItem(justForTonight.c) } } : {}),
+        coming_soon: comingSoon.map(toClientItem),
       },
     });
   } catch (err) {
@@ -260,6 +304,52 @@ async function buildCandidatePool(tmdbKey: string, excluded: Set<string>) {
   return pool.slice(0, 80);
 }
 
+async function buildUpcomingPool(tmdbKey: string, excluded: Set<string>) {
+  const today = new Date();
+  const in4Months = new Date(today.getTime() + 120 * 24 * 60 * 60 * 1000);
+  const fmt = (d: Date) => d.toISOString().slice(0, 10);
+
+  const endpoints = [
+    {
+      url: `${TMDB_BASE}/discover/movie?api_key=${tmdbKey}&primary_release_date.gte=${fmt(today)}&primary_release_date.lte=${fmt(in4Months)}&sort_by=popularity.desc`,
+      mediaType: 'movie',
+    },
+    {
+      url: `${TMDB_BASE}/discover/tv?api_key=${tmdbKey}&first_air_date.gte=${fmt(today)}&first_air_date.lte=${fmt(in4Months)}&sort_by=popularity.desc`,
+      mediaType: 'tv',
+    },
+  ];
+
+  const pages = await Promise.all(
+    endpoints.map((e) => fetch(e.url).then((r) => r.json()).catch(() => ({ results: [] })))
+  );
+  const seen = new Set<string>();
+  const pool: any[] = [];
+
+  pages.forEach((page, i) => {
+    const mediaType = endpoints[i].mediaType;
+    for (const item of page.results || []) {
+      if (!item.poster_path || !item.overview) continue; // thin listings score badly anyway
+      const key = `${mediaType}:${item.id}`;
+      if (excluded.has(key) || seen.has(key)) continue;
+      seen.add(key);
+      pool.push({
+        id: item.id,
+        media_type: mediaType,
+        title: item.title || item.name,
+        poster_path: item.poster_path,
+        backdrop_path: item.backdrop_path,
+        overview: item.overview,
+        release_date: item.release_date || item.first_air_date,
+        popularity: item.popularity,
+        vote_count: item.vote_count,
+      });
+    }
+  });
+
+  return pool.slice(0, 40);
+}
+
 function scoreCandidate(profile: ReturnType<typeof buildTasteProfile>, dna: any) {
   if (!profile) return 0;
 
@@ -289,6 +379,7 @@ function toClientItem(c: any) {
     poster_path: c.poster_path,
     backdrop_path: c.backdrop_path,
     overview: c.overview,
+    release_date: c.release_date,
   };
 }
 

@@ -44,3 +44,22 @@
 @media (max-width: 860px) {
   .aipicks, .aipicks-empty { padding: 90px 20px 100px; }
 }
+
+.aipicks-track-wide { gap: 14px; }
+
+.aipicks-soon-card { flex: 0 0 130px; display: flex; flex-direction: column; }
+.aipicks-soon-card > button { border-radius: 10px; overflow: hidden; }
+.aipicks-soon-card img { width: 100%; aspect-ratio: 2/3; object-fit: cover; }
+.aipicks-soon-title { font-size: 12.5px; font-weight: 600; margin-top: 8px; line-height: 1.3; }
+.aipicks-soon-date { font-size: 11px; color: var(--text-dim); margin-top: 2px; }
+
+.aipicks-remind-btn {
+  margin-top: 8px;
+  padding: 7px 0;
+  border-radius: 12px;
+  background: rgba(255,255,255,0.08);
+  color: var(--text-dim);
+  font-size: 11.5px;
+  font-weight: 700;
+}
+.aipicks-remind-btn.active { background: var(--lime); color: #060608; }

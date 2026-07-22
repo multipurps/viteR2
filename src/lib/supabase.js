@@ -265,3 +265,38 @@ export async function getRecommendations() {
   if (error) throw error;
   return data;
 }
+
+export async function getUserInteractions(userId) {
+  const { data, error } = await supabase
+    .from('zeeyus_interactions')
+    .select('tmdb_id, media_type, rating')
+    .eq('user_id', userId);
+  if (error) throw error;
+  return data || [];
+}
+
+// ── Coming Soon reminders ──
+
+export async function addReminder(userId, tmdbId, mediaType, releaseDate) {
+  const { error } = await supabase.from('zeeyus_reminders').upsert(
+    { user_id: userId, tmdb_id: tmdbId, media_type: mediaType, release_date: releaseDate || null },
+    { onConflict: 'user_id,tmdb_id,media_type' }
+  );
+  if (error) throw error;
+}
+
+export async function removeReminder(userId, tmdbId, mediaType) {
+  const { error } = await supabase
+    .from('zeeyus_reminders')
+    .delete()
+    .eq('user_id', userId)
+    .eq('tmdb_id', tmdbId)
+    .eq('media_type', mediaType);
+  if (error) throw error;
+}
+
+export async function getReminders(userId) {
+  const { data, error } = await supabase.from('zeeyus_reminders').select('*').eq('user_id', userId);
+  if (error) throw error;
+  return data || [];
+}

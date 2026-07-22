@@ -1,0 +1,10 @@
+.leftbehind-block { margin-top: 32px; }
+.leftbehind-block h3 { font-size: 15px; font-weight: 700; margin-bottom: 14px; }
+
+.leftbehind-track { display: flex; gap: 12px; overflow-x: auto; }
+
+.leftbehind-card { flex: 0 0 120px; }
+.leftbehind-card img { width: 100%; aspect-ratio: 2/3; border-radius: 10px; object-fit: cover; }
+
+.leftbehind-bar { height: 3px; border-radius: 2px; background: rgba(255,255,255,0.12); margin-top: 6px; overflow: hidden; }
+.leftbehind-bar div { height: 100%; background: var(--lime); }
