@@ -1,22 +1,39 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { getSeason, IMG } from '../lib/tmdb';
 import { upsertProgress, removeFromContinue } from '../lib/supabase';
 import './Player.css';
 
 // ── Embed sources — same providers/URL patterns as the legacy player ──
-const SERVERS = [
+// SuperEmbed (multiembed.mov) was unreliable and has been dropped in
+// favor of EmbedSU. This is the desktop/TV order; mobile gets its own
+// order below (VidLink last there — it's slower to load on mobile).
+const BASE_SERVERS = [
   { n: 'VidLink', f: (id, t, s, e) => (t === 'tv' ? `https://vidlink.pro/tv/${id}/${s || 1}/${e || 1}` : `https://vidlink.pro/movie/${id}`) },
   { n: 'VidSrc', f: (id, t, s, e) => (t === 'tv' ? `https://vidsrc.to/embed/tv/${id}/${s || 1}/${e || 1}` : `https://vidsrc.to/embed/movie/${id}`) },
   { n: 'AutoEmbed', f: (id, t, s, e) => (t === 'tv' ? `https://autoembed.co/tv/tmdb/${id}-${s || 1}-${e || 1}` : `https://autoembed.co/movie/tmdb/${id}`) },
-  { n: 'SuperEmbed', f: (id, t, s, e) => (t === 'tv' ? `https://multiembed.mov/?video_id=${id}&tmdb=1&s=${s || 1}&e=${e || 1}` : `https://multiembed.mov/?video_id=${id}&tmdb=1`) },
   { n: '2Embed', f: (id, t, s, e) => (t === 'tv' ? `https://www.2embed.cc/embedtv/${id}&s=${s || 1}&e=${e || 1}` : `https://www.2embed.cc/embed/${id}`) },
+  { n: 'EmbedSU', f: (id, t, s, e) => (t === 'tv' ? `https://embed.su/embed/tv/${id}/${s || 1}/${e || 1}` : `https://embed.su/embed/movie/${id}`) },
 ];
+
+// Mobile-only order: 2Embed, AutoEmbed, VidSrc, VidLink, then EmbedSU.
+// Detected by actual touch capability, not screen width — a width
+// check would risk misfiring on TV browsers, which have already shown
+// they can misreport their viewport size.
+const MOBILE_ORDER = ['2Embed', 'AutoEmbed', 'VidSrc', 'VidLink', 'EmbedSU'];
+
+function getServers() {
+  const isMobile = typeof window !== 'undefined'
+    && window.matchMedia?.('(hover: none) and (pointer: coarse)').matches;
+  if (!isMobile) return BASE_SERVERS;
+  return MOBILE_ORDER.map((name) => BASE_SERVERS.find((s) => s.n === name)).filter(Boolean);
+}
 
 export default function Player({ item, mediaType, initialSeason = 1, initialEpisode = 1, onClose }) {
   const { user } = useAuth();
   const isTv = mediaType === 'tv';
   const title = item.title || item.name;
+  const SERVERS = useMemo(getServers, []);
 
   const [serverIdx, setServerIdx] = useState(0);
   const [season, setSeason] = useState(initialSeason);
