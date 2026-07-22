@@ -5,6 +5,7 @@ import { getTrending, getPrimaryProviderId, PROVIDERS, IMG } from '../lib/tmdb';
 import { usePosterColor } from '../hooks/usePosterColor';
 import DesktopQrLogin from './DesktopQrLogin';
 import EmailSignIn from './EmailSignIn';
+import InstallGuide from './InstallGuide';
 import Logo from './Logo';
 import './AuthGate.css';
 
@@ -12,9 +13,18 @@ const PROVIDER_LABEL_BY_ID = Object.fromEntries(
   Object.values(PROVIDERS).map((p) => [p.id, p.label])
 );
 
+const SPLASH_CACHE_KEY = 'splashCacheV1';
+
 function useTitleCarousel() {
-  const [titles, setTitles] = useState([]);
-  const [networks, setNetworks] = useState({}); // { movieId: 'Netflix' }
+  // Seed from last session's cache so the very first frame is already
+  // painted — no waiting on TMDB before the login backdrop shows.
+  const cached = (() => {
+    try { return JSON.parse(sessionStorage.getItem(SPLASH_CACHE_KEY)) || null; }
+    catch { return null; }
+  })();
+
+  const [titles, setTitles] = useState(cached?.titles || []);
+  const [networks, setNetworks] = useState(cached?.networks || {}); // { movieId: 'Netflix' }
   const [index, setIndex] = useState(0);
 
   useEffect(() => {
@@ -23,8 +33,15 @@ function useTitleCarousel() {
       setTitles(list);
 
       // Preload every backdrop up front so rotating to the next one
-      // never shows a blank/loading flash.
-      list.forEach((t) => { const img = new Image(); img.src = IMG(t.backdrop_path, 'original'); });
+      // never shows a blank/loading flash. The first one is marked
+      // high-priority so it wins the race against everything else
+      // the page is loading.
+      list.forEach((t, i) => {
+        const img = new Image();
+        if (i === 0) img.fetchPriority = 'high';
+        img.decoding = 'async';
+        img.src = IMG(t.backdrop_path, 'original');
+      });
 
       // Resolve which network each title streams on, for display.
       const entries = await Promise.all(
@@ -33,7 +50,12 @@ function useTitleCarousel() {
           return [t.id, providerId ? PROVIDER_LABEL_BY_ID[providerId] : null];
         })
       );
-      setNetworks(Object.fromEntries(entries));
+      const networkMap = Object.fromEntries(entries);
+      setNetworks(networkMap);
+
+      try {
+        sessionStorage.setItem(SPLASH_CACHE_KEY, JSON.stringify({ titles: list, networks: networkMap }));
+      } catch { /* storage full/unavailable — non-critical */ }
     });
   }, []);
 
@@ -84,8 +106,8 @@ export default function AuthGate({ children }) {
             <img key={active.id} src={IMG(active.backdrop_path, 'original')} alt="" className="splash-bg" />
           )}
           <div className="splash-scrim" />
+          <Logo size={32} className="splash-header-mark" />
           <div className="splash-content">
-            <Logo size={48} className="splash-mark" />
             {active && <h1 className="splash-title">{active.title || active.name}</h1>}
             {network && <span className="splash-network">{network}</span>}
             <button className="splash-getstarted" onClick={() => setStep('signin')}>Get Started</button>
@@ -107,6 +129,7 @@ export default function AuthGate({ children }) {
             <EmailSignIn />
           </div>
           <DesktopQrLogin />
+          <InstallGuide variant="banner" />
         </div>
       </div>
     );

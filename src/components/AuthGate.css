@@ -43,8 +43,11 @@
   text-align: center;
 }
 
-.splash-mark {
-  margin: 0 auto 40px;
+.splash-header-mark {
+  position: absolute;
+  z-index: 2;
+  top: calc(20px + var(--safe-top));
+  left: 24px;
 }
 
 .splash-title {

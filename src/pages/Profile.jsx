@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { signOut, uploadAvatar } from '../lib/supabase';
 import EnterTvCode from '../components/EnterTvCode';
 import FilmProfile from '../components/FilmProfile';
+import InstallGuide from '../components/InstallGuide';
 import './Profile.css';
 
 export default function Profile() {
@@ -70,6 +71,8 @@ export default function Profile() {
         {error && <p className="profile-error">{error}</p>}
 
         <button className="profile-signout" onClick={() => signOut()}>Sign out</button>
+
+        <InstallGuide variant="card" />
       </div>
 
       <Link to="/rated" className="profile-link-card glass">
