@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { discover, getNetworkList, searchMulti, PROVIDERS, IMG } from '../lib/tmdb';
 import { getNetflixTop10 } from '../lib/supabase';
+import ScrollRow from './ScrollRow';
 import './HomeTop10s.css';
 
 // Providers we already know the TMDB id for.
@@ -20,7 +21,7 @@ async function resolveShowmaxId() {
 
 // Matches real Netflix title strings back to TMDB entries so we still
 // get poster art + ids, while keeping Netflix's own real ranking order.
-async function resolveRealNetflixSection(mediaType) {
+export async function resolveRealNetflixSection(mediaType) {
   const titles = await getNetflixTop10(mediaType === 'tv' ? 'tv' : 'movies');
   if (!titles?.length) return null;
   const matches = await Promise.all(
@@ -144,10 +145,10 @@ export default function HomeTop10s() {
   );
 }
 
-function RankedRow({ items, type }) {
+export function RankedRow({ items, type }) {
   const navigate = useNavigate();
   return (
-    <div className="hometop10-track">
+    <ScrollRow className="hometop10-track">
       {items.map((item, i) => (
         <button
           key={item.id}
@@ -158,6 +159,6 @@ function RankedRow({ items, type }) {
           <img src={IMG(item.poster_path, 'w342')} alt={item.title || item.name} loading="lazy" />
         </button>
       ))}
-    </div>
+    </ScrollRow>
   );
 }

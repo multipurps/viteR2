@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useRef, useState } from 'react';
 import { discover, IMG } from '../lib/tmdb';
+import ScrollRow from './ScrollRow';
 import './GenreRow.css';
 
 const GENRES = [
@@ -42,7 +43,7 @@ export default function GenreRow({ centered = false }) {
   return (
     <section className={`genrow${centered ? ' genrow-centered' : ''}`}>
       <h2 className="genrow-title">Featured</h2>
-      <div className="genrow-track">
+      <ScrollRow className="genrow-track">
         {GENRES.map((g) => (
           <GenreTile
             key={g.genre}
@@ -51,7 +52,7 @@ export default function GenreRow({ centered = false }) {
             onClick={() => navigate(`/search?genre=${g.genre}`)}
           />
         ))}
-      </div>
+      </ScrollRow>
     </section>
   );
 }

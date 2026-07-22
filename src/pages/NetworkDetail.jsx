@@ -1,28 +1,34 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import Hero from '../components/Hero';
-import { discover, getNetworkList, IMG } from '../lib/tmdb';
+import Row from '../components/Row';
+import { RankedRow, resolveRealNetflixSection } from '../components/HomeTop10s';
+import { discover, getNetworkList, PROVIDERS } from '../lib/tmdb';
+import '../components/HomeTop10s.css';
 import './NetworkDetail.css';
 
-const GENRE_CHIPS_MOVIE = [
-  { label: 'All', genre: null },
+// Same genre set used to build the per-genre rows below — no more
+// "All" scattergrid, every genre gets its own row (Movie vs TV ids
+// differ on TMDB, hence two lists).
+const GENRES_MOVIE = [
   { label: 'Action', genre: 28 },
   { label: 'Comedy', genre: 35 },
   { label: 'Drama', genre: 18 },
   { label: 'Horror', genre: 27 },
   { label: 'Sci-Fi', genre: 878 },
   { label: 'Fantasy', genre: 14 },
+  { label: 'Kung Fu & Martial Arts', keywordId: 6075 },
   { label: 'Animation', genre: 16 },
   { label: 'Documentary', genre: 99 },
 ];
 
-const GENRE_CHIPS_TV = [
-  { label: 'All', genre: null },
+const GENRES_TV = [
   { label: 'Action', genre: 10759 },
   { label: 'Comedy', genre: 35 },
   { label: 'Drama', genre: 18 },
   { label: 'Crime', genre: 80 },
   { label: 'Sci-Fi', genre: 10765 },
+  { label: 'Kung Fu & Martial Arts', keywordId: 6075 },
   { label: 'Reality', genre: 10764 },
   { label: 'Animation', genre: 16 },
   { label: 'Documentary', genre: 99 },
@@ -34,11 +40,12 @@ export default function NetworkDetail() {
   const navigate = useNavigate();
   const [provider, setProvider] = useState(undefined); // undefined = loading, null = not found
   const [mediaType, setMediaType] = useState('movie');
-  const [genre, setGenre] = useState(null);
   const [heroItems, setHeroItems] = useState([]);
   const [newItems, setNewItems] = useState([]);
-  const [gridItems, setGridItems] = useState([]);
-  const chips = mediaType === 'movie' ? GENRE_CHIPS_MOVIE : GENRE_CHIPS_TV;
+  const [top10, setTop10] = useState({ items: [], real: false });
+  const [genreRows, setGenreRows] = useState([]);
+
+  const genreList = mediaType === 'movie' ? GENRES_MOVIE : GENRES_TV;
 
   useEffect(() => {
     getNetworkList().then((list) => {
@@ -64,14 +71,58 @@ export default function NetworkDetail() {
     })();
   }, [provider, mediaType]);
 
+  // Top 10 — real weekly ranking for Netflix (same source as the home
+  // page's Top 10 by Network), TMDB popularity for everyone else.
   useEffect(() => {
     if (!provider) return;
+    let cancelled = false;
     (async () => {
-      const genreParam = genre ? `&with_genres=${genre}` : '';
-      const data = await discover(mediaType, `watch_region=${provider.region}&with_watch_providers=${provider.id}&sort_by=popularity.desc${genreParam}`);
-      setGridItems(data.results || []);
+      const isNetflix = provider.id === PROVIDERS.netflix?.id;
+      if (isNetflix) {
+        try {
+          const real = await resolveRealNetflixSection(mediaType);
+          if (real?.length && !cancelled) {
+            setTop10({ items: real, real: true });
+            return;
+          }
+        } catch {
+          // fall through to the estimate below
+        }
+      }
+      const data = await discover(mediaType, `watch_region=${provider.region}&with_watch_providers=${provider.id}&sort_by=popularity.desc`);
+      if (!cancelled) {
+        setTop10({ items: (data.results || []).filter((i) => i.poster_path).slice(0, 10), real: false });
+      }
     })();
-  }, [provider, mediaType, genre]);
+    return () => { cancelled = true; };
+  }, [provider, mediaType]);
+
+  // Genre-categorized rows, replacing the old flat "everything" grid —
+  // each genre resolves independently and appends as it comes in.
+  useEffect(() => {
+    if (!provider) return;
+    let cancelled = false;
+    setGenreRows([]);
+
+    genreList.forEach((g) => {
+      const filterParam = g.keywordId ? `with_keywords=${g.keywordId}` : `with_genres=${g.genre}`;
+      discover(mediaType, `watch_region=${provider.region}&with_watch_providers=${provider.id}&${filterParam}&sort_by=popularity.desc`)
+        .then((data) => {
+          if (cancelled) return;
+          const items = (data.results || []).filter((i) => i.poster_path);
+          if (!items.length) return;
+          setGenreRows((prev) => {
+            const next = prev.filter((r) => r.label !== g.label);
+            next.push({ label: g.label, items });
+            const order = genreList.map((x) => x.label);
+            return next.sort((a, b) => order.indexOf(a.label) - order.indexOf(b.label));
+          });
+        })
+        .catch(() => {});
+    });
+
+    return () => { cancelled = true; };
+  }, [provider, mediaType]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (provider === undefined) {
     return <div className="tv-loading">Loading…</div>;
@@ -90,58 +141,28 @@ export default function NetworkDetail() {
 
       <div className="network-body">
         <div className="network-type-toggle">
-          <button className={mediaType === 'movie' ? 'active' : ''} onClick={() => { setMediaType('movie'); setGenre(null); }}>Movies</button>
-          <button className={mediaType === 'tv' ? 'active' : ''} onClick={() => { setMediaType('tv'); setGenre(null); }}>Series</button>
+          <button className={mediaType === 'movie' ? 'active' : ''} onClick={() => setMediaType('movie')}>Movies</button>
+          <button className={mediaType === 'tv' ? 'active' : ''} onClick={() => setMediaType('tv')}>Series</button>
         </div>
 
-        <div className="network-chips">
-          {chips.map((c) => (
-            <button
-              key={c.label}
-              className={`network-chip${genre === c.genre ? ' active' : ''}`}
-              onClick={() => setGenre(c.genre)}
-            >
-              {c.label}
-            </button>
-          ))}
-        </div>
+        {newItems.length > 0 && <Row title="New" items={newItems.slice(0, 12)} type={mediaType} />}
 
-        {newItems.length > 0 && (
-          <section className="network-row">
-            <h2>New</h2>
-            <div className="network-row-track">
-              {newItems.slice(0, 12).map((item) => (
-                <PosterCard key={item.id} item={item} mediaType={mediaType} />
-              ))}
+        {top10.items.length > 0 && (
+          <div className="hometop10-block">
+            <div className="hometop10-block-head">
+              <h3>Top 10 on {provider.name}</h3>
+              <span className={`hometop10-badge${top10.real ? ' real' : ''}`}>
+                {top10.real ? 'Real weekly ranking' : 'Estimated · TMDB popularity'}
+              </span>
             </div>
-          </section>
+            <RankedRow items={top10.items} type={mediaType} />
+          </div>
         )}
 
-        <section className="network-grid-section">
-          <h2>{mediaType === 'movie' ? 'Movies' : 'Series'}</h2>
-          <div className="network-grid">
-            {gridItems.map((item) => (
-              <PosterCard key={item.id} item={item} mediaType={mediaType} grid />
-            ))}
-          </div>
-        </section>
+        {genreRows.map((r) => (
+          <Row key={r.label} title={r.label} items={r.items} type={mediaType} />
+        ))}
       </div>
     </div>
-  );
-}
-
-function PosterCard({ item, mediaType, grid }) {
-  const navigate = useNavigate();
-  return (
-    <button
-      className={grid ? 'network-poster-grid' : 'network-poster-row'}
-      onClick={() => navigate(`/${mediaType}/${item.id}`)}
-    >
-      <img src={IMG(item.poster_path, 'w342')} alt={item.title || item.name} loading="lazy" />
-      <span className="network-poster-meta">
-        <span>{(item.release_date || item.first_air_date || '').slice(0, 4)}</span>
-        <span className="network-poster-rating">★ {item.vote_average?.toFixed(1)}</span>
-      </span>
-    </button>
   );
 }

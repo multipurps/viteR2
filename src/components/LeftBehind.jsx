@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { getContinueWatching, getUserInteractions } from '../lib/supabase';
 import { IMG } from '../lib/tmdb';
+import ScrollRow from './ScrollRow';
 import './LeftBehind.css';
 
 const STALE_DAYS = 5;
@@ -47,7 +48,7 @@ export default function LeftBehind() {
   return (
     <div className="leftbehind-block">
       <h3>You Left These Behind</h3>
-      <div className="leftbehind-track">
+      <ScrollRow className="leftbehind-track">
         {items.map((c) => (
           <button
             key={`${c.media_type}:${c.media_id}`}
@@ -60,7 +61,7 @@ export default function LeftBehind() {
             </div>
           </button>
         ))}
-      </div>
+      </ScrollRow>
     </div>
   );
 }

@@ -37,7 +37,7 @@ export default function RatingWidget({ mediaType, mediaData }) {
   async function pick(key) {
     if (!user || !mediaData?.id) return;
     setRating(key);
-    rateTitle(user.id, mediaType, mediaData.id, key, key === 'love' ? reasons : []).catch(() => {});
+    rateTitle(user.id, mediaType, mediaData.id, key, key === 'love' ? reasons : [], mediaData).catch(() => {});
 
     if (key !== 'love') {
       setShowReasons(false);
@@ -60,7 +60,7 @@ export default function RatingWidget({ mediaType, mediaData }) {
       ? reasons.filter((r) => r !== el)
       : reasons.length < 3 ? [...reasons, el] : reasons;
     setReasons(next);
-    rateTitle(user.id, mediaType, mediaData.id, 'love', next).catch(() => {});
+    rateTitle(user.id, mediaType, mediaData.id, 'love', next, mediaData).catch(() => {});
   }
 
   if (!user) return null;

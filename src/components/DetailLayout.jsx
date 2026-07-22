@@ -4,6 +4,7 @@ import { IMG } from '../lib/tmdb';
 import PageBackdrop from './PageBackdrop';
 import SaveButton from './SaveButton';
 import RatingWidget from './RatingWidget';
+import ScrollRow from './ScrollRow';
 import './DetailLayout.css';
 
 export default function DetailLayout({ item, mediaType, tags, onPlay, episodesSlot, children }) {
@@ -103,7 +104,7 @@ export default function DetailLayout({ item, mediaType, tags, onPlay, episodesSl
               <h2>Cast</h2>
               <span className="detail2-seeall">See all</span>
             </div>
-            <div className="detail2-cast-track">
+            <ScrollRow className="detail2-cast-track">
               {cast.map((c) => (
                 <div key={c.id} className="detail2-cast-card">
                   <img
@@ -114,7 +115,7 @@ export default function DetailLayout({ item, mediaType, tags, onPlay, episodesSl
                   <span>{c.name}</span>
                 </div>
               ))}
-            </div>
+            </ScrollRow>
           </div>
         )}
 
@@ -126,7 +127,7 @@ export default function DetailLayout({ item, mediaType, tags, onPlay, episodesSl
         {similar.length > 0 && (
           <div className="detail2-section">
             <h2>Similar to this</h2>
-            <div className="detail2-cast-track">
+            <ScrollRow className="detail2-cast-track">
               {similar.map((s) => (
                 <button
                   key={s.id}
@@ -136,7 +137,7 @@ export default function DetailLayout({ item, mediaType, tags, onPlay, episodesSl
                   <img src={IMG(s.poster_path, 'w342')} alt={s.title || s.name} loading="lazy" />
                 </button>
               ))}
-            </div>
+            </ScrollRow>
           </div>
         )}
 

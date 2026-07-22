@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getNetworkList } from '../lib/tmdb';
+import ScrollRow from './ScrollRow';
 import './NetworkRow.css';
 
 // The exact 20 platforms + order requested — matched by name against
@@ -70,13 +71,13 @@ export default function NetworkRow({ title = 'Film Networks', curatedNames, limi
         <h2>{title}</h2>
         <button onClick={() => navigate('/networks')}>See all</button>
       </div>
-      <div className="netrow-track">
+      <ScrollRow className="netrow-track">
         {networks.map((n) => (
           <button key={n.id} className="netrow-card" onClick={() => navigate(`/network/${n.id}`)}>
             <img src={n.logo} alt={n.displayName || n.name} />
           </button>
         ))}
-      </div>
+      </ScrollRow>
     </section>
   );
 }

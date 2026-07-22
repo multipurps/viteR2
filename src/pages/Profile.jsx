@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { signOut, uploadAvatar } from '../lib/supabase';
 import EnterTvCode from '../components/EnterTvCode';
@@ -70,6 +71,11 @@ export default function Profile() {
 
         <button className="profile-signout" onClick={() => signOut()}>Sign out</button>
       </div>
+
+      <Link to="/rated" className="profile-link-card glass">
+        <span>Watched &amp; Rated</span>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 18l6-6-6-6" /></svg>
+      </Link>
 
       <EnterTvCode />
 

@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { IMG } from '../lib/tmdb';
+import ScrollRow from './ScrollRow';
 import './ContinueRow.css';
 
 export default function ContinueRow({ items = [] }) {
@@ -9,7 +10,7 @@ export default function ContinueRow({ items = [] }) {
       <div className="row-head">
         <h2 className="row-title">Continue Watching</h2>
       </div>
-      <div className="row-track">
+      <ScrollRow className="row-track">
         {items.map((item) => {
           const mt = item.media_type;
           const title = item.title || item.name;
@@ -41,7 +42,7 @@ export default function ContinueRow({ items = [] }) {
             </div>
           );
         })}
-      </div>
+      </ScrollRow>
     </section>
   );
 }

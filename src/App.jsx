@@ -15,6 +15,7 @@ import Search from './pages/Search';
 import PairConfirm from './pages/PairConfirm';
 import CategoryFull from './pages/CategoryFull';
 import Watchlist from './pages/Watchlist';
+import Rated from './pages/Rated';
 import Profile from './pages/Profile';
 import AiPicks from './pages/AiPicks';
 
@@ -40,6 +41,7 @@ export default function App() {
                 <Route path="/pair/:code" element={<PairConfirm />} />
                 <Route path="/category/:mediaType/:slug" element={<CategoryFull />} />
                 <Route path="/watchlist" element={<Watchlist />} />
+                <Route path="/rated" element={<Rated />} />
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/ai" element={<AiPicks />} />
               </Routes>

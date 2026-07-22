@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { getRecommendations, getReminders, addReminder, removeReminder } from '../lib/supabase';
 import { IMG } from '../lib/tmdb';
 import LeftBehind from '../components/LeftBehind';
+import ScrollRow from '../components/ScrollRow';
 import './AiPicks.css';
 
 const LABELS = {
@@ -127,20 +128,20 @@ export default function AiPicks() {
       {sections.hidden_gems?.length > 0 && (
         <div className="aipicks-block">
           <h3>Hidden Gems</h3>
-          <div className="aipicks-track">
+          <ScrollRow className="aipicks-track">
             {sections.hidden_gems.map((g) => (
               <button key={g.id} className="aipicks-gem" onClick={() => navigate(`/${g.media_type}/${g.id}`)}>
                 <img src={IMG(g.poster_path, 'w342')} alt={g.title} loading="lazy" />
               </button>
             ))}
-          </div>
+          </ScrollRow>
         </div>
       )}
 
       {sections.coming_soon?.length > 0 && (
         <div className="aipicks-block">
           <h3>Coming Soon For You</h3>
-          <div className="aipicks-track aipicks-track-wide">
+          <ScrollRow className="aipicks-track aipicks-track-wide">
             {sections.coming_soon.map((g) => {
               const key = `${g.media_type}:${g.id}`;
               const reminded = reminders.has(key);
@@ -160,7 +161,7 @@ export default function AiPicks() {
                 </div>
               );
             })}
-          </div>
+          </ScrollRow>
         </div>
       )}
 

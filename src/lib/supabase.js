@@ -228,11 +228,24 @@ export async function redeemPairing(email, tokenHash) {
 
 // ── Recommendations (Story DNA engine) ──
 
-export async function rateTitle(userId, mediaType, tmdbId, rating, reasons = []) {
-  const { error } = await supabase.from('zeeyus_interactions').upsert(
-    { user_id: userId, media_type: mediaType, tmdb_id: tmdbId, rating, reasons, updated_at: new Date().toISOString() },
-    { onConflict: 'user_id,tmdb_id,media_type' }
-  );
+export async function rateTitle(userId, mediaType, tmdbId, rating, reasons = [], mediaData = null) {
+  // Rating a title implies you watched it — mark it watched_pct: 100 so
+  // it shows up on the Rated/Watched page and the recommend function's
+  // "abandoned" signal doesn't misread it later.
+  const row = {
+    user_id: userId,
+    media_type: mediaType,
+    tmdb_id: tmdbId,
+    rating,
+    reasons,
+    watched_pct: 100,
+    updated_at: new Date().toISOString(),
+  };
+  if (mediaData) row.media_data = mediaData;
+
+  const { error } = await supabase.from('zeeyus_interactions').upsert(row, {
+    onConflict: 'user_id,tmdb_id,media_type',
+  });
   if (error) throw error;
 }
 
@@ -245,6 +258,18 @@ export async function getUserRating(userId, tmdbId, mediaType) {
     .eq('media_type', mediaType)
     .maybeSingle();
   return data || null;
+}
+
+// Powers the "Rated / Watched" page under Profile.
+export async function getRatedTitles(userId) {
+  const { data, error } = await supabase
+    .from('zeeyus_interactions')
+    .select('tmdb_id, media_type, rating, reasons, media_data, updated_at')
+    .eq('user_id', userId)
+    .not('rating', 'is', null)
+    .order('updated_at', { ascending: false });
+  if (error) throw error;
+  return data || [];
 }
 
 // Suggested "what did you love about this" chips come from the same

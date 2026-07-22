@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { IMG } from '../lib/tmdb';
+import ScrollRow from './ScrollRow';
 import './Row.css';
 
 export default function Row({ title, items = [], type = 'movie', seeAllTo }) {
@@ -10,7 +11,7 @@ export default function Row({ title, items = [], type = 'movie', seeAllTo }) {
         <h2 className="row-title">{title}</h2>
         {seeAllTo && <Link to={seeAllTo} className="row-seeall">See all</Link>}
       </div>
-      <div className="row-track">
+      <ScrollRow className="row-track">
         {items.map((item) => {
           const mt = item.media_type || type;
           return (
@@ -19,7 +20,7 @@ export default function Row({ title, items = [], type = 'movie', seeAllTo }) {
             </Link>
           );
         })}
-      </div>
+      </ScrollRow>
     </section>
   );
 }

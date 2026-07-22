@@ -133,13 +133,13 @@ export default function Home() {
 
       {tab === 'movie' && (
         <div style={{ marginTop: 30 }}>
-          <CategoryRows mediaType="movie" categories={MOVIE_CATEGORIES} />
+          <CategoryRows mediaType="movie" categories={MOVIE_CATEGORIES.filter((c) => !c.hideOnHome)} />
         </div>
       )}
 
       {tab === 'tv' && (
         <div style={{ marginTop: 30 }}>
-          <CategoryRows mediaType="tv" categories={TV_CATEGORIES} />
+          <CategoryRows mediaType="tv" categories={TV_CATEGORIES.filter((c) => !c.hideOnHome)} />
         </div>
       )}
     </div>
