@@ -8,45 +8,56 @@ import './PromoHero.css';
 
 const ROTATE_MS = 7000;
 
-export default function PromoHero({ items = [] }) {
+// personalized (optional): { eyebrow, blurb, explanation, item } from
+// the recommend Edge Function. When present, this replaces the
+// trending rotation entirely with a single editorial pick — see
+// Home.jsx for how it's chosen and the trending fallback for
+// new/errored users.
+export default function PromoHero({ items = [], personalized }) {
   const [index, setIndex] = useState(0);
+  const [whyOpen, setWhyOpen] = useState(false);
   const navigate = useNavigate();
   const timer = useRef(null);
-  const item = items[index];
+  const item = personalized ? personalized.item : items[index];
 
   useEffect(() => {
-    if (items.length < 2) return;
+    if (personalized || items.length < 2) return;
     timer.current = setInterval(() => setIndex((i) => (i + 1) % items.length), ROTATE_MS);
     return () => clearInterval(timer.current);
-  }, [items.length]);
+  }, [items.length, personalized]);
 
-  const images = items.map((it) => IMG(it.backdrop_path || it.poster_path, 'original'));
+  const images = personalized
+    ? [IMG(item.backdrop_path || item.poster_path, 'original')]
+    : items.map((it) => IMG(it.backdrop_path || it.poster_path, 'original'));
 
   return (
     <>
-      <PageBackdrop images={images} activeIndex={index} />
+      <PageBackdrop images={images} activeIndex={personalized ? 0 : index} />
 
-      {/* This wrap is normal-flow (not fixed) — the backdrop image behind
-          it stays put while scrolling, but the search pill / title /
-          action cluster all scroll away with the rest of the page, same
-          as everything below the hero. Only shown here (Home) — Hero.jsx
-          (Movies/TV/Search) doesn't render a search link at all. */}
       <div className="promo-hero-wrap">
         <HeroSearchLink />
         <div className="promo-hero-content">
           {item && (
             <>
               <span className="promo-hero-eyebrow">
-                {item.media_type === 'tv' ? 'New Season' : 'New Release'}
+                {personalized ? personalized.eyebrow : item.media_type === 'tv' ? 'New Season' : 'New Release'}
               </span>
               <h2 className="promo-hero-title">{item.title || item.name}</h2>
-              <p className="promo-hero-desc">{item.overview}</p>
-              <button
-                className="promo-hero-btn"
-                onClick={() => navigate(`/${item.media_type === 'tv' ? 'tv' : 'movie'}/${item.id}`)}
-              >
-                Watch
-              </button>
+              <p className="promo-hero-desc">{personalized ? personalized.blurb : item.overview}</p>
+              <div className="promo-hero-row">
+                <button
+                  className="promo-hero-btn"
+                  onClick={() => navigate(`/${item.media_type === 'tv' ? 'tv' : 'movie'}/${item.id}`)}
+                >
+                  Watch
+                </button>
+                {personalized?.explanation && (
+                  <button className="promo-hero-why" onClick={() => setWhyOpen((v) => !v)}>
+                    {whyOpen ? 'Hide reason' : 'Why this pick?'}
+                  </button>
+                )}
+              </div>
+              {personalized && whyOpen && <p className="promo-hero-explanation">{personalized.explanation}</p>}
             </>
           )}
         </div>

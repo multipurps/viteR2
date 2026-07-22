@@ -54,6 +54,30 @@
   font-size: 14.5px;
 }
 
+.promo-hero-row { display: flex; align-items: center; gap: 14px; }
+
+.promo-hero-why {
+  padding: 13px 22px;
+  border-radius: 24px;
+  background: rgba(255,255,255,0.10);
+  color: #fff;
+  font-weight: 600;
+  font-size: 13.5px;
+}
+.promo-hero-why:hover { background: rgba(255,255,255,0.16); }
+
+.promo-hero-explanation {
+  margin-top: 14px;
+  max-width: 480px;
+  font-size: 13.5px;
+  color: rgba(255,255,255,0.8);
+  line-height: 1.55;
+  padding: 12px 16px;
+  border-radius: 12px;
+  background: rgba(0,0,0,0.35);
+  border-left: 2px solid var(--lime);
+}
+
 @media (min-width: 1400px) {
   .promo-hero-content { padding: 0 72px 64px; }
 }

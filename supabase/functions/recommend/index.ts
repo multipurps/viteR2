@@ -249,6 +249,8 @@ async function buildCandidatePool(tmdbKey: string, excluded: Set<string>) {
         media_type: mediaType,
         title: item.title || item.name,
         poster_path: item.poster_path,
+        backdrop_path: item.backdrop_path,
+        overview: item.overview,
         popularity: item.popularity,
         vote_count: item.vote_count,
       });
@@ -280,7 +282,14 @@ function scoreCandidate(profile: ReturnType<typeof buildTasteProfile>, dna: any)
 }
 
 function toClientItem(c: any) {
-  return { id: c.id, media_type: c.media_type, title: c.title, poster_path: c.poster_path };
+  return {
+    id: c.id,
+    media_type: c.media_type,
+    title: c.title,
+    poster_path: c.poster_path,
+    backdrop_path: c.backdrop_path,
+    overview: c.overview,
+  };
 }
 
 async function pickFlagshipCategories(profile: any, scored: any[], groqKey: string) {
