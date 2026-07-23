@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { getRecommendations, getReminders, addReminder, removeReminder } from '../lib/supabase';
+import { ensurePushSubscribed } from '../lib/push';
 import { IMG } from '../lib/tmdb';
 import LeftBehind from '../components/LeftBehind';
 import ScrollRow from '../components/ScrollRow';
@@ -46,7 +47,11 @@ export default function AiPicks() {
     } else {
       next.add(key);
       setReminders(next);
-      addReminder(user.id, item.id, item.media_type, item.release_date).catch(() => {});
+      addReminder(user.id, item.id, item.media_type, item.release_date, item.title).catch(() => {});
+      // Best-effort — if push isn't supported or permission is denied,
+      // the reminder still saved above and will just show up in this
+      // list next time, no notification.
+      ensurePushSubscribed(user.id).catch(() => {});
     }
   }
 

@@ -315,9 +315,9 @@ export async function getUserInteractions(userId) {
 
 // ── Coming Soon reminders ──
 
-export async function addReminder(userId, tmdbId, mediaType, releaseDate) {
+export async function addReminder(userId, tmdbId, mediaType, releaseDate, title) {
   const { error } = await supabase.from('zeeyus_reminders').upsert(
-    { user_id: userId, tmdb_id: tmdbId, media_type: mediaType, release_date: releaseDate || null },
+    { user_id: userId, tmdb_id: tmdbId, media_type: mediaType, release_date: releaseDate || null, title: title || null },
     { onConflict: 'user_id,tmdb_id,media_type' }
   );
   if (error) throw error;

@@ -126,3 +126,80 @@ scores a fresh candidate pool against it with zero AI calls, and only spends
 one Groq call per request on the final top-4 picks + explanations. Story DNA
 per title is generated once and cached forever in `zeeyus_story_dna` — that's
 the actual cost control, not the request-time logic.
+
+## Web push notifications setup
+
+Two things this powers: Coming Soon reminders firing on release day, and
+the AI proactively announcing a new recommendation ("AI announcement").
+Both are push notifications, both need the same setup:
+
+1. Run `supabase/sql/006_push.sql` in the SQL editor (push subscriptions
+   table + a couple of tracking columns).
+
+2. Set these as Edge Function secrets, in addition to the ones from the
+   recommendation engine setup:
+   ```
+   supabase secrets set VAPID_SUBJECT=mailto:your@email.com
+   supabase secrets set VAPID_PUBLIC_KEY=BERe9PaZxK_8m5HY4fqmzJrDcjXd5jDrcgrV8GTiiWC_HXWVKXM-li-jHId_oJ9CE73EYlxTQPhlAOlG_4NdgHw
+   supabase secrets set VAPID_PRIVATE_KEY=GS6rEKTD2oIFeEkuQqFE-QIt7BlYJvX-JEOprMws_Ao
+   ```
+   (The public key is also hardcoded in `src/lib/push.js` — that's normal,
+   VAPID public keys are meant to be public. Only the private key is a
+   real secret.)
+
+3. Deploy:
+   ```
+   supabase functions deploy recommend
+   supabase functions deploy send-reminders
+   supabase functions deploy notify-recommendations
+   ```
+   (`recommend` changed too — its logic moved into a shared module so
+   `notify-recommendations` can reuse it, so it needs redeploying even
+   though its behavior from the client's point of view hasn't changed.)
+
+4. Both `send-reminders` and `notify-recommendations` are meant to run on
+   a schedule, not be called from the app. Supabase doesn't cron Edge
+   Functions by itself — you need `pg_cron` + `pg_net` enabled
+   (Database → Extensions in the dashboard, enable both), then run this
+   in the SQL editor, filling in your own project ref and a **service
+   role key** (Settings → API — keep this one out of chat/version
+   control, it's not like the anon key):
+
+   ```sql
+   select cron.schedule(
+     'send-reminders-daily',
+     '0 14 * * *', -- once a day, 14:00 UTC — adjust to taste
+     $$
+     select net.http_post(
+       url := 'https://YOUR_PROJECT_REF.supabase.co/functions/v1/send-reminders',
+       headers := jsonb_build_object('Authorization', 'Bearer YOUR_SERVICE_ROLE_KEY', 'Content-Type', 'application/json'),
+       body := '{}'::jsonb
+     );
+     $$
+   );
+
+   select cron.schedule(
+     'notify-recommendations-weekly',
+     '0 16 * * 3', -- once a week, Wednesday 16:00 UTC — adjust to taste
+     $$
+     select net.http_post(
+       url := 'https://YOUR_PROJECT_REF.supabase.co/functions/v1/notify-recommendations',
+       headers := jsonb_build_object('Authorization', 'Bearer YOUR_SERVICE_ROLE_KEY', 'Content-Type', 'application/json'),
+       body := '{}'::jsonb
+     );
+     $$
+   );
+   ```
+
+   `notify-recommendations` runs the full pipeline (deterministic scoring
+   + one Groq call) once per eligible user per run — it's the one cost
+   that scales with your user count rather than just request count, which
+   is why it defaults to weekly rather than daily. `send-reminders` is
+   cheap (no AI calls at all) so daily is fine.
+
+How the "AI announcement" actually decides when to notify: it only
+fires if the headline pick (Your Next Obsession, or the next category
+down if that's empty) is a *different* title than what it last
+announced to that user — rating more titles or new releases entering
+the catalog are what change the pick over time, not the schedule
+itself. Cooldown is 6 days between announcements per user regardless.
