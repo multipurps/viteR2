@@ -140,8 +140,8 @@ Both are push notifications, both need the same setup:
    recommendation engine setup:
    ```
    supabase secrets set VAPID_SUBJECT=mailto:your@email.com
-   supabase secrets set VAPID_PUBLIC_KEY=BERe9PaZxK_8m5HY4fqmzJrDcjXd5jDrcgrV8GTiiWC_HXWVKXM-li-jHId_oJ9CE73EYlxTQPhlAOlG_4NdgHw
-   supabase secrets set VAPID_PRIVATE_KEY=GS6rEKTD2oIFeEkuQqFE-QIt7BlYJvX-JEOprMws_Ao
+   supabase secrets set VAPID_PUBLIC_KEY=your_vapid_public_key
+   supabase secrets set VAPID_PRIVATE_KEY=your_vapid_private_key
    ```
    (The public key is also hardcoded in `src/lib/push.js` — that's normal,
    VAPID public keys are meant to be public. Only the private key is a
